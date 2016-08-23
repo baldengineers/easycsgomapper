@@ -1,4 +1,12 @@
-#!/usr/bin/env python3
+#easy cs:go mapper: counter-strike: global offensive port of the easy tf2 mapper
+#
+#in development, not at a working stage.
+
+#DIFFERENCES:
+#more prefabrications
+#more sections (subsections?)
+#improved UI
+#
 import sys
 sys.path.append("prefabs/")
 import os.path
