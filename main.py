@@ -6,7 +6,16 @@
 #more prefabrications
 #more sections (subsections?)
 #improved UI
+#improved file count
+#multi-game system
+#   program boots up and variables are set which change what game the program utilizes
+#   (set up after dialog with radio button + grid size is chosen)
+#   grid size of createprefab, how skybox renderings, skybox textures, light vars, window titles, file directories, etc.
+#move all prefabs on grid
+#   if we can make a new grid system widget
 #
+
+
 import sys
 sys.path.append("prefabs/")
 import os.path
