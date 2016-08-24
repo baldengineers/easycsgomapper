@@ -576,7 +576,7 @@ class MainWindow(QMainWindow):
         else:
             pass
         
-        self.grid_change(0,0,0,True, False, True)
+        #self.grid_change(0,0,0,True, False, True)
         '''
         while True:
             try:
@@ -1707,6 +1707,59 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
         self.gif.show()
 
         movie.start()
+
+class initWindow():
+    def grid_change(self):
+        global totalblocks,entity_list,grid_list,iconlist
+        self.count = 0
+        count_btns=0
+
+        try:
+            del entity_list
+            del totalblocks
+            del iconlist
+            del grid_list
+            entity_list = []
+            iconlist = []
+            totalblocks = []
+            grid_list = []
+        except Exception as e:
+            print(str(e))
+            pass
+
+        #gridsize_list = []
+        self.btn_id_count = 0
+    
+        self.window = QDialog(self)
+        
+        #limit to num only
+        self.text = QLineEdit()
+        self.text2 = QLineEdit()
+        self.text3 = QLineEdit()
+        
+        self.radioLayout = QHBoxLayout()
+        self.radioTF2 = QRadioButton("TF2",self)
+        self.radioTF2.toggled.connect(self.radioCSGO.setDown(False))
+        self.radioCSGO = QRadioButton("CS:GO",self)
+        self.radioCSGO.toggled.connect(self.radioTF2.setDown(False))
+        self.radioLayout.addWidget(self.radioTF2)
+        self.radioLayout.addWidget(self.radioCSGO)
+        
+
+        self.okay_btn = QPushButton("OK",self)
+        self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText()))
+
+        self.form = QFormLayout()
+        self.form.addRow("Set Grid Width:",self.text)
+        self.form.addRow("Set Grid Height:",self.text2)
+        self.form.addRow("Set Amount of Levels:",self.text3)
+        self.form.addRow("Choose game:",self.radioLayout)
+        self.form.addRow(self.okay_btn)
+
+        self.window.setLayout(self.form)
+        self.window.setWindowTitle("Set Grid Size")
+        self.window.exec_()
+    
 
 #define some global variables
 level = 0
