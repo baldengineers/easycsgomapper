@@ -15,9 +15,16 @@
 #   if we can make a new grid system widget
 #
 
+#important:
+#move all variable definitions that need changing based off game selection
+#to a separate function which runs after dialog
+#make the grid size dialog run before everything else. make it its own separate class that
+#runs before mainwindow
+
 
 import sys
-sys.path.append("prefabs/")
+#move this to after initial dialog
+sys.path.append(gameDirVar+"prefabs/")
 import os.path
 import os
 from PySide.QtCore import *
@@ -46,7 +53,6 @@ class GridBtn(QWidget):
         self.x = x
         self.y = y
         self.btn_id = btn_id
-        #self.button.move(self.x,self.y)
         self.button.resize(32,32)
         self.button.setFixedSize(32, 32)
         self.button.pressed.connect(lambda: self.click_func(parent, x, y,
@@ -108,19 +114,8 @@ class GridBtn(QWidget):
                 if clicked:
 
                     try:
-                        #gotta redo this. this is very inefficient and needs to be like the rest
-                        #of the prefab lists
-                        '''
-                        current_prefab_icon_list = open('prefab_template/rot_prefab_list.txt', 'r+')
-                        current_prefab_icon_list = current_prefab_icon_list.readlines()
-                        current_prefab_icon_list = current_prefab_icon_list[parent.current_list.currentRow()]
-                        if "\n" in current_prefab_icon_list:
-                            current_prefab_icon_list = current_prefab_icon_list[:-1]
-                        '''
-               
-
                         current_prefab_icon_list = rotation_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
-                        current_prefab_icon_list = open('prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
+                        current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
                         current_prefab_icon_list = current_prefab_icon_list.readlines()
                         icon = current_prefab_icon_list[rotation]
                         if "\n" in icon:
@@ -142,7 +137,7 @@ class GridBtn(QWidget):
                 stored_info_list[level][btn_id] = ""
 
             if "*" not in parent.windowTitle():
-                parent.setWindowTitle("Easy TF2 Mapper* - ["+currentfilename+"]")
+                parent.setWindowTitle("Easy "+gameVar+" Mapper* - ["+currentfilename+"]")
             
             if clicked:
                 templist.append((x,y,moduleName,self.icon[level],None))
@@ -163,11 +158,12 @@ class MainWindow(QMainWindow):
         #create the main window
         super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
-        self.setWindowTitle("Easy TF2 Mapper")
+        self.setWindowTitle("Easy "+gameVar+" Mapper")
         self.setWindowIcon(QIcon("icons\icon.ico"))
+        #if tf2...
         namelist = ['gravelpit','2fort','upward','mvm']
         palette = QPalette()
-        palette.setBrush(QPalette.Background,QBrush(QPixmap("icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
+        palette.setBrush(QPalette.Background,QBrush(QPixmap(gameDirVar+"icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
         self.setPalette(palette)
 
         #create menubar
@@ -195,7 +191,7 @@ class MainWindow(QMainWindow):
         helpAction.triggered.connect(lambda: webbrowser.open_new_tab('http://github.com/baldengineers/easytf2_mapper/wiki'))
         
         tutorialAction = QAction("&Reference Guide",self)
-        tutorialAction.setStatusTip("Quick reference guide on the TF2Mapper website.")
+        tutorialAction.setStatusTip("Quick reference guide on the Mapper website.")
         tutorialAction.triggered.connect(lambda: webbrowser.open_new_tab('http://tf2mapper.com/tutorial.html'))
 
 
@@ -351,17 +347,17 @@ class MainWindow(QMainWindow):
                 self.pootup.exec_()
 
                 self.file.close()
-                os.remove("startupcache/startup.su")
+                os.remove(gameDirVar+"startupcache/startup.su")
                 self.open_hammer(0,"null")
 
     def open_file(self,reloc = False):
         if reloc:
-            os.remove("startupcache/startup.su")
+            os.remove(gameDirVar+"startupcache/startup.su")
         
         try:
-            self.file = open("startupcache/startup.su", "r+")
+            self.file = open(gameDirVar+"startupcache/startup.su", "r+")
         except:
-            self.file = open("startupcache/startup.su", "w+")
+            self.file = open(gameDirVar+"startupcache/startup.su", "w+")
         self.fileloaded = self.file.readlines()
         self.files = "".join(self.fileloaded)
 
@@ -483,8 +479,6 @@ class MainWindow(QMainWindow):
         self.button_rotate_layout.addStretch(1)
             
         self.tile_list1 = QListWidget()
-        #self.tile_list.setMaximumWidth(200)
-        #self.tile_list.setStyleSheet("QListWidget { background-color: rgb(50, 50, 50, 100); }")
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
         
@@ -496,7 +490,6 @@ class MainWindow(QMainWindow):
         self.list_tab_widget.currentChanged.connect(self.changeCurrentList)
 
         print("len:", self.list_tab_widget.count())
-        #self.list_tab_widget.setStyleSheet("QTabWidget { background-color: rgb(50, 50, 50, 100); }")
         
         self.up_tool_btn = QToolButton(self)
         self.up_tool_btn.setIcon(QIcon('icons/up.png'))
@@ -567,22 +560,13 @@ class MainWindow(QMainWindow):
         current_list = self.tile_list1
         
         try:
-            f = open('startupcache/firsttime.su', 'r+')
+            f = open(gameDirVar+'startupcache/firsttime.su', 'r+')
             lines = f.readlines()
         except:
-            f = open('startupcache/firsttime.su','w+')
+            f = open(gameDirVar+'startupcache/firsttime.su','w+')
             lines = f.readlines()
             
         if "startup" not in lines:
-            '''
-            self.popup = QMessageBox(self)
-            self.popup.setGeometry(100,100,500,250)
-            self.popup.setWindowTitle("First Launch")
-            self.popup.setInformativeText("You haven't launched this before! Try looking at the <a href=\"https://github.com/baldengineers/easytf2_mapper/wiki/Texture-bug\">wiki</a> for help!")
-            self.popup.setText("First Launch!")
-            self.popup.exec_()
-            #this is obsolete - jony
-            '''
 
             QMessageBox.information(self, "First Launch", "First Launch!\n\nYou haven't launched this before! Try looking at the <a href=\"https://github.com/baldengineers/easytf2_mapper/wiki/Texture-bug\">wiki</a> for help!")
             f.write("startup")
@@ -732,7 +716,7 @@ class MainWindow(QMainWindow):
 
         #NEEDS TO BE REDONE
         
-        file_list = ["prefab_template/prefab_list.txt", "prefab_template/prefab_icon_list.txt", "prefab_template/prefab_text_list.txt"]
+        file_list = [gameDirVar+"prefab_template/prefab_list.txt", gameDirVar+"prefab_template/prefab_icon_list.txt", gameDirVar+"prefab_template/prefab_text_list.txt"]
         list_list = [prefab_list, prefab_icon_list, prefab_text_list]
 
         for l in list_list:
@@ -741,7 +725,7 @@ class MainWindow(QMainWindow):
             with open(file_list[list_list.index(l)], "w") as file:
 
                 if list_list.index(l) == 0:   
-                    rot_file = open("prefab_template/rot_prefab_list.txt", "w")
+                    rot_file = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "w")
 
                 for item in l:
                     file.write(item + "\n")
@@ -754,13 +738,12 @@ class MainWindow(QMainWindow):
 
     def prefab_list_del(self, currentprefab):
 
-        #NEEDS TO BE REDONE
+        #NEEDS TO BE REDONE based off what mode
         global current_list
-        #print(currentprefab)
         index_list_index = 0
         if current_list == self.tile_list2: index_list_index = 1
         if current_list == self.tile_list3: index_list_index = 2
-        #print(index_list_index)
+        #
         
         self.restartCheck = QCheckBox()
         self.restartCheck.setText("Restart after deletion?")
@@ -769,8 +752,8 @@ class MainWindow(QMainWindow):
                              QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
            
         if choice == QMessageBox.Yes:
-            text_list = ['prefab_template/prefab_text_list.txt','prefab_template/rot_prefab_list.txt',
-                 'prefab_template/prefab_list.txt', 'prefab_template/prefab_icon_list.txt']
+            text_list = [gameDirVar+'prefab_template/prefab_text_list.txt',gameDirVar+'prefab_template/rot_prefab_list.txt',
+                 gameDirVar+'prefab_template/prefab_list.txt', gameDirVar+'prefab_template/prefab_icon_list.txt']
 
             for cur in text_list:
                 file = open(cur, 'r+')
@@ -794,7 +777,8 @@ class MainWindow(QMainWindow):
             choice.addButton(restart_btn, QMessageBox.YesRole)
             choice.addButton(later_btn, QMessageBox.NoRole)
             choice.setDefaultButton(later_btn)
-                              
+
+            #needs to be redone-- final redist will not be called easytf2mapper as it is no longer just that                 
             if choice.exec_() == 0:
                 try:
                     subprocess.Popen('EasyTF2Mapper.exe')
@@ -813,7 +797,7 @@ class MainWindow(QMainWindow):
         current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
         try:
             current_prefab_icon_list = rotation_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
-            current_prefab_icon_list = open('prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
+            current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
             current_prefab_icon_list = current_prefab_icon_list.readlines()
             icon = current_prefab_icon_list[rotation]
             if "\n" in icon:
@@ -825,42 +809,7 @@ class MainWindow(QMainWindow):
             icon = prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
             self.current.setIcon(QIcon(icon))
             self.current.setIconSize(QSize(32,32))
-        '''
-        try:
-            current_prefab_icon_list2 = open('prefab_template/rot_prefab_list.txt', 'r+')
-            current_prefab_icon_list2 = current_prefab_icon_list2.readlines()
-            current_prefab_icon_list2 = current_prefab_icon_list2[self.tile_list1.currentRow()]
-            if "\n" in current_prefab_icon_list2:
-                current_prefab_icon_list2 = current_prefab_icon_list2[:-1]
-            current_prefab_icon_list2 = open('prefab_template/iconlists/'+current_prefab_icon_list2, 'r+')
-            current_prefab_icon_list2 = current_prefab_icon_list2.readlines()
-            icon2 = current_prefab_icon_list2[rotation]
-            if "\n" in icon2:
-                icon2 = icon2[:-1]
-            self.current.setIcon(QIcon(icon2))
-            self.current.setIconSize(QSize(32,32))
-        except Exception as e:
-            print(str(e))
-            icon = prefab_icon_list[self.tile_list1.currentRow()]
-            self.current.setIcon(QIcon(icon))
-            self.current.setIconSize(QSize(32,32))
-
-
-        #might consider using the following code in the future    
-        
-        im_rot = Image.open(prefab_icon_list[self.tile_list.currentRow()])
-        im_rot = im_rot.rotate(360-(rotation*90))
-        data = im_rot.tobytes('raw')#('raw', 'RGBA')
-        im_rot_qt = QImage(data, im_rot.size[0], im_rot.size[1], QImage.Format_ARGB32)
-        im_rot.close()
-        icon = QPixmap.fromImage(im_rot_qt)
-        self.current.setIcon(QIcon(icon))
-        self.current.setIconSize(QSize(32,32))
-        '''             
-        
-
- 
-        
+      
         
     def file_open(self, tmp = False, first = False):
         global grid_list, iconlist, level, stored_info_list, totalblocks,entity_list, currentfilename, file_loaded, latest_path,save_dict,load_dict
@@ -912,19 +861,19 @@ class MainWindow(QMainWindow):
                     break
         
             for i in range(levelcountload):
-                file = open("leveltemp/level" + str(i)+".tmp", "wb")
+                file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
                 pickle.dump(iconlist[i], file)
                 file.close()
               
             self.change_skybox()
             file.close()
-            self.setWindowTitle("Easy TF2 Mapper - [" + str(name[0]) + "]")
+            self.setWindowTitle("Easy "+gameVar+" Mapper - [" + str(name[0]) + "]")
             currentfilename = str(name[0])
             file_loaded = True
             
         else:
             try:
-                file = open("leveltemp/level" + str(level)+".tmp", "rb")
+                file = open(gameDirVar+"leveltemp/level" + str(level)+".tmp", "rb")
                 iconlist[level] = pickle.load(file)
                 file.close()
                 for index, icon in enumerate(iconlist[level]):
@@ -975,13 +924,13 @@ class MainWindow(QMainWindow):
             file.close()
             QMessageBox.information(self, "File Saved", "File saved as %s" %(name))
 
-            self.setWindowTitle("Easy TF2 Mapper - [" + name + "]")
+            self.setWindowTitle("Easy "+gameVar+" Mapper - [" + name + "]")
 
             currentfilename = name
             file_loaded = True
         else:
             try:#writes tmp file to save the icons for each level
-                file = open("leveltemp/level" + str(level)+".tmp", "wb")
+                file = open(gameDirVar+"leveltemp/level" + str(level)+".tmp", "wb")
                 pickle.dump(iconlist[level], file)
                 file.close()
             except Exception as e:
@@ -1003,6 +952,7 @@ class MainWindow(QMainWindow):
             else:
                 self.file_export(True)
         #generate skybox stuff now
+        #needs to be redone to change how skyboxes are rendered
         create = generateSkybox.createSkyboxLeft(grid_x,grid_y,skyboxz,id_num,world_id_num)
         skyboxgeolist.append(create[0])
         id_num = create[1]
@@ -1085,7 +1035,7 @@ class MainWindow(QMainWindow):
                 popup.deleteLater()
             cur_vmf_location = name[0]
         else:
-            file = open('output/tf2mapperoutput.vmf','w+')
+            file = open(gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+')
             totalblocks =[]
             entity_list=[]
             for lvl in stored_info_list:
@@ -1120,15 +1070,17 @@ class MainWindow(QMainWindow):
             wholething = export.execute(totalblocks, entity_list, levels, skybox,skyboxgeolist, light)
             file.write(wholething)
             file.close()
-            cur_vmf_location = 'output/tf2mapperoutput.vmf'
+            cur_vmf_location = gameDirVar+'output/'+gameVar+'mapperoutput.vmf'
 
         
         
     def file_export_bsp(self):
         global cur_vmf_location
         self.file_export(True)
+        #need to change for multi-game
+        #this is fine and can be used, just make an if/then with the cs:go version
         try:
-            tf2BinLoc = open('startupcache/vbsp.su','r+')
+            tf2BinLoc = open(gameDirVar+'startupcache/vbsp.su','r+')
             tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/')
             tf2BinLoc.close()
             subprocess.call('"'+tf2BinLocFile+'/vbsp.exe" "'+cur_vmf_location+'"')
@@ -1308,13 +1260,13 @@ class MainWindow(QMainWindow):
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
 
         for i in range(levels):
-            file = open("leveltemp/level" + str(i)+".tmp", "wb")
+            file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
             pickle.dump(iconlist[i], file)
             file.close()
         
         self.gridLayout.addWidget(self.scrollArea)
         self.button_grid_all.addLayout(self.gridLayout)
-        self.setWindowTitle("Easy TF2 Mapper ")
+        self.setWindowTitle("Easy "+gameVar+" Mapper ")
 
         self.update_levels()
         
@@ -1366,30 +1318,7 @@ class MainWindow(QMainWindow):
         self.window.setLayout(self.layout)
         skybox2_list.itemClicked.connect(self.window.close)
         self.window.exec_()
-    '''
-    def importprefabs(self):
-        prefab_text_list = []
-        prefab_icon_list = []
-        prefab_list=[]
-        prefab_file = open("prefab_template\prefab_list.txt")
-        prefab_text_file = open("prefab_template\prefab_text_list.txt")
-        prefab_icon_file = open("prefab_template\prefab_icon_list.txt")
-        for line in prefab_file.readlines():
-            prefab_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
 
-        for line in prefab_text_file.readlines():
-            prefab_text_list.append(line[:-1] if line.endswith("\n") else line)
-
-        for line in prefab_icon_file.readlines():
-            prefab_icon_list.append(line[:-1] if line.endswith("\n") else line)
-
-        for file in [prefab_file, prefab_text_file, prefab_icon_file]:
-            file.close()
-        for item in prefab_list:
-            globals()[item] = importlib.import_module(item)
-            print("import", item)
-        self.home()
-    '''
     #fix this later, it has a breaking bugs if it works
 
     def close_application(self, restart = False):
@@ -1421,12 +1350,12 @@ class MainWindow(QMainWindow):
                                           QMessageBox.Yes | QMessageBox.No,
                                           QMessageBox.No)
             if choice == QMessageBox.Yes:
-                folder = 'leveltemp/'
+                folder = gameDirVar+'leveltemp/'
                 for f in os.listdir(folder):
                     if "level" in f: 
                         print("removing", f)
                         os.remove(folder+f)
-                    
+                #again the exe references need to be changed    
                 try:
                     subprocess.call('sudo wine EasyTF2Mapper.exe')
                     
@@ -1478,6 +1407,7 @@ class MainWindow(QMainWindow):
         self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
 
         self.sectionSelect = QComboBox()
+        #needs to have a cs:go version
         self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
         
         self.form = QFormLayout()
@@ -1523,7 +1453,8 @@ class MainWindow(QMainWindow):
             choice.setInformativeText("Restart? You will lose any unsaved progress.")
             choice.addButton(restart_btn, QMessageBox.YesRole)
             choice.addButton(later_btn, QMessageBox.NoRole)
-            choice.setDefaultButton(later_btn)                
+            choice.setDefaultButton(later_btn)
+            #exe name change
             if choice.exec_() == 0:
                 try:
                     subprocess.call('sudo wine EasyTF2Mapper.exe')
@@ -1551,51 +1482,51 @@ class MainWindow(QMainWindow):
         with open("info.txt", "r+") as f:
             zip_info = f.readlines()
             if zip_info[3] == 2:
-                with open('prefab_template/rot_prefab_list.txt',"a") as d:
+                with open(gameDirVar+'prefab_template/rot_prefab_list.txt',"a") as d:
                     tempfil = zip_info[0]
                     tempfil = tempfil.replace('\n','')
-                    d.write(tempfil+"_icon_list.txt\n")
-                with open('prefab_template/prefab_list.txt',"a") as d:
+                    d.write(gameDirVar+tempfil+"_icon_list.txt\n")
+                with open(gameDirVar+'prefab_template/prefab_list.txt',"a") as d:
                     tempfil = zip_info[0]
                     tempfil = tempfil.replace('\n','')
                     d.write(tempfil+'\n')
-                with open('prefab_template/prefab_text_list.txt',"a") as d:
+                with open(gameDirVar+'prefab_template/prefab_text_list.txt',"a") as d:
                     d.write(zip_info[2])
-                with open('prefab_template/prefab_icon_list.txt',"a") as d:
+                with open(gameDirVar+'prefab_template/prefab_icon_list.txt',"a") as d:
                     tempfil = zip_info[1]
                     tempfil = tempfil.replace('\n','')
-                    d.write('icons/'+tempfil+'_right.jpg\n')
+                    d.write(gameDirVar+'icons/'+tempfil+'_right.jpg\n')
             else:
                 #most childish code 2016
-                z = open('prefab_template/rot_prefab_list.txt',"r")
+                z = open(gameDirVar+'prefab_template/rot_prefab_list.txt',"r")
                 zlines = z.readlines()
                 z.close()
-                y = open('prefab_template/prefab_list.txt',"r")
+                y = open(gameDirVar+'prefab_template/prefab_list.txt',"r")
                 ylines = y.readlines()
                 y.close()
-                x = open('prefab_template/prefab_text_list.txt',"r")
+                x = open(gameDirVar+'prefab_template/prefab_text_list.txt',"r")
                 xlines = x.readlines()
                 x.close()
-                w = open('prefab_template/prefab_icon_list.txt',"r")
+                w = open(gameDirVar+'prefab_template/prefab_icon_list.txt',"r")
                 wlines = w.readlines()
                 w.close()
                 
-                z = open('prefab_template/rot_prefab_list.txt',"w")
-                zlines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[0]+"_icon_list.txt\n")
+                z = open(gameDirVar+'prefab_template/rot_prefab_list.txt',"w")
+                zlines.insert(self.index_section_index[int(zip_info[3])]-1,gameDirVar+zip_info[0]+"_icon_list.txt\n")
                 zlines = "".join(zlines)
                 z.write(zlines)
                 z.close()
-                y = open('prefab_template/prefab_list.txt',"w")
+                y = open(gameDirVar+'prefab_template/prefab_list.txt',"w")
                 ylines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[0])
                 ylines = "".join(ylines)
                 y.write(ylines)
                 y.close()
-                x = open('prefab_template/prefab_text_list.txt',"w")
+                x = open(gameDirVar+'prefab_template/prefab_text_list.txt',"w")
                 xlines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[2])
                 xlines = "".join(xlines)
                 x.write(xlines)
                 x.close()
-                w = open('prefab_template/prefab_icon_list.txt',"w")
+                w = open(gameDirVar+'prefab_template/prefab_icon_list.txt',"w")
                 wlines.insert(self.index_section_index[int(zip_info[3])]-1,'icons/'+zip_info[1]+'_right.jpg\n')
                 wlines = "".join(wlines)
                 w.write(wlines)
@@ -1612,7 +1543,8 @@ class MainWindow(QMainWindow):
         choice.setInformativeText("Restart? You will lose any unsaved progress.")
         choice.addButton(restart_btn, QMessageBox.YesRole)
         choice.addButton(later_btn, QMessageBox.NoRole)
-        choice.setDefaultButton(later_btn)                 
+        choice.setDefaultButton(later_btn)
+        #rename exe
         if choice.exec_() == 0:
             try:
                 subprocess.call('sudo wine EasyTF2Mapper.exe')
@@ -1633,7 +1565,7 @@ class MainWindow(QMainWindow):
         self.console.setWindowTitle("Developer Console")
 
         self.prev_text = QTextEdit("<Bald Engineers Developer Console>")
-        self.prev_text.setText('''Developer console for Easy TF2 Mapper version r 1.0.1. Current commands are:
+        self.prev_text.setText('''Developer console for Easy '''+gameVar+''' Mapper version r 1.0.1. Current commands are:
 print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py <python function>.\n''')
         self.prev_text.setReadOnly(True)
         
@@ -1691,7 +1623,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
                 new_text = text_prefix + str(e)
 
         elif command == "help":
-            new_text = text_prefix + '''Developer console for Easy TF2 Mapper version r 1.0.1. Current commands are: print <variable>, func <function>, setlevel <int>, help, restart, exit, func <function>, wiki, py <python function>'''
+            new_text = text_prefix + '''Developer console for Easy '''+gameVar+''' Mapper version r 1.0.1. Current commands are: print <variable>, func <function>, setlevel <int>, help, restart, exit, func <function>, wiki, py <python function>'''
 
         elif command == "exit":
             self.close_application()
@@ -1837,52 +1769,22 @@ entity
     }
 }
 '''
+#skybox default needs to be based off game chosen
 skybox = 'sky_tf2_04'
-batchtext = '''
-set ftypename=Easy TF2 Mapper Save
-set extension=.ezm
-set pathtoexe="EasyTF2Mapper.exe"
-set pathtoicon="icons/icon.ico"
 
-if %pathtoicon%=="" set pathtoicon=%pathtoexe%,0
-REG ADD HKEY_CLASSES_ROOT\%extension%\ /t REG_SZ /d %ftypename% /f
-REG ADD HKLM\SOFTWARE\Classes\%ftypename%\DefaultIcon\ /t REG_SZ /d %pathtoicon% /f
-ftype %ftypename%=%pathtoexe% "%%1" %%*import pickle
-import pprint
-import random
-import glob
-import webbrowser
-import wave
-import zipfile
-import shutil
-import winsound
-
-class GridBtn(QWidget):
-    def __init__(self, parent, x, y, btn_id):
-        super(GridBtn, self).__init__()
-        self.button = QPushButton("", parent)
-        self.x = x
-        self.y = y
-        self.btn_id = btn_id
-        #self.button.move(self.x,self.y)
-        self.button.resize(32,32)
-        self.button.setFixedSize(32, 32)
-
-assoc %extension%=%ftypename%
-'''
 #skyboxlight = '255 255 255 200'
 #skyboxangle = '0 0 0'
 #if the user does not change the lighting, it sticks with this.
 #if the user does not choose a skybox it sticks with this
 
-prefab_file = open("prefab_template/prefab_list.txt")
-prefab_text_file = open("prefab_template/prefab_text_list.txt")
-prefab_icon_file = open("prefab_template/prefab_icon_list.txt")
+prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
+prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
+prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
 
-skybox_file = open("prefab_template/skybox_list.txt")
-skybox_icon = open("prefab_template/skybox_icons.txt")
-skybox_light = open("prefab_template/skybox_light.txt")
-skybox_angle = open("prefab_template/skybox_angle.txt") 
+skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
+skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
+skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
+skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
 
 prefab_list.append([])
 section=0
@@ -1910,7 +1812,7 @@ for line in prefab_icon_file.readlines():
     else:
         prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
 
-f = open('prefab_template/rot_prefab_list.txt', 'r+')
+f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
 lns = f.readlines()
 f.close()
 
