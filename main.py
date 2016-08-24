@@ -154,7 +154,12 @@ class GridBtn(QWidget):
             return False
         
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self,whichGame):
+        #tell which game was chosen on launch
+        if whichGame:
+            gameVar,gameDirVar = "TF2","tf2/"
+        else:
+            gameVar,gameDirVar = "CS:GO","csgo/"
         #create the main window
         super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
@@ -576,15 +581,6 @@ class MainWindow(QMainWindow):
         else:
             pass
         
-        #self.grid_change(0,0,0,True, False, True)
-        '''
-        while True:
-            try:
-                if self.tile_list.currentItemChanged:
-                    self.changeIcon()
-            except:
-                pass
-        '''
         
         self.show()
 
@@ -1709,7 +1705,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
         movie.start()
 
 class initWindow():
-    def grid_change(self):
+    def gridChange(self):
         global totalblocks,entity_list,grid_list,iconlist
         self.count = 0
         count_btns=0
@@ -1737,6 +1733,10 @@ class initWindow():
         self.text2 = QLineEdit()
         self.text3 = QLineEdit()
         
+        self.text.setValidator(QValidator(0,1000))
+        self.text2.setValidator(QValidator(0,1000))
+        self.text3.setValidator(QValidator(0,100))
+        
         self.radioLayout = QHBoxLayout()
         self.radioTF2 = QRadioButton("TF2",self)
         self.radioTF2.toggled.connect(self.radioCSGO.setDown(False))
@@ -1747,7 +1747,7 @@ class initWindow():
         
 
         self.okay_btn = QPushButton("OK",self)
-        self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText()))
+        self.okay_btn.clicked.connect(lambda: gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText()))
 
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.text)
@@ -1759,7 +1759,8 @@ class initWindow():
         self.window.setLayout(self.form)
         self.window.setWindowTitle("Set Grid Size")
         self.window.exec_()
-    
+        return radioTF2.isClicked()
+        
 
 #define some global variables
 level = 0
@@ -1916,7 +1917,8 @@ print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find t
 
 #Main Program
 app = QApplication(sys.argv)
-gui = MainWindow()
+info = initWindow()
+gui = MainWindow(info.radioTF2.isClicked())
 
 
 
