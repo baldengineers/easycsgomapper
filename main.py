@@ -24,7 +24,7 @@
 
 import sys
 #move this to after initial dialog
-sys.path.append(gameDirVar+"prefabs/")
+
 import os.path
 import os
 from PySide.QtCore import *
@@ -160,6 +160,8 @@ class MainWindow(QMainWindow):
             gameVar,gameDirVar = "TF2","tf2/"
         else:
             gameVar,gameDirVar = "CS:GO","csgo/"
+        sys.path.append(gameDirVar+"prefabs/")
+        createPrefab.setGameDirVar(gameDirVar)
         #create the main window
         super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
