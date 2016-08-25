@@ -325,7 +325,10 @@ class MainWindow(QMainWindow):
         self.change_skybox()
         self.level_select()
 
-
+    def TFFormat(self):
+        pass
+    def CSFormat(self):
+        pass
         
     def open_hammer(self,loaded,file,reloc = False):
         self.open_file()
@@ -1335,7 +1338,7 @@ class MainWindow(QMainWindow):
                     close = False
                 
             if close:
-                folder = 'leveltemp/'
+                folder = gameDirVar+'leveltemp/'
                 for f in os.listdir(folder):
                     if "level" in f: 
                         print("removing", f)
