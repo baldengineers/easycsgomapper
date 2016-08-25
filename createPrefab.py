@@ -7,7 +7,7 @@ algorithms to create the object (look in the prefabs folder)
 from PIL import Image
 import zipfile
 import os
-
+gameDirVar=''
 
 
 def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid_block, in_entity_block, rot_py_list, rot_enabled): 
