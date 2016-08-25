@@ -157,11 +157,13 @@ class MainWindow(QMainWindow):
     def __init__(self,whichGame):
         #tell which game was chosen on launch
         if whichGame:
-            gameVar,gameDirVar = "TF2","tf2/"
+            gameVar,gameDirVar,isTFBool = "TF2","tf2/",True
         else:
             gameVar,gameDirVar = "CS:GO","csgo/"
+        TFFormat() if isTFBool else CSFormat()
         sys.path.append(gameDirVar+"prefabs/")
         createPrefab.setGameDirVar(gameDirVar)
+        
         #create the main window
         super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
@@ -1749,7 +1751,7 @@ class initWindow():
         
 
         self.okay_btn = QPushButton("OK",self)
-        self.okay_btn.clicked.connect(lambda: gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText()))
+        self.okay_btn.clicked.connect(self.clickFunction)
 
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.text)
@@ -1761,9 +1763,10 @@ class initWindow():
         self.window.setLayout(self.form)
         self.window.setWindowTitle("Set Grid Size")
         self.window.exec_()
-        return radioTF2.isClicked()
-        
-
+        #return radioTF2.isClicked()
+    def clickFunction(self):
+        gui = MainWindow(self.radioTF2.isClicked())
+        gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText())
 #define some global variables
 level = 0
 levels = 0
@@ -1920,7 +1923,7 @@ print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find t
 #Main Program
 app = QApplication(sys.argv)
 info = initWindow()
-gui = MainWindow(info.radioTF2.isClicked())
+
 
 
 
