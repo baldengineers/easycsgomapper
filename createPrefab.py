@@ -100,9 +100,9 @@ def compileTXT(txt_path, txt_list, prefab_name, prefab_text, prefab_icon, ent_li
     file.write(item)
   file.close
   if insertBool:  
-    prefab_file = open("prefab_template/prefab_list.txt", "r")
-    prefab_text_file = open("prefab_template/prefab_text_list.txt", "r")
-    prefab_icon_file = open("prefab_template/prefab_icon_list.txt", "r")
+    prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt", "r")
+    prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt", "r")
+    prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt", "r")
     prefab_file_contents,prefab_text_file_contents,prefab_icon_file_contents = prefab_file.readlines(),prefab_text_file.readlines(),prefab_icon_file.readlines()
     
     for file in [prefab_file, prefab_text_file, prefab_icon_file]:
@@ -116,17 +116,17 @@ def compileTXT(txt_path, txt_list, prefab_name, prefab_text, prefab_icon, ent_li
     prefab_text_file_contents = "".join(prefab_text_file_contents)
     prefab_icon_file_contents = "".join(prefab_icon_file_contents)
     
-    prefab_file = open("prefab_template/prefab_list.txt", "w")
-    prefab_text_file = open("prefab_template/prefab_text_list.txt", "w")
-    prefab_icon_file = open("prefab_template/prefab_icon_list.txt", "w")
+    prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt", "w")
+    prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt", "w")
+    prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt", "w")
     
     prefab_file.write(prefab_file_contents)
     prefab_text_file.write(prefab_text_file_contents)
     prefab_icon_file.write(prefab_icon_file_contents)
   else:
-    prefab_file = open("prefab_template/prefab_list.txt", "a")
-    prefab_text_file = open("prefab_template/prefab_text_list.txt", "a")
-    prefab_icon_file = open("prefab_template/prefab_icon_list.txt", "a")
+    prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt", "a")
+    prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt", "a")
+    prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt", "a")
 
     prefab_file.write(prefab_name + "\n")
     prefab_text_file.write(prefab_text + "\n")
@@ -561,9 +561,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
       if index != len(prefab_icon_list) - 1:
        prefab_icon_list[index] = item + "/" # add the "/" back into the filepath
         
-  txt_path = "prefab_template/" + prefab_name + ".txt"
-  ent_path = "prefab_template/" + prefab_name + "_entities.txt"
-  py_path = "prefabs/" + prefab_name + ".py"
+  txt_path = gameDirVar+"prefab_template/" + prefab_name + ".txt"
+  ent_path = gameDirVar+"prefab_template/" + prefab_name + "_entities.txt"
+  py_path = gameDirVar+"prefabs/" + prefab_name + ".py"
   loopernum = 0
   for line in openlines:
 
@@ -945,53 +945,53 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     ext_list = ["_right.jpg","_down.jpg","_left.jpg","_up.jpg"]
     icondir = str(prefab_name)
     if not insertBool:
-        with open("prefab_template/rot_prefab_list.txt", "a") as f:
+        with open(gameDirVar+"prefab_template/rot_prefab_list.txt", "a") as f:
           f.write(icondir+"_icon_list.txt\n")
           f.close()
     else:
-        tempApp = open("prefab_template/rot_prefab_list.txt", "r")
+        tempApp = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "r")
         tempLines = tempApp.readlines()
         tempApp.close()
         tempLines.insert(indexLine,icondir+"_icon_list.txt\n")
         tempLines = "".join(tempLines)
-        tempWrite = open("prefab_template/rot_prefab_list.txt", "w")
+        tempWrite = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "w")
         tempWrite.write(tempLines)
         tempWrite.close()
 
     imageRot = Image.open(prefab_icon)
-    imageRot.save("icons/"+ icondir+"_right.jpg")
+    imageRot.save(gameDirVar+"icons/"+ icondir+"_right.jpg")
     imageRot2 = Image.open(prefab_icon)
     imageRot2 = imageRot2.rotate(270)
-    imageRot2.save("icons/"+ icondir+"_down.jpg")
+    imageRot2.save(gameDirVar+"icons/"+ icondir+"_down.jpg")
     imageRot3 = Image.open(prefab_icon)
     imageRot3 = imageRot3.rotate(180)
-    imageRot3.save("icons/"+ icondir+"_left.jpg")
+    imageRot3.save(gameDirVar+"icons/"+ icondir+"_left.jpg")
     imageRot4 = Image.open(prefab_icon)
     imageRot4 = imageRot4.rotate(90)
-    imageRot4.save("icons/"+ icondir+"_up.jpg")
-    f = open("prefab_template/iconlists/"+ icondir+"_icon_list.txt","w+")
+    imageRot4.save(gameDirVar+"icons/"+ icondir+"_up.jpg")
+    f = open(gameDirVar+"prefab_template/iconlists/"+ icondir+"_icon_list.txt","w+")
     for i in ext_list:
-      f.write("icons/"+ icondir+i+"\n")
+      f.write(gameDirVar+"icons/"+ icondir+i+"\n")
     f.close()
 
   else:
     icondir = str(prefab_name)
     if not insertBool:
-        with open("prefab_template/rot_prefab_list.txt", "a") as f:
+        with open(gameDirVar+"prefab_template/rot_prefab_list.txt", "a") as f:
           f.write("NO_ROTATION\n")
           f.close()
     else:
-        tempApp = open("prefab_template/rot_prefab_list.txt", "r")
+        tempApp = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "r")
         tempLines = tempApp.readlines()
         tempApp.close()
         tempLines.insert(indexLine,"NO_ROTATION\n")
         tempLines = "".join(tempLines)
-        tempWrite = open("prefab_template/rot_prefab_list.txt", "w")
+        tempWrite = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "w")
         tempWrite.write(tempLines)
         tempWrite.close()
-    f = open("prefab_template/iconlists/"+ icondir+"_icon_list.txt","w+")
+    f = open(gameDirVar+"prefab_template/iconlists/"+ icondir+"_icon_list.txt","w+")
     for i in range(4):
-      f.write("icons/"+icondir+"\n")
+      f.write(gameDirVar+"icons/"+icondir+"\n")
     f.close()
 
 
@@ -1007,20 +1007,22 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
       f.write(py_path)
 
       if rot_enabled:
-        f.write("icons/"+ icondir+"_right.jpg")
-        f.write("icons/"+ icondir+"_down.jpg")
-        f.write("icons/"+ icondir+"_left.jpg")
-        f.write("icons/"+ icondir+"_up.jpg")
+        f.write(gameDirVar+"icons/"+ icondir+"_right.jpg")
+        f.write(gameDirVar+"icons/"+ icondir+"_down.jpg")
+        f.write(gameDirVar+"icons/"+ icondir+"_left.jpg")
+        f.write(gameDirVar+"icons/"+ icondir+"_up.jpg")
       else:
-        f.write("icons/"+ icondir+".jpg")
+        f.write(gameDirVar+"icons/"+ icondir+".jpg")
       
       if contains_ent:
         f.write(ent_path)
 
-      f.write("prefab_template/iconlists/"+icondir+"_icon_list.txt")
-      f.write("info.txt")
-      os.remove("info.txt")
+      f.write(gameDirVar+"prefab_template/iconlists/"+icondir+"_icon_list.txt")
+      f.write(gameDirVar+"info.txt")
+      os.remove(gameDirVar+"info.txt")
 
   return txtReturn + pyReturn
 
+def setGameDirVar(var):
+  gameDirVar = var
 insertBool = False
