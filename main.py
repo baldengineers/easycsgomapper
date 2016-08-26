@@ -155,13 +155,131 @@ class GridBtn(QWidget):
         
 class MainWindow(QMainWindow):
     def __init__(self,whichGame):
+        def TFFormat():
+            sys.path.append(gameDirVar+"prefabs/")
+            currentlight = '''
+            entity
+            {
+                "id" "world_idnum"
+                "classname" "light_environment"
+                "_ambient" "255 255 255 100"
+                "_ambientHDR" "-1 -1 -1 1"
+                "_AmbientScaleHDR" "1"
+                "_light" "CURRENT_LIGHT"
+                "_lightHDR" "-1 -1 -1 1"
+                "_lightscaleHDR" "1"
+                "angles" "CURRENT_ANGLE"
+                "pitch" "0"
+                "SunSpreadAngle" "0"
+                "origin" "0 0 73"
+                editor
+                {
+                    "color" "220 30 220"
+                    "visgroupshown" "1"
+                    "visgroupautoshown" "1"
+                    "logicalpos" "[0 500]"
+                }
+            }
+            '''
+            #skybox default needs to be based off game chosen
+            skybox = 'sky_tf2_04'
+
+            #skyboxlight = '255 255 255 200'
+            #skyboxangle = '0 0 0'
+            #if the user does not change the lighting, it sticks with this.
+            #if the user does not choose a skybox it sticks with this
+
+            prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
+            prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
+            prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
+
+            skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
+            skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
+            skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
+            skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
+
+            prefab_list.append([])
+            section=0
+            for line in prefab_file.readlines():
+                if line == '\n':
+                    prefab_list.append([])
+                    section+=1
+                else:
+                    prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+            section=0
+            prefab_text_list.append([])
+            for line in prefab_text_file.readlines():
+                if line == '\n':
+                    prefab_text_list.append([])
+                    section+=1
+                else:
+                    prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
+
+            section=0
+            prefab_icon_list.append([])
+            for line in prefab_icon_file.readlines():
+                if line == "\n":
+                    prefab_icon_list.append([])
+                    section +=1
+                else:
+                    prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
+
+            f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
+            lns = f.readlines()
+            f.close()
+
+            section = 0
+            rotation_icon_list = []
+            index_section_list = [0]
+            rotation_icon_list.append([])
+            for index,line in enumerate(lns):
+                if line == '\n':
+                    index_section_list.append(index)
+                    rotation_icon_list.append([])
+                    section+=1
+                else:
+                    rotation_icon_list[section].append(line[:-1] if '\n' in line else line)
+            print(index_section_list)
+            for line in skybox_file.readlines():
+                skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+
+            for line in skybox_icon.readlines():
+                skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
+
+            for line in skybox_light.readlines():
+                skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
+
+            for line in skybox_angle.readlines():
+                skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
+                
+            for file in [prefab_file, prefab_text_file, prefab_icon_file,skybox_file,skybox_icon,skybox_angle,skybox_light]:
+                file.close()
+
+            #imports that need prefab_list to be defined
+            for sec in prefab_list:
+                for item in sec:
+                    if item:
+                        globals()[item] = importlib.import_module(item)
+                        print("import", item)
+                        save_dict[item]=eval(item)
+                        load_dict[eval(item)]=item
+
+            logo = open('logo.log','r+')
+            logo_f = logo.readlines()
+            for i in logo_f:
+                print(i[:-1])
+            logo.close()
+
+            print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
+
         #tell which game was chosen on launch
         if whichGame:
             gameVar,gameDirVar,isTFBool = "TF2","tf2/",True
         else:
             gameVar,gameDirVar = "CS:GO","csgo/"
+        global gameVar,gameDirVar
         TFFormat() if isTFBool else CSFormat()
-        sys.path.append(gameDirVar+"prefabs/")
+        
         createPrefab.setGameDirVar(gameDirVar)
         
         #create the main window
@@ -325,8 +443,7 @@ class MainWindow(QMainWindow):
         self.change_skybox()
         self.level_select()
 
-    def TFFormat(self):
-        pass
+
     def CSFormat(self):
         pass
         
@@ -1711,7 +1828,9 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
         movie.start()
 
-class initWindow():
+class initWindow(QMainWindow):
+    def __init__(self):
+        super(initWindow,self).__init__()
     def gridChange(self):
         global totalblocks,entity_list,grid_list,iconlist
         self.count = 0
@@ -1740,15 +1859,18 @@ class initWindow():
         self.text2 = QLineEdit()
         self.text3 = QLineEdit()
         
-        self.text.setValidator(QValidator(0,1000))
-        self.text2.setValidator(QValidator(0,1000))
-        self.text3.setValidator(QValidator(0,100))
+        self.text.setValidator(QIntValidator(0,1000))
+        self.text2.setValidator(QIntValidator(0,1000))
+        self.text3.setValidator(QIntValidator(0,100))
+
+        self.group = QButtonGroup()
         
         self.radioLayout = QHBoxLayout()
         self.radioTF2 = QRadioButton("TF2",self)
-        self.radioTF2.toggled.connect(self.radioCSGO.setDown(False))
         self.radioCSGO = QRadioButton("CS:GO",self)
-        self.radioCSGO.toggled.connect(self.radioTF2.setDown(False))
+        self.group.addButton(self.radioTF2)
+        self.group.addButton(self.radioCSGO)
+        self.group.setExclusive(True)
         self.radioLayout.addWidget(self.radioTF2)
         self.radioLayout.addWidget(self.radioCSGO)
         
@@ -1768,7 +1890,7 @@ class initWindow():
         self.window.exec_()
         #return radioTF2.isClicked()
     def clickFunction(self):
-        gui = MainWindow(self.radioTF2.isClicked())
+        gui = MainWindow(self.radioTF2.isChecked())
         gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText())
 #define some global variables
 level = 0
@@ -1807,125 +1929,12 @@ currentfilename='Untitled'
 file_loaded = False
 current_loaded = ''
 latest_path='/'
-currentlight = '''
-entity
-{
-    "id" "world_idnum"
-    "classname" "light_environment"
-    "_ambient" "255 255 255 100"
-    "_ambientHDR" "-1 -1 -1 1"
-    "_AmbientScaleHDR" "1"
-    "_light" "CURRENT_LIGHT"
-    "_lightHDR" "-1 -1 -1 1"
-    "_lightscaleHDR" "1"
-    "angles" "CURRENT_ANGLE"
-    "pitch" "0"
-    "SunSpreadAngle" "0"
-    "origin" "0 0 73"
-    editor
-    {
-        "color" "220 30 220"
-        "visgroupshown" "1"
-        "visgroupautoshown" "1"
-        "logicalpos" "[0 500]"
-    }
-}
-'''
-#skybox default needs to be based off game chosen
-skybox = 'sky_tf2_04'
-
-#skyboxlight = '255 255 255 200'
-#skyboxangle = '0 0 0'
-#if the user does not change the lighting, it sticks with this.
-#if the user does not choose a skybox it sticks with this
-
-prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
-prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
-prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
-
-skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
-skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
-skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
-skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
-
-prefab_list.append([])
-section=0
-for line in prefab_file.readlines():
-    if line == '\n':
-        prefab_list.append([])
-        section+=1
-    else:
-        prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
-section=0
-prefab_text_list.append([])
-for line in prefab_text_file.readlines():
-    if line == '\n':
-        prefab_text_list.append([])
-        section+=1
-    else:
-        prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-section=0
-prefab_icon_list.append([])
-for line in prefab_icon_file.readlines():
-    if line == "\n":
-        prefab_icon_list.append([])
-        section +=1
-    else:
-        prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
-lns = f.readlines()
-f.close()
-
-section = 0
-rotation_icon_list = []
-index_section_list = [0]
-rotation_icon_list.append([])
-for index,line in enumerate(lns):
-    if line == '\n':
-        index_section_list.append(index)
-        rotation_icon_list.append([])
-        section+=1
-    else:
-        rotation_icon_list[section].append(line[:-1] if '\n' in line else line)
-print(index_section_list)
-for line in skybox_file.readlines():
-    skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
-
-for line in skybox_icon.readlines():
-    skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
-
-for line in skybox_light.readlines():
-    skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
-
-for line in skybox_angle.readlines():
-    skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
-    
-for file in [prefab_file, prefab_text_file, prefab_icon_file,skybox_file,skybox_icon,skybox_angle,skybox_light]:
-    file.close()
-
-#imports that need prefab_list to be defined
-for sec in prefab_list:
-    for item in sec:
-        if item:
-            globals()[item] = importlib.import_module(item)
-            print("import", item)
-            save_dict[item]=eval(item)
-            load_dict[eval(item)]=item
-
-logo = open('logo.log','r+')
-logo_f = logo.readlines()
-for i in logo_f:
-    print(i[:-1])
-logo.close()
-
-print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
 
 
 #Main Program
 app = QApplication(sys.argv)
 info = initWindow()
+info.gridChange()
 
 
 

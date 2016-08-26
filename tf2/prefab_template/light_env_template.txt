@@ -1,0 +1,23 @@
+}
+entity
+{
+    "id" "world_idnum"
+    "classname" "light_environment"
+    "_ambient" "255 255 255 200"
+    "_ambientHDR" "-1 -1 -1 1"
+    "_AmbientScaleHDR" "1"
+    "_light" "CURRENT_LIGHT"
+    "_lightHDR" "-1 -1 -1 1"
+    "_lightscaleHDR" "1"
+    "angles" "CURRENT_ANGLE"
+    "pitch" "0"
+    "SunSpreadAngle" "0"
+    "origin" "0 0 73"
+    editor
+    {
+        "color" "220 30 220"
+        "visgroupshown" "1"
+        "visgroupautoshown" "1"
+        "logicalpos" "[0 500]"
+    }
+}
