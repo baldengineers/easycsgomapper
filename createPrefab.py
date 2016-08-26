@@ -10,7 +10,9 @@ import os
 gameDirVar=''
 
 
-def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid_block, in_entity_block, rot_py_list, rot_enabled): 
+def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid_block, in_entity_block, rot_py_list, rot_enabled):
+  global LEVEL_HEIGHT
+  
   value_list = []
   #item count needs to be -1 so that the initial "SEPARATE" makes the var 0
   num_count = -1
@@ -62,29 +64,17 @@ def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid
       py_list.append(py_list_text)
 
     txt_list[txt_list.index("INSERT_VAR")] = "%s%d" %(var, var_num)
-
-  rot_list = ["#ROT1", "#ROT2", "#ROT3"]
-
-  for item in rot_list:
-    if item == "#ROT1":
-      degrees = 270
-    elif item == "#ROT2":
-      degrees = 180
-    elif item == "#ROT3":
-      degrees = 90
-    else:
-      degrees = 0
     
-    for var in xyz_list:
-      if var == "z" or var == "pz":
-        rot_py_list_text = "%s%s%d = level*448 + %d" %(item, var, var_num, value)
-        rot_py_list.append(rot_py_list_text)
-      elif value == 0:
-        rot_py_list_text = "%s%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (%s, %s), %d)[%d])" %(item, var, var_num, py_list[-3][py_list[-1].index("=") + 2:], py_list[-2][py_list[-1].index("=") + 2:], degrees, 0 if var == "x" or var == "px" else 1)
-        rot_py_list.append(rot_py_list_text)
-      else:
-        rot_py_list_text = "%s%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (%s, %s), %d)[%d])" %(item, var, var_num, py_list[-3][py_list[-1].index("=") + 2:], py_list[-2][py_list[-1].index("=") + 2:], degrees, 0 if var == "x" or var == "px" else 1)
-        rot_py_list.append(rot_py_list_text)
+  for var in xyz_list:
+    if var == "z" or var == "pz":
+      rot_py_list_text = "%s%s%d = level*%d + %d" %(item, var, var_num, LEVEL_HEIGHT, value)
+      rot_py_list.append(rot_py_list_text)
+    elif value == 0:
+      rot_py_list_text = "%s%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (%s, %s), 360-90*rotation if rotation!= 0 else 0)[%d])" %(item, var, var_num, py_list[-3][py_list[-1].index("=") + 2:], py_list[-2][py_list[-1].index("=") + 2:], 0 if var == "x" or var == "px" else 1)
+      rot_py_list.append(rot_py_list_text)
+    else:
+      rot_py_list_text = "%s%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (%s, %s), 360-90*rotation if rotation!= 0 else 0)[%d])" %(item, var, var_num, py_list[-3][py_list[-1].index("=") + 2:], py_list[-2][py_list[-1].index("=") + 2:], 0 if var == "x" or var == "px" else 1)
+      rot_py_list.append(rot_py_list_text)
 
 
 def compileTXT(txt_path, txt_list, prefab_name, prefab_text, prefab_icon, ent_list, ent_path,indexLine):
@@ -236,7 +226,8 @@ def create(name, prefab_name, prefab_text, prefab_icon, rot_enabled, workshop_ex
     insertBool = False
   else:
     insertBool = True
-
+  
+  LEVEL_HEIGHT = 448 #probably change this in the future to something more reasonable, like 256 or even 128
   py_list = []
   ent_py_list = []
   rot_py_list = []
