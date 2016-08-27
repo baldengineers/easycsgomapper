@@ -7,6 +7,7 @@ algorithms to create the object (look in the prefabs folder)
 from PIL import Image
 import zipfile
 import os
+global insertBool
 gameDirVar=''
 
 
@@ -79,7 +80,6 @@ def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid
 
 def compileTXT(txt_path, txt_list, prefab_name, prefab_text, prefab_icon, ent_list, ent_path,indexLine):
   file = open(txt_path, "w")
-  global insertBool
   for item in txt_list:
     file.write(item)
   file.close()
@@ -930,7 +930,6 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
 
   file.close()
-  global insertBool
   if rot_enabled:
     print(prefab_icon)
     ext_list = ["_right.jpg","_down.jpg","_left.jpg","_up.jpg"]
