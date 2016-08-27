@@ -117,12 +117,12 @@ class GridBtn(QWidget):
                         current_prefab_icon_list = rotation_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
                         current_prefab_icon_list = current_prefab_icon_list.readlines()
-                        icon = current_prefab_icon_list[rotation]
+                        icon = gameDirVar+current_prefab_icon_list[rotation]
                         if "\n" in icon:
                             icon = icon[:-1]
                     except Exception as e:
                         print(str(e))
-                        icon = prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                        icon = gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         
                 else:
                     icon = h_icon
@@ -156,6 +156,7 @@ class GridBtn(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self,whichGame):
         def TFFormat():
+            global gameDirVar,gameVar
             sys.path.append(gameDirVar+"prefabs/")
             currentlight = '''
             entity
@@ -273,11 +274,12 @@ class MainWindow(QMainWindow):
             print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
 
         #tell which game was chosen on launch
+        global gameVar,gameDirVar
         if whichGame:
             gameVar,gameDirVar,isTFBool = "TF2","tf2/",True
         else:
             gameVar,gameDirVar = "CS:GO","csgo/"
-        global gameVar,gameDirVar
+        
         TFFormat() if isTFBool else CSFormat()
         
         createPrefab.setGameDirVar(gameDirVar)
@@ -441,7 +443,7 @@ class MainWindow(QMainWindow):
         
         self.home()
         self.change_skybox()
-        self.level_select()
+        #self.level_select()
 
 
     def CSFormat(self):
@@ -650,7 +652,7 @@ class MainWindow(QMainWindow):
         for index, text in enumerate(prefab_text_list):
             for ind, indiv in enumerate(text):
                 curr_list = eval("self.tile_list%d" % (index+1))
-                item = QListWidgetItem(QIcon(prefab_icon_list[index][ind]), indiv)
+                item = QListWidgetItem(QIcon(gameDirVar+prefab_icon_list[index][ind]), indiv)
                 curr_list.addItem(item)
             
         for i in range(self.list_tab_widget.count()):
@@ -1426,7 +1428,7 @@ class MainWindow(QMainWindow):
         skybox2_list = QListWidget()
         skybox2_list.setIconSize(QSize(200, 25))
         for index, text in enumerate(skybox_list):
-            item = QListWidgetItem(QIcon(skybox_icon_list[index]), text)
+            item = QListWidgetItem(QIcon(gameDirVar+skybox_icon_list[index]), text)
             skybox2_list.addItem(item)
         
         self.layout = QHBoxLayout()
@@ -1829,7 +1831,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
         movie.start()
 
 class initWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self):   
         super(initWindow,self).__init__()
     def gridChange(self):
         global totalblocks,entity_list,grid_list,iconlist
@@ -1853,7 +1855,7 @@ class initWindow(QMainWindow):
         self.btn_id_count = 0
     
         self.window = QDialog(self)
-        
+        self.window.setWindowIcon(QIcon("icons\icon.ico"))
         #limit to num only
         self.text = QLineEdit()
         self.text2 = QLineEdit()
@@ -1890,8 +1892,10 @@ class initWindow(QMainWindow):
         self.window.exec_()
         #return radioTF2.isClicked()
     def clickFunction(self):
+        self.window.deleteLater()
         gui = MainWindow(self.radioTF2.isChecked())
         gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText())
+        
 #define some global variables
 level = 0
 levels = 0
