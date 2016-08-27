@@ -1,5 +1,7 @@
 import os
-
+def setGameDirVar(var):
+    global gameDirVar
+    gameDirVar = var
 def createSkyboxLeft(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
     f = open('prefab_template/skybox_worldgeo/skybox_side.txt','r+')
@@ -19,7 +21,7 @@ def createSkyboxLeft(gridx,gridy,skyboxz,id_num,world_id_num):
 
 def createSkyboxNorth(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
-    f = open('prefab_template/skybox_worldgeo/skybox_north.txt','r+')
+    f = open(gameDirVar+'prefab_template/skybox_worldgeo/skybox_north.txt','r+')
     lines = f.readlines()
     values = "".join(lines)
     ogvalues = "".join(lines)
@@ -36,7 +38,7 @@ def createSkyboxNorth(gridx,gridy,skyboxz,id_num,world_id_num):
 
 def createSkyboxTop(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
-    f = open('prefab_template/skybox_worldgeo/skybox_top.txt','r+')
+    f = open(gameDirVar+'prefab_template/skybox_worldgeo/skybox_top.txt','r+')
     lines = f.readlines()
     values = "".join(lines)
     ogvalues = "".join(lines)
@@ -55,7 +57,7 @@ def createSkyboxTop(gridx,gridy,skyboxz,id_num,world_id_num):
 
 def createSkyboxRight(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
-    f = open('prefab_template/skybox_worldgeo/skybox_right.txt','r+')
+    f = open(gameDirVar+'prefab_template/skybox_worldgeo/skybox_right.txt','r+')
     lines = f.readlines()
     values = "".join(lines)
     ogvalues = "".join(lines)
@@ -74,7 +76,7 @@ def createSkyboxRight(gridx,gridy,skyboxz,id_num,world_id_num):
 
 def createSkyboxSouth(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
-    f = open('prefab_template/skybox_worldgeo/skybox_south.txt','r+')
+    f = open(gameDirVar+'prefab_template/skybox_worldgeo/skybox_south.txt','r+')
     lines = f.readlines()
     values = "".join(lines)
     ogvalues = "".join(lines)
@@ -90,3 +92,4 @@ def createSkyboxSouth(gridx,gridy,skyboxz,id_num,world_id_num):
         id_num = id_num+1
 
     return values, id_num, world_id_num
+gameDirVar=''

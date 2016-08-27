@@ -35,6 +35,7 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 import generateSkybox
 import light_create
+import export
 import subprocess
 import pickle
 import pprint
@@ -156,7 +157,7 @@ class GridBtn(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self,whichGame):
         def TFFormat():
-            global gameDirVar,gameVar
+            global gameDirVar,gameVar,rotation_icon_list,prefab_text_list,prefab_text_list,prefab_icon_list,index_section_list
             sys.path.append(gameDirVar+"prefabs/")
             currentlight = '''
             entity
@@ -240,7 +241,7 @@ class MainWindow(QMainWindow):
                     section+=1
                 else:
                     rotation_icon_list[section].append(line[:-1] if '\n' in line else line)
-            print(index_section_list)
+            print(rotation_icon_list)
             for line in skybox_file.readlines():
                 skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
 
@@ -283,6 +284,9 @@ class MainWindow(QMainWindow):
         TFFormat() if isTFBool else CSFormat()
         
         createPrefab.setGameDirVar(gameDirVar)
+        light_create.setGameDirVar(gameDirVar)
+        generateSkybox.setGameDirVar(gameDirVar)
+        export.setGameDirVar(gameDirVar)
         
         #create the main window
         super(MainWindow, self).__init__()
@@ -918,17 +922,22 @@ class MainWindow(QMainWindow):
         
         current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
         try:
+            print('1')
             current_prefab_icon_list = rotation_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+            print('2')
             current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
+            print('3')
             current_prefab_icon_list = current_prefab_icon_list.readlines()
+            print('4')
             icon = current_prefab_icon_list[rotation]
+            print('5')
             if "\n" in icon:
                 icon = icon[:-1]
-            self.current.setIcon(QIcon(icon))
+            self.current.setIcon(QIcon(gameDirVar+icon))
             self.current.setIconSize(QSize(32,32))
         except Exception as e:
             print(str(e))
-            icon = prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+            icon = gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
             self.current.setIcon(QIcon(icon))
             self.current.setIconSize(QSize(32,32))
       
@@ -1897,6 +1906,7 @@ class initWindow(QMainWindow):
         gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText())
         
 #define some global variables
+#global rotation_icon_list
 level = 0
 levels = 0
 id_num = 1

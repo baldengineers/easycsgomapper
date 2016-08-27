@@ -1,7 +1,11 @@
 #does the environment lighting
 import os
+
+def setGameDirVar(var):
+    global gameDirVar
+    gameDirVar = var
 def replacevalues(light_r,light_g,light_b,light_brightness,world_id_num):
-    l = open('prefab_template\light_env_template.txt')
+    l = open(gameDirVar+'prefab_template\light_env_template.txt')
     lines = l.readlines()
     lines_str = "".join(lines)
 
@@ -14,3 +18,4 @@ def replacevalues(light_r,light_g,light_b,light_brightness,world_id_num):
     lines_str = lines_str.replace("light_b", str(light_b))
     lines_str = lines_str.replace("lightbrightness", str(light_brightness))
     return lines_str
+gameDirVar=''

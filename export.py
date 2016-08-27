@@ -1,9 +1,13 @@
 import os
 
+def setGameDirVar(var):
+    global gameDirVar
+    gameDirVar = var
+
 def execute(totalblocks, entity_list,levels, skybox, skyboxgeolist, light):
     compiledblocks=''
     totalentities=''
-    beg_template = open('prefab_template/beginning_template.txt', 'r+')
+    beg_template = open(gameDirVar+'prefab_template/beginning_template.txt', 'r+')
     beg_template = beg_template.readlines()
     beg_template = "".join(beg_template)
     beg_template = beg_template.replace('CURRENT_SKYBOX',skybox)
@@ -33,3 +37,4 @@ cordon
 
     return whole
 
+gameDirVar=''
