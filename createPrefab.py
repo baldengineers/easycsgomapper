@@ -9,11 +9,9 @@ import zipfile
 import os
 global insertBool
 gameDirVar=''
-
+LEVEL_HEIGHT = 448 #probably change this in the future to something more reasonable, like 256 or even 128
 
 def write_var(num_list, txt_list, py_list, var_num, value_list_history, in_solid_block, in_entity_block, rot_py_list, rot_enabled):
-  global LEVEL_HEIGHT
-  
   value_list = []
   #item count needs to be -1 so that the initial "SEPARATE" makes the var 0
   num_count = -1
@@ -226,8 +224,7 @@ def create(name, prefab_name, prefab_text, prefab_icon, rot_enabled, workshop_ex
     insertBool = False
   else:
     insertBool = True
-  
-  LEVEL_HEIGHT = 448 #probably change this in the future to something more reasonable, like 256 or even 128
+
   py_list = []
   ent_py_list = []
   rot_py_list = []
