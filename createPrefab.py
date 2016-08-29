@@ -7,7 +7,7 @@ algorithms to create the object (look in the prefabs folder)
 from PIL import Image
 import zipfile
 import os
-global insertBool
+insertBool = False
 gameDirVar=''
 LEVEL_HEIGHT = 448 #probably change this in the future to something more reasonable, like 256 or even 128
 
@@ -1012,4 +1012,3 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
 def setGameDirVar(var):
   gameDirVar = var
-insertBool = False
