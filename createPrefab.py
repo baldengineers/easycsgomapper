@@ -491,40 +491,6 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         entity_num += 1
 """]
 
-  rot_code = [["""
-    if rotation == 0:
-""",
-    "#INSERT_ROT_0_PY_LIST\n",
-"""
-    elif rotation == 1:
-""",
-    "#INSERT_ROT_1_PY_LIST\n",
-"""
-    elif rotation == 2:
-""",
-    "#INSERT_ROT_2_PY_LIST\n",
-"""
-    elif rotation == 3:
-""",
-    "#INSERT_ROT_3_PY_LIST\n"],
-
-["""
-    if rotation == 0:
-""",
-    "#INSERT_ROT_0_PY_LIST\n",
-"""
-    elif rotation == 1:
-""",
-    "#INSERT_ROT_1_PY_LIST\n",
-"""
-    elif rotation == 2:
-""",
-    "#INSERT_ROT_2_PY_LIST\n",
-"""
-    elif rotation == 3:
-""",
-    "#INSERT_ROT_3_PY_LIST\n"]]
-
   var_num = 1
   ent_var_num = 1
   contains_ent = False #True if there are entities in the vmf
@@ -539,7 +505,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
   file = open(name, "r")
 
   openlines = file.readlines()
-
+  
   prefab_icon_list = prefab_icon.split("/")
 
   if "easytf2_mapper" in prefab_icon_list:
@@ -548,7 +514,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     for index, item in enumerate(prefab_icon_list): #enumerate allows you to give 2 vars in the for loop
       if index != len(prefab_icon_list) - 1:
        prefab_icon_list[index] = item + "/" # add the "/" back into the filepath
-        
+  
   txt_path = gameDirVar+"prefab_template/" + prefab_name + ".txt"
   ent_path = gameDirVar+"prefab_template/" + prefab_name + "_entities.txt"
   py_path = gameDirVar+"prefabs/" + prefab_name + ".py"
