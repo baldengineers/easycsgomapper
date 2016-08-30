@@ -1533,7 +1533,7 @@ class MainWindow(QMainWindow):
 
         self.okay_btn.clicked.connect(self.create_run_func)
 
-        self.rotCheckBox = QCheckBox()
+        #self.rotCheckBox = QCheckBox()
         self.expCheckBox = QCheckBox()
         self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
 
@@ -1547,7 +1547,7 @@ class MainWindow(QMainWindow):
         self.form.addRow("Prefab Name:", self.nameLineEdit)
         self.form.addRow("VMF file (.vmf):", self.vmfLayout)
         self.form.addRow("Icon (.jpg):", self.iconLayout)
-        self.form.addRow("Make Rotations?", self.rotCheckBox)
+        #self.form.addRow("Make Rotations?", self.rotCheckBox)
         self.form.addRow("Export prefab?", self.expCheckBox)
         self.form.addRow("Which section?",self.sectionSelect)
         for i in range(5):
@@ -1571,10 +1571,7 @@ class MainWindow(QMainWindow):
         form_list,t_list = [self.vmfTextEdit.displayText(),self.textLineEdit.displayText(),self.iconTextEdit.displayText(),self.nameLineEdit.displayText()],[]
         form_dict = {1:'Prefab Text',2:'Prefab Name',3:'VMF file',4:'Icon'}
         if self.vmfTextEdit.displayText() !=  '' and self.textLineEdit.displayText() != '' and self.iconTextEdit.displayText() != '' and self.nameLineEdit.displayText() != '':
-            QMessageBox.information(self, "Files Created, restart to see the prefab.",
-                                                                          createPrefab.create(self.vmfTextEdit.displayText(), name_str,
-                                                                            self.textLineEdit.displayText(), self.iconTextEdit.displayText(),
-                                                                                self.rotCheckBox.isChecked(),self.expCheckBox.isChecked(),input_number,self.sectionSelect.currentIndex()))
+            QMessageBox.information(self, "Files Created, restart to see the prefab.",createPrefab.create(self.vmfTextEdit.displayText(), name_str, self.textLineEdit.displayText(), self.iconTextEdit.displayText(),self.expCheckBox.isChecked(),input_number,self.sectionSelect.currentIndex()))
             restart_btn = QPushButton("Restart")
             later_btn = QPushButton("Later")
             choice = QMessageBox(self)
