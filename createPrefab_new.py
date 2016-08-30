@@ -142,7 +142,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                 if "solid" in line:
                     if header:
                         header = False
-                        del vmf_data[:vmf_data.index(line)-1] #potential error here because still referencing original list in the for loop, and elsewhere in the program
+                        vmf_data[:index] = ""
                     block_type = "solid"
                 elif "side" in line:
                     block_type = "side"
