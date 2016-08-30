@@ -136,7 +136,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         
         with open(vmf_file, "r") as f:
             vmf_data = f.readlines()
-            header = False
+            header = True
 
             for index, line in enumerate(vmf_data):
                 if "solid" in line:
