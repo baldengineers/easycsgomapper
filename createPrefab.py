@@ -219,7 +219,7 @@ def compilePY(py_path, py_list, txt_path, compile_list, contains_ent, ent_code, 
 
 
 
-def create(name, prefab_name, prefab_text, prefab_icon, rot_enabled, workshop_export,indexLine,index):
+def create(name, prefab_name, prefab_text, prefab_icon, workshop_export,indexLine,index):
   if indexLine == 'END':
     insertBool = False
   else:
