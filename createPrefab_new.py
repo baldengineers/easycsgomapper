@@ -135,5 +135,5 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 			vmf_data = f.readlines()
 			
 			for line in vmf_data:
-				
+			
 				
