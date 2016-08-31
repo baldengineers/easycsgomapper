@@ -10,11 +10,14 @@ response = input("Are you sure you want to do this? (y/n):")
 if response == "y" or response == "yes":
     #location = input("Paste directory of updater here: ")
     try:
-        
+        try:
+            os.makedir('updated/')
+        except:
+            print('directory already found, continuing.')
         #
         #gets file info
         #
-        url = 'http://github.com/baldengineers/easytf2_mapper/archive/master.zip'
+        url = 'http://github.com/baldengineers/mapper/archive/master.zip'
         site = urllib.request.urlopen(url)
         meta = site.info()
         size = meta["Content-Length"]
@@ -23,13 +26,14 @@ if response == "y" or response == "yes":
         #
         #downloads zip
         #
-        with open('easytf2mapper-master.zip', 'wb') as handle:
+        with open('mapper-master.zip', 'wb') as handle:
             response = requests.get('http://github.com/baldengineers/easytf2_mapper/archive/master.zip', stream=True)
 
             if not response.ok:
                 print('something went wrong getting the file.')
 
             for i,block in enumerate(response.iter_content(1024)):
+                os.system('cls')
                 print("\n"*50+"%d/%d bytes downloaded (%d percent)" % (i*1024, int(size), (float((i*1024)/int(size))*100)))
                 handle.write(block)
         
@@ -38,9 +42,9 @@ if response == "y" or response == "yes":
         #unpacks master zip
         #
 
-        zipupdate = zipfile.ZipFile('easytf2mapper-master.zip', 'r')
+        zipupdate = zipfile.ZipFile('mapper-master.zip', 'r')
         for file in zipupdate.namelist():
-            if file.startswith('easytf2_mapper-master/latestwinredist'):
+            if file.startswith('mapper-master/latestwinredist'):
                 zipupdate.extract(file, 'updated/')
         zipupdate.close()
         print('done unpacking master zip')
@@ -48,9 +52,9 @@ if response == "y" or response == "yes":
         #
         #unpacks latest zip
         #
-        ziplatest = zipfile.ZipFile('updated/easytf2_mapper-master/latestwinredist/easytf2mapper_latest.zip')
+        ziplatest = zipfile.ZipFile('updated/mapper-master/latestwinredist/mapper_latest.zip')
         for file in ziplatest.namelist():
-            if file.startswith('updater.exe'):
+            if file.startswith('updater.exe') or file.startswith('updater.py'):
                 pass
             else:
                 ziplatest.extract(file)
@@ -58,8 +62,8 @@ if response == "y" or response == "yes":
         print('done unpacking latest zip')
         
         #removes zip after it's done
-        os.remove('easytf2mapper-master.zip')
-        shutil.rmtree('updated/easytf2_mapper-master/')
+        os.remove('mapper-master.zip')
+        shutil.rmtree('updated/mapper-master/')
 
         #status
         print("Update successful. You can find the updated version in the /updated directory.")
