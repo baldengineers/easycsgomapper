@@ -169,20 +169,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                                     index += 1
     def assign_var(self, num):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
-        xyz_list = ["x","y","z"]
-        
-        """for index, var in enumerate(xyz_list):
-            if var == "z":
-                text = "%s%d = level*%d + %d" %(var, self.var_num, LEVEL_HEIGHT, num[index])
-            else:
-                text = "%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*%d*512%s%s, posy*%d*512%s%s), (360 if rotation!=0 else 0)-90*rotation)[%d])" %(var, var_num, num[index], py_list[-2][py_list[-1].index("=") + 2:], 0 if var == "x" or var == "px" else 1)
-                #change so it assigns a variable to this whole thing, then find the index
-                #plz change the above and make it also work for 0 by removing the thing at end if value == 0. Also implement the negative- positive for x and negative for y
-            self.var_list.append(text)"""
+        X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
             
-        self.var_list.append("%s%d = level*%d + %d" %(var, self.var_num, LEVEL_HEIGHT, num[index]))
-        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*%d*512%s%s, posy*%d*512%s%s), (360 if rotation!=0 else 0)-90*rotation)[%d])" %(var, var_num, num[index], py_list[-2][py_list[-1].index("=") + 2:], 0 if var == "x" or var == "px" else 1))
-        
+        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else "", 0 if var == "x" or var == "px" else 1))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
-            
+        self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
