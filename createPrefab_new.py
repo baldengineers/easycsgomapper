@@ -8,9 +8,10 @@ class Create():
         #indexLine |  | I have no fucking idea
         #index |  | I have no idea about this either
 
-        #self.compilelist is the outline of the prefab.py file
-
-        self.compile_list = [
+        self.LEVEL_HEIGHT = 448 #self.LEVEL_HEIGHT is the constant for the height of each level of the map.
+        self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
+        self.var_num = 1 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
+        self.compile_list = [ #self.compilelist is the outline of the prefab.py file
         """import os
 import math
 def rotatePoint(centerPoint,point,angle):
@@ -132,7 +133,6 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         "#INSERT_ENT_CODE\n",]
 
         block_type = "" #block_type contains the current block of code the program is currently looking at. A block of code is determined by the two brackets {}/()/[] surrounding it.
-        var_num = 1 #var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
         
         with open(vmf_file, "r") as f:
             vmf_data = f.readlines()
@@ -156,13 +156,26 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     if block_type == "side":
                         for char in line:
                             if char == "(":
-                                num = ["","",""] #num is for the numbers in the parenthesis in the points for the plane
-                                ind = 0
+                                num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane
+                                num_index = 0 #current index for the num variable above
                                 block_type = "()"
-
-                            if block_type = "()":
+                            elif block_type = "()":
                                 if not char == " ":
-                                    num[ind] += char
+                                    if not char == ")":
+                                        num[num_index] += char
+                                    else:
+                                        self.assign_var(num)
                                 else:
-                                    ind += 1
-                    
+                                    index += 1
+    def assign_var(self, num):
+        #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
+        xyz_list = ["x","y","z"]
+        
+        for index, var in enumerate(xyz_list):
+            if var == "z":
+                text = "%s%d = level*%d + %d" %(var, self.var_num, LEVEL_HEIGHT, num[index])
+            else:
+                text = "%s%s%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (%s, %s), 360-90*rotation if rotation!= 0 else 0)[%d])" %(item, var, var_num, py_list[-3][py_list[-1].index("=") + 2:], py_list[-2][py_list[-1].index("=") + 2:], 0 if var == "x" or var == "px" else 1)
+                #plz change the above and make it also work for 0 by removing the thing at end if value == 0. Also implement the negative- positive for x and negative for y
+            self.var_list.append(text)
+            
