@@ -88,50 +88,112 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     for i in range(ogvalues.count('id_num')):
         values = values.replace('id_num', str(id_num), 1)
         id_num = id_num+1
-        if "ROTATION_RIGHT" in values:
-            if rotation == 0:
-                values = values.replace("ROTATION_RIGHT","0 0 0",1)
-            elif rotation == 1:
-                values = values.replace("ROTATION_RIGHT","0 270 0",1)
-            elif rotation == 2:
-                values = values.replace("ROTATION_RIGHT","0 180 0",1)
-            elif rotation == 3:
-                values = values.replace("ROTATION_RIGHT","0 90 0",1)
-        if "ROTATION_UP" in values:
-            if rotation == 0:
-                values = values.replace("ROTATION_UP","0 90 0",1)
-            elif rotation == 1:
-                values = values.replace("ROTATION_UP","0 0 0",1)
-            elif rotation == 2:
-                values = values.replace("ROTATION_UP","0 270 0",1)
-            elif rotation == 3:
-                values = values.replace("ROTATION_UP","0 180 0",1)
-        if "ROTATION_LEFT" in values:
-            if rotation == 0:
-                values = values.replace("ROTATION_LEFT","0 180 0",1)
-            elif rotation == 1:
-                values = values.replace("ROTATION_LEFT","0 90 0",1)
-            elif rotation == 2:
-                values = values.replace("ROTATION_LEFT","0 0 0",1)
-            elif rotation == 3:
-                values = values.replace("ROTATION_LEFT","0 270 0",1)
-        if "ROTATION_DOWN" in values:
-            if rotation == 0:
-                values = values.replace("ROTATION_DOWN","0 270 0",1)
-            elif rotation == 1:
-                values = values.replace("ROTATION_DOWN","0 180 0",1)
-            elif rotation == 2:
-                values = values.replace("ROTATION_DOWN","0 90 0",1)
-            elif rotation == 3:
-                values = values.replace("ROTATION_DOWN","0 0 0",1)
-    values = values.replace('"[0 0 0 1] 0.25"','"[1 1 1 1] 0.25"')
-    values = values.replace('"[0 0 1 0] 0.25"','"[1 1 1 1] 0.25"')
-    values = values.replace('"[0 1 0 0] 0.25"','"[1 1 1 1] 0.25"')
-    values = values.replace('"[1 0 0 0] 0.25"','"[1 1 1 1] 0.25"')
         """,
 
         "#INSERT_ENT_CODE\n",]
 
+#here is entity code, feel free to change. only added to get the new entity rotation code in.        
+  ent_code =["#INSERT_ENT_OPEN_FILE\n",
+
+             """
+    lines_ent = g.readlines()
+    rot_replace_list=[]
+    for index,line in enumerate(lines_ent):
+        if "#ROTATION_" in line:
+            us_count = 0
+            tlist=[]
+            for char in line:
+                if us_count == 1:
+                    tlist.append(char)
+                if char == "_":
+                    us_count += 1
+            old = "".join(tlist)
+            tlist = "".join(tlist).split(' ')
+            
+            rot_replace_list.append([line,"%s" % str(int(tlist[0])*(-90))+' '+str(int(tlist[1])*(-90))+' '+str(int(tlist[2])*(-90)),index])
+    for rep in rot_replace_list:
+        lines_ent[rep[2]] = lines_ent[rep[2]].replace('#ROTATION_'+rep[0],rep[1])
+""",
+
+             "#INSERT_ROT_IF\n",
+
+             "#INSERT_ENT_PY_LIST\n",
+
+             "#INSERT_ROT_ENT_CODE\n",
+             
+             "#INSERT_ENT_VAR_COUNT\n",
+
+"""
+    ent_values = "".join(lines_ent)
+    ent_values_split = ent_values.split("\\"")
+    valcount = "".join(lines_ent)
+
+    for item in ent_values_split:
+        if "entity_name" in item or "parent_name" in item or "door_large" in item:
+            placeholder_list.append(item)
+
+    for i in range(valcount.count('world_idnum')):
+        ent_values = ent_values.replace('world_idnum', str(world_id_num), 1)
+        world_id_num += 1
+
+    for var in ["px", "py", "pz"]:
+        for count in range(1,ent_var_count+1):
+            string = var + str(count)
+            string_var = str(eval(var + str(count)))
+
+            if var == "pz":
+                ent_values = ent_values.replace(string + "\\"",string_var + "\\"") #we need to do this or else it will mess up on 2 digit numbers
+            else:
+                ent_values = ent_values.replace(string + " ",string_var + " ")
+                
+    for var in ["x", "y", "z"]:
+        for count in range(1,var_count+1):
+            try:
+                string = var + str(count)
+                string_var = str(eval(var + str(count)))
+                if var == "z":
+                    ent_values = ent_values.replace(string + ")",string_var + ")") #we need to do this or else it will mess up on 2 digit numbers
+                else:
+                    ent_values = ent_values.replace(string + " ",string_var + " ")
+            except:
+                pass
+
+    for i in range(valcount.count('id_num')):
+        ent_values = ent_values.replace('id_num', str(id_num), 1)
+        id_num = id_num+1
+
+    for i in range(int(valcount.count('laser_target')/2)):
+        if "laser_target_plac" in ent_values:
+            ent_values = ent_values.replace("laser_target_plac", "laser_target" + str(entity_num), 2)
+            entity_num += 1
+
+    for i in range(int(valcount.count('sound'))):
+        if "sound_plac" in ent_values:
+            ent_values = ent_values.replace("sound_plac", "AmbSound"+str(entity_num), 2)
+            ent_values = ent_values.replace("relay_plac", "LogicRelay"+str(entity_num),2)
+            entity_num += 1
+
+    for i in range(valcount.count("entity_name")):
+        try:
+            ent_values = ent_values.replace("entity_name", "entity" + str(entity_num), 1)
+            ent_values = ent_values.replace("entity_same", "entity" + str(entity_num), 1)
+            if "parent_name" in placeholder_list[entity_num]:
+                ent_values = ent_values.replace("parent_name", "entity" + str(entity_num), 1)
+                placeholder_list.remove(placeholder_list[entity_num])
+            
+            if "door_large" in ent_values:
+                ent_values = ent_values.replace("door_large", "door_large" + str(entity_num), 4)
+            if "\\"respawn_name\\"" in ent_values:
+                ent_values = ent_values.replace("\\"respawn_name\\"", "\\"respawn_name" + str(entity_num) + "\\"", 2)
+            entity_num += 1
+        except Exception as e:
+            print(str(e))
+
+    for i in range(valcount.count("#ROTATION_")):
+        ent_values = ent_values.replace
+
+        entity_num += 1
+"""]
         block_type = "" #block_type contains the current block of code the program is currently looking at. A block of code is determined by the two brackets {}/()/[] surrounding it.
         
         with open(vmf_file, "r") as f:
