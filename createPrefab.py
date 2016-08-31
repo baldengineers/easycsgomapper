@@ -374,6 +374,22 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
              """
     lines_ent = g.readlines()
+    rot_replace_list=[]
+    for index,line in enumerate(lines_ent):
+        if "#ROTATION_" in line:
+            us_count = 0
+            tlist=[]
+            for char in line:
+                if us_count == 1:
+                    tlist.append(char)
+                if char == "_":
+                    us_count += 1
+            old = "".join(tlist)
+            tlist = "".join(tlist).split(' ')
+            
+            rot_replace_list.append([line,"%s" % str(int(tlist[0])*(-90))+' '+str(int(tlist[1])*(-90))+' '+str(int(tlist[2])*(-90)),index])
+    for rep in rot_replace_list:
+        lines_ent[rep[2]] = lines_ent[rep[2]].replace('#ROTATION_'+rep[0],rep[1])
 """,
 
              "#INSERT_ROT_IF\n",
@@ -450,43 +466,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         except Exception as e:
             print(str(e))
 
-    for i in range(valcount.count("ROTATION")):
-        if "ROTATION_RIGHT" in ent_values:
-            if rotation == 0:
-                ent_values = ent_values.replace("ROTATION_RIGHT","0 0 0",1)
-            elif rotation == 1:
-                ent_values = ent_values.replace("ROTATION_RIGHT","0 270 0",1)
-            elif rotation == 2:
-                ent_values = ent_values.replace("ROTATION_RIGHT","0 180 0 ",1)
-            elif rotation == 3:
-                ent_values = ent_values.replace("ROTATION_RIGHT","0 90 0",1)
-        if "ROTATION_LEFT" in ent_values:
-            if rotation == 0:
-                ent_values = ent_values.replace("ROTATION_LEFT","0 180 0",1)
-            elif rotation == 1:
-                ent_values = ent_values.replace("ROTATION_LEFT","0 90 0",1)
-            elif rotation == 2:
-                ent_values = ent_values.replace("ROTATION_LEFT","0 0 0",1)
-            elif rotation == 3:
-                ent_values = ent_values.replace("ROTATION_LEFT","0 270 0",1)
-        if "ROTATION_DOWN" in ent_values:
-            if rotation == 0:
-                ent_values = ent_values.replace("ROTATION_DOWN","0 270 0",1)
-            elif rotation == 1:
-                ent_values = ent_values.replace("ROTATION_DOWN","0 180 0",1)
-            elif rotation == 2:
-                ent_values = ent_values.replace("ROTATION_DOWN","0 90 0",1)
-            elif rotation == 3:
-                ent_values = ent_values.replace("ROTATION_DOWN","0 0 0",1)
-        if "ROTATION_UP" in ent_values:
-            if rotation == 0:
-                ent_values = ent_values.replace("ROTATION_UP","0 90 0",1)
-            elif rotation == 1:
-                ent_values = ent_values.replace("ROTATION_UP","0 0 0",1)
-            elif rotation == 2:
-                ent_values = ent_values.replace("ROTATION_UP","0 270 0",1)
-            elif rotation == 3:
-                ent_values = ent_values.replace("ROTATION_UP","0 180 0",1)
+    for i in range(valcount.count("#ROTATION_")):
+        ent_values = ent_values.replace
 
         entity_num += 1
 """]
@@ -611,48 +592,18 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         elif "\"angles\" \"0 0 0\"" in line:
           quote_num = 0
+          rot_numlist = []
           for letter in line:
               if letter == "\"":
                 quote_num += 1
+              if quote_num == 3:
+                rot_numlist.append(letter)
               if quote_num != 3:
                 ent_list.append(letter)
               elif letter == "\"":
                 ent_list.append(letter)
-                        
-          ent_list.insert(-2, "ROTATION_RIGHT")
-        elif '"angles" "0 90 0"' in line:
-          quote_num = 0
-          for letter in line:
-              if letter == "\"":
-                quote_num += 1
-              if quote_num != 3:
-                ent_list.append(letter)
-              elif letter == "\"":
-                ent_list.append(letter)
-                        
-          ent_list.insert(-2, "ROTATION_UP")
-        elif '"angles" "0 180 0"' in line:
-          quote_num = 0
-          for letter in line:
-              if letter == "\"":
-                quote_num += 1
-              if quote_num != 3:
-                ent_list.append(letter)
-              elif letter == "\"":
-                ent_list.append(letter)
-                        
-          ent_list.insert(-2, "ROTATION_LEFT")
-        elif '"angles" "0 270 0"' in line:
-          quote_num = 0
-          for letter in line:
-              if letter == "\"":
-                quote_num += 1
-              if quote_num != 3:
-                ent_list.append(letter)
-              elif letter == "\"":
-                ent_list.append(letter)
-                        
-          ent_list.insert(-2, "ROTATION_DOWN")
+          rot_string = "#ROTATION_"+"".join(rot_numlist)
+          ent_list.insert(-2, rot_string)
         elif "\t\"targetname\"" in line and "relay" not in line and "ambient_generic" not in openlines[loopernum-17] and "respawn_trigger" not in line and "\"func_door\"" not in openlines[loopernum-19] and "filter_activator_tfteam" not in openlines[loopernum-2] and "info_target" not in openlines[loopernum-3]:
           quote_num = 0
           for letter in line:
