@@ -201,6 +201,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             header = True
 
             for index, line in enumerate(vmf_data):
+                if "\"" in line:
+                    line[(line.index("\""):]
+                    #start = s.index( first ) + len( first )
+                    #end = s.index( last, start )
+                    #return s[start:end]
+                    #implement this later
                 if "solid" in line:
                     if header:
                         header = False
@@ -216,19 +222,22 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     vmf_data[index] = vmf_data[:vmf_data[index].index("id")+5] + id_var + "\"" #This line does this: "id" " + id_var + "
                 elif "(" in line:
                     if block_type == "side":
-                        for char in line:
-                            if char == "(":
-                                num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
-                                num_index = 0 #current index for the num variable above
-                                block_type = "()"
-                            elif block_type = "()":
-                                if not char == " ":
-                                    if not char == ")":
-                                        num[num_index] += char
+                        if "plane" in line:
+                            for char in line:
+                                if char == "(":
+                                    num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
+                                    num_index = 0 #current index for the num variable above
+                                    block_type = "()"
+                                elif block_type = "()":
+                                    if not char == " ":
+                                        if not char == ")":
+                                            num[num_index] += char
+                                        else:
+                                            self.assign_var(num)
+                                            block_type = "side"
                                     else:
-                                        self.assign_var(num)
-                                else:
-                                    index += 1
+                                        num_index += 1
+                        
     def assign_var(self, num):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
@@ -237,3 +246,5 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
         self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
+        
+        
