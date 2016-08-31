@@ -109,6 +109,17 @@ class GridBtn(QWidget):
             clear_btn(btn_id)
         else:
             if clicked:
+                if ymin = None or xmin = None:
+                    ymin,xmin = y,x
+                else:
+                    if y < ymin:
+                        ymin = y
+                    if x < xmin:
+                        xmin = x
+                    if y > ymax:
+                        ymax = y
+                    if x > xmax:
+                        xmax = x
                 moduleName = eval(prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
             else:
                 moduleName = h_moduleName if h_moduleName != None else clear_btn(btn_id)
@@ -1819,6 +1830,13 @@ entity_list=[]
 
 save_dict={}
 load_dict={}
+
+#better skybox generation
+global xmin,ymin,xmax,ymax
+xmin = None
+ymin = None
+xmax = 0
+ymax = 0
 
 stored_info_list=[]
 
