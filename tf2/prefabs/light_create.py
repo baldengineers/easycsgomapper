@@ -1,7 +1,7 @@
 #does the environment lighting
 import os
 def replacevalues(light_r,light_g,light_b,light_brightness,world_id_num):
-    l = open('prefab_template\light_env_template.txt')
+    l = open('tf2/prefab_template\light_env_template.txt')
     lines = l.readlines()
     lines_str = "".join(lines)
 

@@ -4,7 +4,7 @@ def setGameDirVar(var):
     gameDirVar = var
 def createSkyboxLeft(gridx,gridy,skyboxz,id_num,world_id_num):
     values = []
-    f = open('prefab_template/skybox_worldgeo/skybox_side.txt','r+')
+    f = open(gameDirVar+'prefab_template/skybox_worldgeo/skybox_side.txt','r+')
     lines = f.readlines()
     values = "".join(lines)
     ogvalues = "".join(lines)

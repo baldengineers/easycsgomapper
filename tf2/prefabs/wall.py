@@ -12,7 +12,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     
     looplist = '1'
     values=[]#Values are all of the lines of a prefab that have the vertex coords
-    f = open('prefab_template/wall.txt', 'r+')
+    f = open('tf2/prefab_template/wall.txt', 'r+')
     lines = f.readlines() #gathers each line of the prefab and puts numbers them
 
     if rotation == 0:

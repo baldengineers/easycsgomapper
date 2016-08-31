@@ -12,7 +12,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     
     looplist = '1'
     values=[]#Values are all of the lines of a prefab that have the vertex coords
-    f = open('prefab_template/cp_koth_prefab.txt', 'r+')
+    f = open('tf2/prefab_template/cp_koth_prefab.txt', 'r+')
     lines = f.readlines() #gathers each line of the prefab and puts numbers them
 
     if rotation == 0:
@@ -559,7 +559,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     values = values.replace('"[1 0 0 0] 0.25"','"[1 1 1 1] 0.25"')
         
 
-    g = open('prefab_template/cp_koth_prefab_entities.txt', 'r+')
+    g = open('tf2/prefab_template/cp_koth_prefab_entities.txt', 'r+')
     lines_ent = g.readlines()
 
     if rotation == 0:
