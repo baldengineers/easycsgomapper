@@ -223,44 +223,60 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_type = "side"
                 elif block_type == "side":
                     if key == "plane":
-                        for char in line:
+                        for char_index, char in enumerate(line):
                             if char == "(":
                                 num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
                                 num_index = 0 #current index for the num variable above
-                                block_type = "()"
+                                if "X" not in self.between(line,f_ind=char_index,last=")"):
+                                    block_type = "()"
+                                else:
+                                    pass
                             elif block_type == "()":
                                 if not char == " ":
                                     if not char == ")":
                                         num[num_index] += char
                                     else:
-                                        self.assign_var(num)
+                                        self.assign_var(num, line)
                                         block_type = "side"
                                 else:
                                     num_index += 1
+                    elif key == "uaxis" or key == "vaxis":
+                        replace = self.between(line, "[", "]")
+                        line.replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                 elif key == "id":
                     if block_type == "solid":
                         id_var = "world_idnum"
                     elif block_type == "side":
                         id_var = "id_num"
                     vmf_data[index] = vmf_data[:vmf_data[index].index("id")+5] + id_var + "\"" #This line does this: "id" " + id_var + "
-                elif key == "uaxis" or key == "vaxis":
-                    replace = self.between(line, "[", "]")
-                    line.replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                         
-    def assign_var(self, num):
+    def assign_var(self, num, line):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else "", 0 if var == "x" or var == "px" else 1))
+        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else ""))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
         self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
         
-    def between(self, string, first, last, i=1):
+        vmf_data.replace("(" + self.between(line,"(",")") + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
+        self.var_num += 1
+        
+    def between(self, string="", first="", last="", f_ind=0, l_ind=0, i=1):
         #finds a substring between the given strings
+        
+        #string is the string you are searching within
+        #first is the first character/word that limits the resulting word
+        #last is the last ''
+        #f_ind is the index of the first character ''
+        #l_ind is the index of the last character ''
         #i is the amount of iterations to do it (currently unused)
-        start = string.index(first) + len(first)
-        end = string.index(last, start)
-        return string[start:end] 
+        
+        if first or last or f_ind or l_ind:
+            start = (string.index(first)) if first else f_ind + (len(first)) if first else 1
+            end = (string.index(last, start)) if last else l_ind
+            return string[start:end] 
+        else:
+            return ""
         
         
