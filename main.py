@@ -1441,7 +1441,18 @@ class MainWindow(QMainWindow):
 
         self.sectionSelect = QComboBox()
         #needs to have a cs:go version
-        self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
+        if isTFBool:
+            self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
+        else:
+            pass
+        self.radioLayout = QHBoxLayout()
+        self.radioTF2 = QRadioButton("TF2",self)
+        self.radioCSGO = QRadioButton("CS:GO",self)
+        self.group.addButton(self.radioTF2)
+        self.group.addButton(self.radioCSGO)
+        self.group.setExclusive(True)
+        self.radioLayout.addWidget(self.radioTF2)
+        self.radioLayout.addWidget(self.radioCSGO)
         
         self.form = QFormLayout()
         self.form.addRow(self.buggyText)
@@ -1452,6 +1463,7 @@ class MainWindow(QMainWindow):
         #self.form.addRow("Make Rotations?", self.rotCheckBox)
         self.form.addRow("Export prefab?", self.expCheckBox)
         self.form.addRow("Which section?",self.sectionSelect)
+        self.form.addRow("Which game?" self.radioLayout)
         for i in range(5):
             self.form.addRow(self.blankstring)
         self.form.addRow(self.okay_btn_layout)
@@ -1473,7 +1485,7 @@ class MainWindow(QMainWindow):
         form_list,t_list = [self.vmfTextEdit.displayText(),self.textLineEdit.displayText(),self.iconTextEdit.displayText(),self.nameLineEdit.displayText()],[]
         form_dict = {1:'Prefab Text',2:'Prefab Name',3:'VMF file',4:'Icon'}
         if self.vmfTextEdit.displayText() !=  '' and self.textLineEdit.displayText() != '' and self.iconTextEdit.displayText() != '' and self.nameLineEdit.displayText() != '':
-            QMessageBox.information(self, "Files Created, restart to see the prefab.",createPrefab.create(self.vmfTextEdit.displayText(), name_str, self.textLineEdit.displayText(), self.iconTextEdit.displayText(),self.expCheckBox.isChecked(),input_number,self.sectionSelect.currentIndex()))
+            QMessageBox.information(self, "Files Created, restart to see the prefab.",createPrefab.create(self.vmfTextEdit.displayText(), name_str, self.textLineEdit.displayText(), self.iconTextEdit.displayText(),self.expCheckBox.isChecked(),input_number,self.sectionSelect.currentIndex(),self.radioTF2.isChecked()))
             restart_btn = QPushButton("Restart")
             later_btn = QPushButton("Later")
             choice = QMessageBox(self)
