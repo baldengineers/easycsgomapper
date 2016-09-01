@@ -128,9 +128,7 @@ class GridBtn(QWidget):
                 if clicked:
 
                     try:
-                        current_prefab_icon_list = rotation_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
-                        current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
-                        current_prefab_icon_list = current_prefab_icon_list.readlines()
+                        current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+rotation_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()], 'r+').readlines()
                         icon = gameDirVar+current_prefab_icon_list[rotation]
                         if "\n" in icon:
                             icon = icon[:-1]
@@ -180,10 +178,15 @@ class MainWindow(QMainWindow):
         
         TFFormat() if isTFBool else CSFormat()
         
+        util_list = [createPrefab,light_create,generateSkybox,export]
+        for util in util_list:
+            util.setGameDirVar(gameDirVar)
+        '''
         createPrefab.setGameDirVar(gameDirVar)
         light_create.setGameDirVar(gameDirVar)
         generateSkybox.setGameDirVar(gameDirVar)
         export.setGameDirVar(gameDirVar)
+        '''
         
         #create the main window
         super(MainWindow, self).__init__()
