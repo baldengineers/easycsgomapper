@@ -1,5 +1,5 @@
 class Create():
-    def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export):
+    def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
         #prefab_text | string | is the name of the prefab as it will appear in the main application window
@@ -221,6 +221,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_type = "solid"
                 elif block_title == "side":
                     block_type = "side"
+                elif block_title == "entity":
+                    block_type = "entity"
                 elif block_type == "side":
                     if key == "plane":
                         for char_index, char in enumerate(line):
@@ -243,11 +245,14 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.between(line, "[", "]")
                         line.replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
+                elif block_type == "entity":
+                    if key == "":
                 elif key == "id":
-                    if block_type == "solid":
+                    if block_type == "solid" or block_type == "entity":
                         id_var = "world_idnum"
                     elif block_type == "side":
                         id_var = "id_num"
+                    vmf_data[index] = between(line,"\"","\"",i=3)
                     vmf_data[index] = vmf_data[:vmf_data[index].index("id")+5] + id_var + "\"" #This line does this: "id" " + id_var + "
                         
     def assign_var(self, num, line):
@@ -262,21 +267,36 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         vmf_data.replace("(" + self.between(line,"(",")") + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
-    def between(self, string="", first="", last="", f_ind=0, l_ind=0, i=1):
+    def between(self, string="", first="", last="", f_ind=0, l_ind=0, rev=False):
         #finds a substring between the given strings
         
         #string is the string you are searching within
-        #first is the first character/word that limits the resulting word
+        #first is the first character that limits the resulting word
         #last is the last ''
         #f_ind is the index of the first character ''
         #l_ind is the index of the last character ''
-        #i is the amount of iterations to do it (currently unused)
-        
+        #rev is if going through string in reverse
+        """
         if first or last or f_ind or l_ind:
-            start = (string.index(first)) if first else f_ind + (len(first)) if first else 1
+            start = (string[string.index(last)+1:].index(first)) if first else f_ind + (len(first)) if first else 1
             end = (string.index(last, start)) if last else l_ind
             return string[start:end] 
         else:
             return ""
+            """
         
+        word = ""
+        first_met = False
         
+        if first or last or f_ind or l_ind:
+            for char in string if not rev else reversed(string):
+                if char == first:
+                    first_met = True
+                elif first_met:
+                    if not char == last:
+                        word+=char
+                    else:
+                        return word
+                        #implement f_ind and l_ind
+        else:
+            return ""
