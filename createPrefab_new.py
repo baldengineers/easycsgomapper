@@ -198,45 +198,54 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         
         with open(vmf_file, "r") as f:
             vmf_data = f.readlines()
-            header = True
+            header = True #header is used to get rid of the header at the beginning of the vmf file
 
             for index, line in enumerate(vmf_data):
                 if "\"" in line:
-                    line[(line.index("\""):]
-                    #start = s.index( first ) + len( first )
-                    #end = s.index( last, start )
-                    #return s[start:end]
-                    #implement this later
-                if "solid" in line:
+                    key = self.between(line, "\"", "\"")
+                    #for example, in "lightmapscale" "16", lightmapscale is the key
+                elif "{" not in line and "}" not in line:
+                    block_title = line.replace(" ","") #isolates the title of code blocks such as "solid" or "side"
+                else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
+                    continue
+                
+                #structure for the below if statement:
+                #1: if block_title == ...
+                #2: if block_type == ...
+                #3: if key == ...
+                    
+                if block_title == "solid":
                     if header:
                         header = False
                         vmf_data[:index] = ""
                     block_type = "solid"
-                elif "side" in line:
+                elif block_title == "side":
                     block_type = "side"
-                elif "id" in line:
+                elif block_type == "side":
+                    if key == "plane":
+                        for char in line:
+                            if char == "(":
+                                num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
+                                num_index = 0 #current index for the num variable above
+                                block_type = "()"
+                            elif block_type == "()":
+                                if not char == " ":
+                                    if not char == ")":
+                                        num[num_index] += char
+                                    else:
+                                        self.assign_var(num)
+                                        block_type = "side"
+                                else:
+                                    num_index += 1
+                elif key == "id":
                     if block_type == "solid":
                         id_var = "world_idnum"
                     elif block_type == "side":
                         id_var = "id_num"
                     vmf_data[index] = vmf_data[:vmf_data[index].index("id")+5] + id_var + "\"" #This line does this: "id" " + id_var + "
-                elif "(" in line:
-                    if block_type == "side":
-                        if "plane" in line:
-                            for char in line:
-                                if char == "(":
-                                    num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
-                                    num_index = 0 #current index for the num variable above
-                                    block_type = "()"
-                                elif block_type = "()":
-                                    if not char == " ":
-                                        if not char == ")":
-                                            num[num_index] += char
-                                        else:
-                                            self.assign_var(num)
-                                            block_type = "side"
-                                    else:
-                                        num_index += 1
+                elif key == "uaxis" or key == "vaxis":
+                    replace = self.between(line, "[", "]")
+                    line.replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                         
     def assign_var(self, num):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
@@ -246,5 +255,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
         self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
+        
+    def between(self, string, first, last, i=1):
+        #finds a substring between the given strings
+        #i is the amount of iterations to do it (currently unused)
+        start = string.index(first) + len(first)
+        end = string.index(last, start)
+        return string[start:end] 
         
         
