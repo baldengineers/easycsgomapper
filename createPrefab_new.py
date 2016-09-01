@@ -1,5 +1,5 @@
 class Create():
-    def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export,indexLine,index):
+    def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export):
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
         #prefab_text | string | is the name of the prefab as it will appear in the main application window
