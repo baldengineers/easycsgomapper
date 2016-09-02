@@ -267,38 +267,23 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         vmf_data.replace("(" + self.between(line,"(",")") + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
-    def between(self, string="", first="", last="", f_ind=0, l_ind=0, rev=False):
-        #finds a substring between the given strings
-        
-        #string is the string you are searching within
-        #first is the first character that limits the resulting word
-        #last is the last ''
-        #f_ind is the index of the first character ''
-        #l_ind is the index of the last character ''
-        #rev is if going through string in reverse
-        
-        if first or last or f_ind or l_ind:
-            ind_func = eval("string.rindex") if rev else eval("string.index") #whether to check starting from the end or not
-            start = ind_func(first) + len(first) if not rev else -2 #the if not rev part not working
-            end = ind_func(last, start)
-            return string[start:end] 
+def between(string="", first="", last="", f_ind=0, l_ind=0, rev=False):
+    #finds a substring between the given strings
+    
+    #string is the string you are searching within
+    #first is the first character that limits the resulting word
+    #last is the last ''
+    #f_ind is the index of the first character ''
+    #l_ind is the index of the last character ''
+    #rev is if going through string in reverse
+    
+    if first or last or f_ind or l_ind:
+        if not rev:
+            start = string.index(first) + len(first)
+            end = string.index(last,start)
         else:
-            return ""
-            #plz fix later
-"""     
-        word = ""
-        first_met = False
-        
-        if first or last or f_ind or l_ind:
-            for ind,char in enumerate(string if not rev else reversed(string)):
-                if (char == first) if not f_ind else (ind == f_ind):
-                    first_met = True
-                elif first_met:
-                    if not (char == last) if not l_ind else (ind == l_ind):
-                        word+=char
-                    else:
-                        return word
-                        #implement f_ind and l_ind
-        else:
-            return ""
-"""
+            start = string.rindex(first) - 1
+            end = string.rindex(last,start)
+        return string[start:end]
+    else:
+        return ""
