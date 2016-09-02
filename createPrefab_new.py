@@ -279,7 +279,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         
         if first or last or f_ind or l_ind:
             ind_func = eval("string.rindex") if rev else eval("string.index") #whether to check starting from the end or not
-            start = ind_func(first) + len(first)
+            start = ind_func(first) + len(first) if not rev else - 1 #the if not rev part not working
             end = ind_func(last, start)
             return string[start:end] 
         else:
