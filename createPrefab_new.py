@@ -276,27 +276,29 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         #f_ind is the index of the first character ''
         #l_ind is the index of the last character ''
         #rev is if going through string in reverse
-        """
+        
         if first or last or f_ind or l_ind:
-            start = (string[string.index(last)+1:].index(first)) if first else f_ind + (len(first)) if first else 1
-            end = (string.index(last, start)) if last else l_ind
+            ind_func = eval("string.rindex") if rev else eval("string.index") #whether to check starting from the end or not
+            start = ind_func(first) + len(first)
+            end = ind_func(last, start)
             return string[start:end] 
         else:
             return ""
-            """
-        
+            #plz fix later
+"""     
         word = ""
         first_met = False
         
         if first or last or f_ind or l_ind:
-            for char in string if not rev else reversed(string):
-                if char == first:
+            for ind,char in enumerate(string if not rev else reversed(string)):
+                if (char == first) if not f_ind else (ind == f_ind):
                     first_met = True
                 elif first_met:
-                    if not char == last:
+                    if not (char == last) if not l_ind else (ind == l_ind):
                         word+=char
                     else:
                         return word
                         #implement f_ind and l_ind
         else:
             return ""
+"""
