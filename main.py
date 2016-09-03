@@ -976,7 +976,8 @@ class MainWindow(QMainWindow):
     def file_export(self,bsp=False):
         global cur_vmf_location,id_num,stored_info_list, grid_y, grid_x, world_id_num, count_btns, currentlight, skybox, skybox2_list, entity_list, skybox_light_list, skybox_angle_list, latest_path
         skyboxgeolist = []
-        skyboxz = QInputDialog.getText(self,("Set Skybox Height"),("Skybox Height(hammer units, %d minimum recommended):" %(levels*512)), QLineEdit.Normal, "%d" %(levels*512))
+        #make recommended height based off tallest prefab in the map
+        skyboxz = QInputDialog.getText(self,("Set Skybox Height"),("Skybox Height(hammer units, %d minimum recommended):" %(1024)), QLineEdit.Normal, "%d" %(1024))
         try:
             skyboxz = int(skyboxz[0])
         except:
