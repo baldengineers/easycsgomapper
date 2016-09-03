@@ -1,3 +1,5 @@
+import re
+
 class Create():
     def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
         #vmf_file | string | contains the filepath of the vmf file of the prefab
@@ -197,13 +199,15 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         block_type = "" #block_type contains the current block of code the program is currently looking at. A block of code is determined by the two brackets {}/()/[] surrounding it.
         
         with open(vmf_file, "r") as f:
-            vmf_data = f.readlines()
+            self.vmf_data = f.readlines()
             header = True #header is used to get rid of the header at the beginning of the vmf file
 
-            for index, line in enumerate(vmf_data):
+            for index, line in enumerate(self.vmf_data):
                 if "\"" in line:
-                    key = self.between(line, "\"", "\"")
-                    #for example, in "lightmapscale" "16", lightmapscale is the key
+                    line_sep = self.separate("Q",line) #line separated by the quotes as a tuple
+                    key = line_sep[0]
+                    value = line_sep[1]
+                    #for example, in "lightmapscale" "16", lightmapscale is the key, 16 is the value
                 elif "{" not in line and "}" not in line:
                     block_title = line.replace(" ","") #isolates the title of code blocks such as "solid" or "side"
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
@@ -217,7 +221,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                 if block_title == "solid":
                     if header:
                         header = False
-                        vmf_data[:index] = ""
+                        self.vmf_data[:index] = ""
                     block_type = "solid"
                 elif block_title == "side":
                     block_type = "side"
@@ -225,11 +229,14 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_type = "entity"
                 elif block_type == "side":
                     if key == "plane":
+                        curr_p = 0 #current point that program is iterating through, increases at every "("
                         for char_index, char in enumerate(line):
                             if char == "(":
+                                curr_p += 1
                                 num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
                                 num_index = 0 #current index for the num variable above
-                                if "X" not in self.between(line,f_ind=char_index,last=")"):
+                                p_vals = self.separate("P",line) #contains all the point values of the plane in a tuple
+                                if "X" not in p_vals[curr_p-1]: #must subtract 1 from curr_p to get INDEX
                                     block_type = "()"
                                 else:
                                     pass
@@ -238,13 +245,13 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                                     if not char == ")":
                                         num[num_index] += char
                                     else:
-                                        self.assign_var(num, line)
+                                        self.assign_var(num, line, p_vals[curr_p-1])
                                         block_type = "side"
                                 else:
                                     num_index += 1
                     elif key == "uaxis" or key == "vaxis":
-                        replace = self.between(line, "[", "]")
-                        line.replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
+                        replace = self.separate("B", line, "[", "]")
+                        self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                 elif block_type == "entity":
                     if key == "":
                 elif key == "id":
@@ -252,9 +259,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         id_var = "world_idnum"
                     elif block_type == "side":
                         id_var = "id_num"
-                    vmf_data[index].replace(between(line,"\"","\"",rev=True), id_var)
+                    self.vmf_data[index].replace(value, id_var)
                         
-    def assign_var(self, num, line):
+    def assign_var(self, num, line, p_val):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
             
@@ -263,23 +270,22 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
         self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
         
-        vmf_data.replace("(" + self.between(line,"(",")") + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
+        self.vmf_data.replace("(" + p_val + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
-    def between(self, string="", first="", last="", f_ind=0, l_ind=0, rev=False):
-        #finds a substring between the given strings
+    def separate(self, t, s, first="", last="")
+        #separate(t) separates a string based on what you want to separate
+        #t | string | is the type of line that you want to separate
+        #s | string | string you want to separate
+        #first and last are optional parameters to find a word between
         
-        #string is the string you are searching within
-        #first is the first character that limits the resulting word
-        #last is the last ''
-        #f_ind is the index of the first character ''
-        #l_ind is the index of the last character ''
-        #rev is if going through string in reverse
-        
-        if not rev:
-            start = (string.index(first) + len(first)) if first else f_ind + 1
-            end = (string.index(last,start)) if last else l_ind
+        if t == "BY_QUOTE" or t == "Q":
+            ex = r'"(.*?)" "(.*?)"'
+        elif t == "BY_PARENTHESIS" or t == "P":
+            ex = r'\((.*?)\) \((.*?)\) \((.*?)\)'
+        elif t == "BETWEEN" or t == "B":
+            ex = r'%s(.*?)%s' % (first, last)
         else:
-            start = (string.rindex(first) - 1) if first else f_ind - 1
-            end = (string.rindex(last,start)) if last else l_ind
-        return string[start:end]
+            return print("%s is is not a valid separate command" % (t))
+            
+        return re.search(ex,s).groups()
