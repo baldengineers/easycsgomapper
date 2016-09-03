@@ -84,6 +84,7 @@ class GridBtn(QWidget):
         global history
         global redo_history
         global prefab_list
+        global xmin,ymin,xmax,ymax
         
 
         current_list = eval('parent.tile_list%s' % str(parent.list_tab_widget.currentIndex()+1))
@@ -109,7 +110,7 @@ class GridBtn(QWidget):
             clear_btn(btn_id)
         else:
             if clicked:
-                if ymin = None or xmin = None:
+                if ymin == None or xmin == None:
                     ymin,xmin = y,x
                 else:
                     if y < ymin:
@@ -439,7 +440,7 @@ class MainWindow(QMainWindow):
 
         actiondict = {}
         self.buttonLabel = QLabel("Rotation:",self)
-        self.levelLabel = QLabel("Level Select:",self)
+        #self.levelLabel = QLabel("Level Select:",self)
         self.listLabel = QLabel("List of prefabs:",self)
         self.gridLabel = QLabel("Work Area:",self)
         
@@ -466,7 +467,7 @@ class MainWindow(QMainWindow):
 ##        self.level.setFixedSize(QSize(150,30))
 ##        self.level.clicked.connect(self.level_select)
 ##'''
-
+        '''
         self.levelSelect = QComboBox(self)
         self.levelSelect.currentIndexChanged.connect(lambda: self.change_level_new())
 
@@ -481,7 +482,7 @@ class MainWindow(QMainWindow):
         self.leveldown.setIconSize(QSize(20,20))
         self.leveldown.clicked.connect(lambda: self.change_level(True, False))
         self.leveldown.setAutoRaise(True)
-        
+        '''        
         self.rotateCW = QToolButton(self)
         self.rotateCW.setShortcut(QKeySequence(Qt.Key_Right))
         self.rotateCW.setIcon(QIcon('icons/rotate_cw.png'))
@@ -506,10 +507,10 @@ class MainWindow(QMainWindow):
         self.button_rotate_layout.addWidget(self.current)
         self.button_rotate_layout.addWidget(self.rotateCW)
         self.button_rotate_layout.addWidget(self.divider)
-        self.button_rotate_layout.addWidget(self.levelLabel)
-        self.button_rotate_layout.addWidget(self.levelSelect)
-        self.button_rotate_layout.addWidget(self.levelup)
-        self.button_rotate_layout.addWidget(self.leveldown)
+        #self.button_rotate_layout.addWidget(self.levelLabel)
+        #self.button_rotate_layout.addWidget(self.levelSelect)
+        #self.button_rotate_layout.addWidget(self.levelup)
+        #self.button_rotate_layout.addWidget(self.leveldown)
         
         self.button_rotate_layout.addStretch(1)
             
@@ -686,15 +687,17 @@ class MainWindow(QMainWindow):
         try:
             for i in range(1000):
                 try:
-                    self.levelSelect.removeItem(i)
+                    pass
+                    #self.levelSelect.removeItem(i)
                 except:
                     break
         except:
             pass
         print(levels)
-        self.levelSelect.removeItem(0)
+        #self.levelSelect.removeItem(0)
         for i in range(levels):
-            self.levelSelect.addItem("Level %s" % str(i+1))
+            pass
+            #self.levelSelect.addItem("Level %s" % str(i+1))
 
     def changeCurrentList(self):
         global current_list
@@ -1212,19 +1215,19 @@ class MainWindow(QMainWindow):
             self.text3 = QLineEdit()
 
             self.okay_btn = QPushButton("OK",self)
-            self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText()))
+            self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), 1))
 
             self.form = QFormLayout()
             self.form.addRow("Set Grid Width:",self.text)
             self.form.addRow("Set Grid Height:",self.text2)
-            self.form.addRow("Set Amount of Levels:",self.text3)
+            #self.form.addRow("Set Amount of Levels:",self.text3)
             self.form.addRow(self.okay_btn)
 
             self.window.setLayout(self.form)
             self.window.setWindowTitle("Set Grid Size")
             self.window.exec_()
         elif var2 == True:
-            self.grid_change_func(sxvar,syvar,szvar)
+            self.grid_change_func(sxvar,syvar,1)
 
     def grid_change_func(self,x,y,z):
         global grid_y, grid_x, levels, file_loaded, currentfilename, level, count_btns
@@ -1466,7 +1469,7 @@ class MainWindow(QMainWindow):
         #self.form.addRow("Make Rotations?", self.rotCheckBox)
         self.form.addRow("Export prefab?", self.expCheckBox)
         self.form.addRow("Which section?",self.sectionSelect)
-        self.form.addRow("Which game?" self.radioLayout)
+        self.form.addRow("Which game?", self.radioLayout)
         for i in range(5):
             self.form.addRow(self.blankstring)
         self.form.addRow(self.okay_btn_layout)
@@ -1806,7 +1809,7 @@ class initWindow(QMainWindow):
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.text)
         self.form.addRow("Set Grid Height:",self.text2)
-        self.form.addRow("Set Amount of Levels:",self.text3)
+        #self.form.addRow("Set Amount of Levels:",self.text3)
         self.form.addRow("Choose game:",self.radioLayout)
         self.form.addRow(self.okay_btn)
 
@@ -1815,9 +1818,10 @@ class initWindow(QMainWindow):
         self.window.exec_()
         #return radioTF2.isClicked()
     def clickFunction(self):
-        gui = MainWindow(self.radioTF2.isChecked())
-        gui.grid_change_func(self.text.displayText(), self.text2.displayText(), self.text3.displayText())
         self.window.deleteLater()
+        gui = MainWindow(self.radioTF2.isChecked())
+        gui.grid_change_func(self.text.displayText(), self.text2.displayText(), 1)
+        
         
         
 #define some global variables
