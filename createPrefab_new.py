@@ -242,57 +242,55 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_type = "side"
                 elif block_title == "entity":
                     block_type = "entity"
+                elif block_title == "cameras":
+                    del self.vmf_data[index:]
                 elif block_type == "side":
                     if key == "plane":
                         curr_p = 0 #current point that program is iterating through, increases at every "("
                         for char_index, char in enumerate(line):
                             if char == "(":
                                 curr_p += 1
-                                num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
+                                #num = ["","",""] #num is for the numbers in the parenthesis that are the x y z coords of the point, it is a list of STRINGS
                                 num_index = 0 #current index for the num variable above
                                 p_vals = self.separate("P",value) #contains all the point values of the plane in a tuple
                                 if "x" not in p_vals[curr_p-1]: #must subtract 1 from curr_p to get INDEX
-                                    block_type = "()"
+                                    self.assign_var(p_vals[curr_p-1])
                                 else:
                                     pass
-                            elif block_type == "()":
-                                if not char == " ":
-                                    if not char == ")":
-                                        num[num_index] += char
-                                    else:
-                                        self.assign_var(num, line, p_vals[curr_p-1])
-                                        block_type = "side"
-                                else:
-                                    num_index += 1
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                 elif block_type == "entity":
                     if key == "angles":
-                        anglevallist = line.split("\" \"")[1].replace("\"","").split(" ")
-                        self.vmf_data[index] = self.vmf_data[index].replace(self.vmf_data[index].split("\" \"")[1].replace("\"",""),"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))
+                        anglevallist = value.split(" ")
+                        self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))
                         
                     elif key == "origin":
-                        originvals = line.split("\" \"")[1].replace("\"","")
-                        self.vmf_data[index] = self.vmf_data[index].replace(self.vmf_data[index].split("\" \"")[1].replace("\"",""),"px%s py%s pz%s" % (self.var_num,self.var_num,self.var_num))        
-                        self.var_num+=1    
+                        self.assign_var(value) 
 
         print("vmf_data: ")
         for i in self.vmf_data:
             print(i)
         print("var_list: ",self.var_list)
                         
-    def assign_var(self, num, line, p_val):
+    def assign_var(self, p_val):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
-        X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
+        #p_val is the coord values for the point
+        #ent is whether or not to put a p in front of var to signify an entity
+        
+        nums = p_val.split(" ")
+        X,Y,Z = 0,1,2 #Constants to make managing the indices of nums[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(self.var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else ""))
+        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(self.var_num, "+" + nums[X], "+" + nums[Y]))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
-        self.var_list.append("z%d = level*%d + %s" %(self.var_num, self.LEVEL_HEIGHT, num[Z]))
+        self.var_list.append("z%d = level*%d + %s" %(self.var_num, self.LEVEL_HEIGHT, nums[Z]))
 
         for index in range(len(self.vmf_data)):
-            self.vmf_data[index] = self.vmf_data[index].replace("(" + p_val + ")", "(x%d y%d z%d)" %(self.var_num, self.var_num, self.var_num))
+            line_sep = self.separate("Q",self.vmf_data[index])
+            key = line_sep[0]
+            if not key == "angles":
+                self.vmf_data[index] = self.vmf_data[index].replace(p_val, "x%d y%d z%d" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
     def separate(self, t, s, first="", last=""):
@@ -309,7 +307,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             ex = r'%s(.*?)%s' % (first, last)
         else:
             return print("%s is is not a valid separate command" % (t))
-            
-        return re.search(ex,s).groups()
 
-xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+        try:    
+            return re.search(ex,s).groups()
+        except AttributeError: #happens if the above is NoneType
+            return [""]
+
+#xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+
+xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
