@@ -252,8 +252,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         id_var = "world_idnum"
                     elif block_type == "side":
                         id_var = "id_num"
-                    vmf_data[index] = between(line,"\"","\"",i=3)
-                    vmf_data[index] = vmf_data[:vmf_data[index].index("id")+5] + id_var + "\"" #This line does this: "id" " + id_var + "
+                    vmf_data[index].replace(between(line,"\"","\"",rev=True), id_var)
                         
     def assign_var(self, num, line):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
@@ -267,17 +266,16 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         vmf_data.replace("(" + self.between(line,"(",")") + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
-def between(string="", first="", last="", f_ind=0, l_ind=0, rev=False):
-    #finds a substring between the given strings
+    def between(self, string="", first="", last="", f_ind=0, l_ind=0, rev=False):
+        #finds a substring between the given strings
+        
+        #string is the string you are searching within
+        #first is the first character that limits the resulting word
+        #last is the last ''
+        #f_ind is the index of the first character ''
+        #l_ind is the index of the last character ''
+        #rev is if going through string in reverse
     
-    #string is the string you are searching within
-    #first is the first character that limits the resulting word
-    #last is the last ''
-    #f_ind is the index of the first character ''
-    #l_ind is the index of the last character ''
-    #rev is if going through string in reverse
-    
-    if first or last or f_ind or l_ind:
         if not rev:
             start = string.index(first) + len(first)
             end = string.index(last,start)
@@ -285,5 +283,3 @@ def between(string="", first="", last="", f_ind=0, l_ind=0, rev=False):
             start = string.rindex(first) - 1
             end = string.rindex(last,start)
         return string[start:end]
-    else:
-        return ""
