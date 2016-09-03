@@ -94,8 +94,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         "#INSERT_ENT_CODE\n",]
 
-#here is entity code, feel free to change. only added to get the new entity rotation code in.        
-  ent_code =["#INSERT_ENT_OPEN_FILE\n",
+        #here is entity code, feel free to change. only added to get the new entity rotation code in.        
+        ent_code =["#INSERT_ENT_OPEN_FILE\n",
 
              """
     lines_ent = g.readlines()
@@ -196,32 +196,48 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         entity_num += 1
 """]
+        block_title = ""
         block_type = "" #block_type contains the current block of code the program is currently looking at. A block of code is determined by the two brackets {}/()/[] surrounding it.
+        key = ""
+        value = ""
         
         with open(vmf_file, "r") as f:
             self.vmf_data = f.readlines()
             header = True #header is used to get rid of the header at the beginning of the vmf file
 
             for index, line in enumerate(self.vmf_data):
+                key = ""
+                value = ""
+                block_title = "" #note: don't reset block_type because that carries lasts until the bracket
                 if "\"" in line:
                     line_sep = self.separate("Q",line) #line separated by the quotes as a tuple
                     key = line_sep[0]
                     value = line_sep[1]
                     #for example, in "lightmapscale" "16", lightmapscale is the key, 16 is the value
                 elif "{" not in line and "}" not in line:
-                    block_title = line.replace(" ","") #isolates the title of code blocks such as "solid" or "side"
+                    block_title = line.strip() #isolates the title of code blocks such as "solid" or "side"
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
+                    #block_type = ""
                     continue
                 
                 #structure for the below if statement:
-                #1: if block_title == ...
-                #2: if block_type == ...
-                #3: if key == ...
-                    
-                if block_title == "solid":
+                #1: if key == ...
+                #2: elif block_title == ...
+                #3: elif block_type == ...
+
+                if key == "id":
+                    if block_type == "solid" or block_type == "entity":
+                        id_var = "world_idnum"
+                    elif block_type == "side":
+                        id_var = "id_num"
+                    else:
+                        continue
+                    self.vmf_data[index] = self.vmf_data[index].replace(value, id_var)
+                elif block_title == "solid":
                     if header:
                         header = False
-                        self.vmf_data[:index] = ""
+                        for i in range(index):
+                            self.vmf_data[i] = ""
                     block_type = "solid"
                 elif block_title == "side":
                     block_type = "side"
@@ -235,8 +251,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                                 curr_p += 1
                                 num = ["","",""] #num is for the numbers in the parenthesis that are the points for the plane, it is a list of STRINGS
                                 num_index = 0 #current index for the num variable above
-                                p_vals = self.separate("P",line) #contains all the point values of the plane in a tuple
-                                if "X" not in p_vals[curr_p-1]: #must subtract 1 from curr_p to get INDEX
+                                p_vals = self.separate("P",value) #contains all the point values of the plane in a tuple
+                                if "x" not in p_vals[curr_p-1]: #must subtract 1 from curr_p to get INDEX
                                     block_type = "()"
                                 else:
                                     pass
@@ -250,30 +266,32 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                                 else:
                                     num_index += 1
                     elif key == "uaxis" or key == "vaxis":
-                        replace = self.separate("B", line, "[", "]")
-                        self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
+                        replace = self.separate("B", value, "\[", "\]")[0]
+                        self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                 elif block_type == "entity":
                     if key == "":
-                elif key == "id":
-                    if block_type == "solid" or block_type == "entity":
-                        id_var = "world_idnum"
-                    elif block_type == "side":
-                        id_var = "id_num"
-                    self.vmf_data[index].replace(value, id_var)
+                        #TODO: implement entity stuffz
+                        pass
+
+        print("vmf_data: ")
+        for i in self.vmf_data:
+            print(i)
+        print("var_list: ",self.var_list)
                         
     def assign_var(self, num, line, p_val):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         X,Y,Z = 0,1,2 #Constants to make managing the indices of num[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else ""))
+        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(self.var_num, ("+" + num[X]) if num[X] != 0 else "", ("+" + num[Y]) if num[Y] != 0 else ""))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
-        self.var_list.append("z%d = level*%d + %d" %(self.var_num, LEVEL_HEIGHT, num[Z]))
-        
-        self.vmf_data.replace("(" + p_val + ")", "(x%d, y%d, z%d)" %(self.var_num, self.var_num, self.var_num))
+        self.var_list.append("z%d = level*%d + %s" %(self.var_num, self.LEVEL_HEIGHT, num[Z]))
+
+        for index in range(len(self.vmf_data)):
+            self.vmf_data[index] = self.vmf_data[index].replace("(" + p_val + ")", "(x%d y%d z%d)" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
-    def separate(self, t, s, first="", last="")
+    def separate(self, t, s, first="", last=""):
         #separate(t) separates a string based on what you want to separate
         #t | string | is the type of line that you want to separate
         #s | string | string you want to separate
@@ -289,3 +307,5 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             return print("%s is is not a valid separate command" % (t))
             
         return re.search(ex,s).groups()
+
+xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
