@@ -109,10 +109,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     tlist.append(char)
                 if char == "_":
                     us_count += 1
-            old = "".join(tlist)
             tlist = "".join(tlist).split(' ')
             
-            rot_replace_list.append([line,"%s" % str(int(tlist[0])*(-90))+' '+str(int(tlist[1])*(-90))+' '+str(int(tlist[2])*(-90)),index])
+            lines_ent[index] = ([line.replace(line.split("\" \"")[1].replace("\"",""),str(int(tlist[0]*(-90))+' '+str(int(tlist[1]*(-90))+' '+str(int(tlist[2]*(-90))
     for rep in rot_replace_list:
         lines_ent[rep[2]] = lines_ent[rep[2]].replace('#ROTATION_'+rep[0],rep[1])
 """,
@@ -269,9 +268,14 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
                 elif block_type == "entity":
-                    if key == "":
-                        #TODO: implement entity stuffz
-                        pass
+                    if key == "angles":
+                        anglevallist = line.split("\" \"")[1].replace("\"","").split(" ")
+                        self.vmf_data[index] = self.vmf_data[index].replace(self.vmf_data[index].split("\" \"")[1].replace("\"",""),"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))
+                        
+                    elif key == "origin":
+                        originvals = line.split("\" \"")[1].replace("\"","")
+                        self.vmf_data[index] = self.vmf_data[index].replace(self.vmf_data[index].split("\" \"")[1].replace("\"",""),"px%s py%s pz%s" % (self.var_num,self.var_num,self.var_num))        
+                        self.var_num+=1    
 
         print("vmf_data: ")
         for i in self.vmf_data:
