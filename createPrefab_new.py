@@ -275,11 +275,11 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         #f_ind is the index of the first character ''
         #l_ind is the index of the last character ''
         #rev is if going through string in reverse
-    
+        
         if not rev:
-            start = string.index(first) + len(first)
-            end = string.index(last,start)
+            start = (string.index(first) + len(first)) if first else f_ind + 1
+            end = (string.index(last,start)) if last else l_ind
         else:
-            start = string.rindex(first) - 1
-            end = string.rindex(last,start)
+            start = (string.rindex(first) - 1) if first else f_ind - 1
+            end = (string.rindex(last,start)) if last else l_ind
         return string[start:end]
