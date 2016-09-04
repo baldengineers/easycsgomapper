@@ -1952,23 +1952,12 @@ def TFFormat():
         else:
             prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
 
-    #f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
-    #lns = f.readlines()
-    #f.close()
 
     section = 0
     rotation_icon_list = []
     index_section_list = [0]
     rotation_icon_list.append([])
-    '''
-    for index,line in enumerate(lns):
-        if line == '\n':
-            index_section_list.append(index)
-            rotation_icon_list.append([])
-            section+=1
-        else:
-            rotation_icon_list[section].append(line[:-1] if '\n' in line else line)
-    '''
+
     #print(rotation_icon_list)
     for line in skybox_file.readlines():
         skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
