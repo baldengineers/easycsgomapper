@@ -263,10 +263,10 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                 elif block_type == "entity":
                     if key == "angles":
                         anglevallist = value.split(" ")
-                        self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))
-                        
+                        self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))  
                     elif key == "origin":
-                        self.assign_var(value) 
+                        self.assign_var(value)
+                    
 
         print("vmf_data: ")
         for i in self.vmf_data:
@@ -276,7 +276,6 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     def assign_var(self, p_val):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         #p_val is the coord values for the point
-        #ent is whether or not to put a p in front of var to signify an entity
         
         nums = p_val.split(" ")
         X,Y,Z = 0,1,2 #Constants to make managing the indices of nums[] easier
