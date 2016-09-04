@@ -1,4 +1,0 @@
-icons/spire_right.jpg
-icons/spire_down.jpg
-icons/spire_left.jpg
-icons/spire_up.jpg

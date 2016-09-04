@@ -1,4 +1,0 @@
-icons/blank_tile_right.jpg
-icons/blank_tile_down.jpg
-icons/blank_tile_left.jpg
-icons/blank_tile_up.jpg

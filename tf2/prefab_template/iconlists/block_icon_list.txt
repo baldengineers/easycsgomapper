@@ -1,4 +1,0 @@
-icons/block_right.jpg
-icons/block_down.jpg
-icons/block_left.jpg
-icons/block_up.jpg

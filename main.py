@@ -129,10 +129,14 @@ class GridBtn(QWidget):
                 if clicked:
 
                     try:
-                        current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+rotation_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()], 'r+').readlines()
-                        icon = gameDirVar+current_prefab_icon_list[rotation]
+                        icon = gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         if "\n" in icon:
                             icon = icon[:-1]
+                        #following three lines rotates it
+                        icon = QPixmap(icon)
+                        transform = QTransform().rotate(90*rotation)
+                        icon = icon.transformed(transform, Qt.SmoothTransformation)
+
                     except Exception as e:
                         print(str(e))
                         icon = gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
@@ -1948,14 +1952,15 @@ def TFFormat():
         else:
             prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
 
-    f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
-    lns = f.readlines()
-    f.close()
+    #f = open(gameDirVar+'prefab_template/rot_prefab_list.txt', 'r+')
+    #lns = f.readlines()
+    #f.close()
 
     section = 0
     rotation_icon_list = []
     index_section_list = [0]
     rotation_icon_list.append([])
+    '''
     for index,line in enumerate(lns):
         if line == '\n':
             index_section_list.append(index)
@@ -1963,6 +1968,7 @@ def TFFormat():
             section+=1
         else:
             rotation_icon_list[section].append(line[:-1] if '\n' in line else line)
+    '''
     #print(rotation_icon_list)
     for line in skybox_file.readlines():
         skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line

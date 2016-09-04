@@ -1,4 +1,0 @@
-icons/wall_stone_right.jpg
-icons/wall_stone_down.jpg
-icons/wall_stone_left.jpg
-icons/wall_stone_up.jpg

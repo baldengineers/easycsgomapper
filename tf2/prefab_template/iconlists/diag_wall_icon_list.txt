@@ -1,4 +1,0 @@
-icons/diag_wall_right.jpg
-icons/diag_wall_down.jpg
-icons/diag_wall_left.jpg
-icons/diag_wall_up.jpg
