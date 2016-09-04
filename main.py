@@ -823,26 +823,32 @@ class MainWindow(QMainWindow):
     def changeIcon(self):
         global rotation
         
-        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
-        try:
-            #print('1')
-            current_prefab_icon_list = rotation_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
-            #print('2')
-            current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
-            #print('3')
-            current_prefab_icon_list = current_prefab_icon_list.readlines()
-            #print('4')
-            icon = current_prefab_icon_list[rotation]
-            #print('5')
-            if "\n" in icon:
-                icon = icon[:-1]
-            self.current.setIcon(QIcon(gameDirVar+icon))
-            self.current.setIconSize(QSize(32,32))
-        except Exception as e:
-            print(str(e))
-            icon = gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
-            self.current.setIcon(QIcon(icon))
-            self.current.setIconSize(QSize(32,32))
+##        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
+##        try:
+##            #print('1')
+##            current_prefab_icon_list = rotation_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+##            #print('2')
+##            current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
+##            #print('3')
+##            current_prefab_icon_list = current_prefab_icon_list.readlines()
+##            #print('4')
+##            icon = current_prefab_icon_list[rotation]
+##            #print('5')
+##            if "\n" in icon:
+##                icon = icon[:-1]
+##            self.current.setIcon(QIcon(gameDirVar+icon))
+##            self.current.setIconSize(QSize(32,32))
+##        except Exception as e:
+##            print(str(e))
+        icon = gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+
+        #following three lines rotates it
+        pixmap = QPixmap(icon)
+        transform = QTransform().rotate(90*rotation)
+        pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
+        
+        self.current.setIcon(QIcon(pixmap))
+        self.current.setIconSize(QSize(32,32))
       
         
     def file_open(self, tmp = False, first = False):
