@@ -1231,7 +1231,6 @@ class MainWindow(QMainWindow):
 ##            self.window.exec_()
 ##        elif var2 == True:
 ##            self.grid_change_func(sxvar,syvar,1)
-##
         #can you move the logic above (with var,var2,and var3) into grid_change_func? If you do that, I can implement the following, much more efficient grid_change()
         dialog = initWindow(False, self)
         dialog.gridChange()
