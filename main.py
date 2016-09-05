@@ -1243,18 +1243,10 @@ class MainWindow(QMainWindow):
         self.count = 0
         
         file_loaded = False
-        try:
-            self.window.deleteLater()
-        except:
-            pass
 
-        try:
-            self.grid_y = int(y)
-            self.grid_x = int(x)
-            levels = int(z)
-        except ValueError:
-            QMessageBox.critical(self.window, "Error", "Please enter a number.")
-            self.grid_change(0,0,0,False,False,True)
+        self.grid_y = y
+        self.grid_x = x
+        levels = z
 
         self.removeButtons()
 
@@ -1830,6 +1822,7 @@ class initWindow(QMainWindow):
         self.window.exec_()
         #return radioTF2.isClicked()
     def clickFunction(self):
+        self.window.hide()
         self.window.deleteLater()
         if self.startup:
             gui = MainWindow(self.radioTF2.isChecked())
