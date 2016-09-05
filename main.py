@@ -558,7 +558,7 @@ class MainWindow(QMainWindow):
             
         for i in range(self.list_tab_widget.count()):
             eval("self.tile_list%d" %(i+1)).currentItemChanged.connect(self.changeIcon)
-
+        
         #contains label and list vertically
         self.tile_list_layout = QVBoxLayout()
         self.tile_list_layout.addWidget(self.listLabel)
@@ -585,9 +585,32 @@ class MainWindow(QMainWindow):
         self.column = QHBoxLayout()
         self.column.addLayout(self.button_grid_all)
         self.column.addLayout(self.tile_list_layout)
-        
+
         self.row = QVBoxLayout(self.central_widget)
         self.row.addLayout(self.column)
+        
+        #widgets needed for the splitter
+        #IMPLEMENT LATER
+##        self.left_top = QWidget()
+##        self.left_top.setLayout(self.button_rotate_layout)
+##        self.left_bot = QWidget()
+##        self.left_bot.setLayout(self.gridLayout)
+##        self.right = QWidget()
+##        self.right.setLayout(self.tile_list_layout)
+##
+##        self.splitter_left = QSplitter()
+##        self.splitter_left.setOrientation(Qt.Vertical)
+##        self.splitter_left.addWidget(self.left_top)
+##        self.splitter_left.addWidget(self.left_bot)
+##
+##        self.splitter_right = QSplitter()
+##        self.splitter_right.addWidget(self.right)
+##
+##        self.row = QVBoxLayout(self.central_widget)
+##        self.row.addWidget(self.splitter_left)
+##        self.row.addWidget(self.splitter_right)
+        
+        
 
         current_list = self.tile_list1
         
