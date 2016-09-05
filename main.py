@@ -447,14 +447,7 @@ class MainWindow(QMainWindow):
         #self.levelLabel = QLabel("Level Select:",self)
         self.listLabel = QLabel("List of prefabs:",self)
         self.gridLabel = QLabel("Work Area:",self)
-        
-        self.divider = QFrame(self)
-        self.divider.setFrameShape(QFrame.VLine)
-        self.divider.setLineWidth(10)
-
-        self.dividerH = QFrame(self)
-        self.dividerH.setFrameShape(QFrame.HLine)
-        self.dividerH.setLineWidth(10)
+        self.toolsLabel = QLabel("Prefab Controls:",self)
 
         self.current = QPushButton("",self)
         self.current.setIcon(QIcon(''))
@@ -510,7 +503,6 @@ class MainWindow(QMainWindow):
         self.button_rotate_layout.addWidget(self.rotateCCW)
         self.button_rotate_layout.addWidget(self.current)
         self.button_rotate_layout.addWidget(self.rotateCW)
-        self.button_rotate_layout.addWidget(self.divider)
         #self.button_rotate_layout.addWidget(self.levelLabel)
         #self.button_rotate_layout.addWidget(self.levelSelect)
         #self.button_rotate_layout.addWidget(self.levelup)
@@ -571,6 +563,7 @@ class MainWindow(QMainWindow):
         self.tile_list_layout = QVBoxLayout()
         self.tile_list_layout.addWidget(self.listLabel)
         self.tile_list_layout.addWidget(self.list_tab_widget)
+        self.tile_list_layout.addWidget(self.toolsLabel)
         self.tile_list_layout.addWidget(self.tile_toolbar)
         
         self.button_grid_layout = QGridLayout()
@@ -587,7 +580,6 @@ class MainWindow(QMainWindow):
         self.gridLayout.addWidget(self.scrollArea)
         self.button_grid_all = QVBoxLayout()
         self.button_grid_all.addLayout(self.button_rotate_layout)
-        self.button_grid_all.addWidget(self.dividerH)
         self.button_grid_all.addLayout(self.gridLayout)
         
         self.column = QHBoxLayout()
@@ -610,7 +602,7 @@ class MainWindow(QMainWindow):
 
             QMessageBox.information(self, "First Launch", "First Launch!\n\nYou haven't launched this before! Try looking at the <a href=\"https://github.com/baldengineers/easytf2_mapper/wiki/Texture-bug\">wiki</a> for help!")
             f.write("startup")
-            f.close
+            f.close()
         
             #WILL ONLY WORK IN REDIST FORM
         else:
@@ -1193,52 +1185,56 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
         
     def grid_change(self,xvar,yvar,zvar,var,var2,var3):
-        global totalblocks,entity_list,grid_list,iconlist
-        if var2 == True:
-            sxvar = xvar
-            syvar = yvar
-            szvar = zvar
-        else:
-            pass
-        self.count = 0
-        count_btns=0
-        if var3 == True:
-            try:
-                del entity_list
-                del totalblocks
-                del iconlist
-                del grid_list
-                entity_list = []
-                iconlist = []
-                totalblocks = []
-                grid_list = []
-            except Exception as e:
-                print(str(e))
-                pass
-
-        #gridsize_list = []
-        self.btn_id_count = 0
-        if var == True:
-            self.window = QDialog(self)
-
-            self.text = QLineEdit()
-            self.text2 = QLineEdit()
-            self.text3 = QLineEdit()
-
-            self.okay_btn = QPushButton("OK",self)
-            self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), 1))
-
-            self.form = QFormLayout()
-            self.form.addRow("Set Grid Width:",self.text)
-            self.form.addRow("Set Grid Height:",self.text2)
-            #self.form.addRow("Set Amount of Levels:",self.text3)
-            self.form.addRow(self.okay_btn)
-
-            self.window.setLayout(self.form)
-            self.window.setWindowTitle("Set Grid Size")
-            self.window.exec_()
-        elif var2 == True:
-            self.grid_change_func(sxvar,syvar,1)
+##        global totalblocks,entity_list,grid_list,iconlist
+##        if var2 == True:
+##            sxvar = xvar
+##            syvar = yvar
+##            szvar = zvar
+##        else:
+##            pass
+##        self.count = 0
+##        count_btns=0
+##        if var3 == True:
+##            try:
+##                del entity_list
+##                del totalblocks
+##                del iconlist
+##                del grid_list
+##                entity_list = []
+##                iconlist = []
+##                totalblocks = []
+##                grid_list = []
+##            except Exception as e:
+##                print(str(e))
+##                pass
+##
+##        #gridsize_list = []
+##        self.btn_id_count = 0
+##        if var == True:
+##            self.window = QDialog(self)
+##
+##            self.text = QLineEdit()
+##            self.text2 = QLineEdit()
+##            self.text3 = QLineEdit()
+##
+##            self.okay_btn = QPushButton("OK",self)
+##            self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), 1))
+##
+##            self.form = QFormLayout()
+##            self.form.addRow("Set Grid Width:",self.text)
+##            self.form.addRow("Set Grid Height:",self.text2)
+##            #self.form.addRow("Set Amount of Levels:",self.text3)
+##            self.form.addRow(self.okay_btn)
+##
+##            self.window.setLayout(self.form)
+##            self.window.setWindowTitle("Set Grid Size")
+##            self.window.exec_()
+##        elif var2 == True:
+##            self.grid_change_func(sxvar,syvar,1)
+##
+        #can you move the logic above (with var,var2,and var3) into grid_change_func? If you do that, I can implement the following, much more efficient grid_change()
+        dialog = initWindow(False, self)
+        dialog.gridChange()
 
     def grid_change_func(self,x,y,z):
         global grid_y, grid_x, levels, file_loaded, currentfilename, level, count_btns
@@ -1258,7 +1254,6 @@ class MainWindow(QMainWindow):
             self.grid_x = int(x)
             levels = int(z)
         except ValueError:
-            #TODO: Instead of a print statement, we need to bring up a window, alerting the user
             QMessageBox.critical(self.window, "Error", "Please enter a number.")
             self.grid_change(0,0,0,False,False,True)
 
@@ -1755,6 +1750,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
     def heavy(self):
         self.gif("icons/heavy.gif", (350,262,150,99), "DANCE HEAVY DANCE!")
+        print("LOL")
 
     def gif(self, file, geo, title, icon="icons\icon.ico"):
         self.gif = QLabel()
@@ -1768,8 +1764,10 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
         movie.start()
 
 class initWindow(QMainWindow):
-    def __init__(self):   
+    def __init__(self,startup=True,gui=None):   
         super(initWindow,self).__init__()
+        self.startup = startup #if the window is being run when program starts up
+        self.gui = gui #is not none only when changing grid size when main ui is open. when this happens, gui is the main ui's "self"
     def gridChange(self):
         global totalblocks,entity_list,grid_list,iconlist
         self.count = 0
@@ -1794,19 +1792,22 @@ class initWindow(QMainWindow):
         self.window = QDialog(self)
         self.window.setWindowIcon(QIcon("icons\icon.ico"))
         #limit to num only
-        self.text = QLineEdit()
-        self.text2 = QLineEdit()
-        self.text3 = QLineEdit()
-        
-        self.text.setValidator(QIntValidator(0,1000))
-        self.text2.setValidator(QIntValidator(0,1000))
-        self.text3.setValidator(QIntValidator(0,100))
+
+        self.widthSpin = QSpinBox()
+        self.heightSpin = QSpinBox()
+
+        for spin in [self.widthSpin, self.heightSpin]:
+            spin.setRange(0,1000)
+            spin.setSingleStep(5)
+            spin.setValue(5)
 
         self.group = QButtonGroup()
         
         self.radioLayout = QHBoxLayout()
-        self.radioTF2 = QRadioButton("TF2",self)
-        self.radioCSGO = QRadioButton("CS:GO",self)
+        self.radioTF2 = QRadioButton("&TF2",self)
+        self.radioTF2.setChecked(True)
+        self.radioTF2.setWhatsThis("TF2- The best game xd")
+        self.radioCSGO = QRadioButton("&CS:GO",self)
         self.group.addButton(self.radioTF2)
         self.group.addButton(self.radioCSGO)
         self.group.setExclusive(True)
@@ -1818,10 +1819,11 @@ class initWindow(QMainWindow):
         self.okay_btn.clicked.connect(self.clickFunction)
 
         self.form = QFormLayout()
-        self.form.addRow("Set Grid Width:",self.text)
-        self.form.addRow("Set Grid Height:",self.text2)
+        self.form.addRow("Set Grid Width:",self.widthSpin)
+        self.form.addRow("Set Grid Height:",self.heightSpin)
         #self.form.addRow("Set Amount of Levels:",self.text3)
-        self.form.addRow("Choose game:",self.radioLayout)
+        if self.startup:
+            self.form.addRow("Choose game:",self.radioLayout)
         self.form.addRow(self.okay_btn)
 
         self.window.setLayout(self.form)
@@ -1830,10 +1832,11 @@ class initWindow(QMainWindow):
         #return radioTF2.isClicked()
     def clickFunction(self):
         self.window.deleteLater()
-        gui = MainWindow(self.radioTF2.isChecked())
-        gui.grid_change_func(self.text.displayText(), self.text2.displayText(), 1)
-        
-        
+        if self.startup:
+            gui = MainWindow(self.radioTF2.isChecked())
+            gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
+        else:
+            self.gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
         
 #define some global variables
 #global rotation_icon_list
@@ -1996,11 +1999,7 @@ def CSFormat(self):
 #Main Program
 app = QApplication(sys.argv)
 info = initWindow()
-info.gridChange()
-
-
-
-
+sys.exit(info.gridChange())
 
 app.exec_()
 
