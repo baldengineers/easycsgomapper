@@ -102,7 +102,7 @@ class GridBtn(QWidget):
             self.button.setIcon(QIcon())
             totalblocks[level][btn_id] = ''
             entity_list[level][btn_id] = ''
-            iconlist[level][btn_id] = ''
+            iconlist[level][btn_id] = ('','')
             stored_info_list[level][btn_id]=''
             self.icon[level] = None
         
@@ -146,7 +146,7 @@ class GridBtn(QWidget):
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                iconlist[level][btn_id] = icon
+                iconlist[level][btn_id] = [gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],rotation]
                 stored_info_list[level][btn_id] = [moduleName,x,y,id_num,world_id_num,entity_num,placeholder_list,rotation,level]
 
                 self.icon[level] = icon
@@ -238,7 +238,7 @@ class MainWindow(QMainWindow):
         newAction = QAction("&New", self)
         newAction.setShortcut("Ctrl+n")
         newAction.setStatusTip("Create a New File")
-        newAction.triggered.connect(lambda: self.grid_change(0,0,0,True,False,True))
+        newAction.triggered.connect(lambda: self.grid_change())
 
         hammerAction = QAction("&Open Hammer",self)
         hammerAction.setShortcut("Ctrl+H")
@@ -278,7 +278,7 @@ class MainWindow(QMainWindow):
         gridAction = QAction("&Set Grid Size", self)
         gridAction.setShortcut("Ctrl+G")
         gridAction.setStatusTip("Set Grid Height and Width. RESETS ALL BLOCKS.")
-        gridAction.triggered.connect(lambda: self.grid_change(0,0,0,True,False,True))
+        gridAction.triggered.connect(lambda: self.grid_change())
 
         createPrefabAction = QAction("&Create Prefab", self)
         createPrefabAction.setShortcut("Ctrl+I")
@@ -886,7 +886,8 @@ class MainWindow(QMainWindow):
                     
                 elif "grid_size" in header:
                     openlines = pickle.load(file)
-                    self.grid_change(openlines[0],openlines[1],openlines[2],False, True, True)
+                    self.grid_change_func(openlines[0],openlines[1],openlines[2])
+                    #print('grid changed')
                 elif "stored_info_list" in header:
                     stored_info_list=[]
                     stored_info_list_temp=[]
@@ -909,10 +910,8 @@ class MainWindow(QMainWindow):
 
                     for item in openlines:
                         iconlist.append(item)
-                    for index, icon in enumerate(iconlist[0]):
-                        if "icons" in icon:
-                            grid_list[index].button.setIcon(QIcon(icon))
-                            grid_list[index].button.setIconSize(QSize(32,32))
+                  
+                    
                 elif "skybox2_list" in header:
                     openlines = pickle.load(file)
                     skybox2_list.setCurrentRow(openlines)
@@ -924,11 +923,13 @@ class MainWindow(QMainWindow):
                 pickle.dump(iconlist[i], file)
                 file.close()
               
-            self.change_skybox()
+            #self.change_skybox()
             file.close()
             self.setWindowTitle("Easy "+gameVar+" Mapper - [" + str(name[0]) + "]")
             currentfilename = str(name[0])
             file_loaded = True
+            self.upd_icns()
+
             
         else:
             try:
@@ -940,6 +941,22 @@ class MainWindow(QMainWindow):
                     grid_list[index].button.setIconSize(QSize(32,32))
             except Exception as e:
                 print(str(e))
+
+    def upd_icns(self):
+        for index, icon in enumerate(iconlist[0]):
+            #if "icons" in icon:
+            #print(grid_list)
+            try:
+                #print("index: "+str(index)+" icon name: "+icon[0])
+                ptrans = QTransform().rotate(90*icon[1])
+                pmap = QPixmap(icon[0]).transformed(ptrans,Qt.SmoothTransformation)
+                
+                grid_list[index].button.setIcon(QIcon(pmap))
+                grid_list[index].button.setIconSize(QSize(32,32))
+            except Exception as e:
+                #print(str(e))
+                grid_list[index].button.setIcon(QIcon(''))
+                grid_list[index].button.setIconSize(QSize(32,32))  
             
     def file_save(self, tmp = False, saveAs = False):
         global grid_x, grid_y, iconlist, levels, level, currentfilename, file_loaded, latest_path, stored_info_list, save_dict,load_dict,skybox2_list
@@ -968,7 +985,7 @@ class MainWindow(QMainWindow):
             for index,lvl in enumerate(stored_info_list):
                 stored_info_list_temp.append([])
                 for info in lvl:
-                    print(info)
+                    #print(info)
                     try:
                         temp = load_dict[info[0]]
                         info[0] = temp
@@ -1207,59 +1224,19 @@ class MainWindow(QMainWindow):
             if widget is not None:
                 widget.deleteLater()
         
-    def grid_change(self,xvar,yvar,zvar,var,var2,var3):
-##        global totalblocks,entity_list,grid_list,iconlist
-##        if var2 == True:
-##            sxvar = xvar
-##            syvar = yvar
-##            szvar = zvar
-##        else:
-##            pass
-##        self.count = 0
-##        count_btns=0
-##        if var3 == True:
-##            try:
-##                del entity_list
-##                del totalblocks
-##                del iconlist
-##                del grid_list
-##                entity_list = []
-##                iconlist = []
-##                totalblocks = []
-##                grid_list = []
-##            except Exception as e:
-##                print(str(e))
-##                pass
-##
-##        #gridsize_list = []
-##        self.btn_id_count = 0
-##        if var == True:
-##            self.window = QDialog(self)
-##
-##            self.text = QLineEdit()
-##            self.text2 = QLineEdit()
-##            self.text3 = QLineEdit()
-##
-##            self.okay_btn = QPushButton("OK",self)
-##            self.okay_btn.clicked.connect(lambda: self.grid_change_func(self.text.displayText(), self.text2.displayText(), 1))
-##
-##            self.form = QFormLayout()
-##            self.form.addRow("Set Grid Width:",self.text)
-##            self.form.addRow("Set Grid Height:",self.text2)
-##            #self.form.addRow("Set Amount of Levels:",self.text3)
-##            self.form.addRow(self.okay_btn)
-##
-##            self.window.setLayout(self.form)
-##            self.window.setWindowTitle("Set Grid Size")
-##            self.window.exec_()
-##        elif var2 == True:
-##            self.grid_change_func(sxvar,syvar,1)
-        #can you move the logic above (with var,var2,and var3) into grid_change_func? If you do that, I can implement the following, much more efficient grid_change()
+    def grid_change(self):            
         dialog = initWindow(False, self)
         dialog.gridChange()
 
     def grid_change_func(self,x,y,z):
-        global grid_y, grid_x, levels, file_loaded, currentfilename, level, count_btns
+        global grid_y, grid_x, levels, file_loaded, currentfilename, level, count_btns,grid_list
+        try:
+            entity_list = []
+            iconlist = []
+            totalblocks = []
+            grid_list = []
+        except Exception as e:
+            print(str(e))
         level = 0
         levels = 1
         count_btns = 0
@@ -1284,12 +1261,13 @@ class MainWindow(QMainWindow):
             for x in range(self.grid_x):
                 
                 for y in range(self.grid_y):
+                    #print('-_-')
                     totalblocks[z].append("") #This is so that there are no problems with replacing list values
                     
                     
                     count_btns += 1
                     entity_list[z].append("")
-                    iconlist[z].append("")
+                    iconlist[z].append(('',''))
                     stored_info_list[z].append('')
         for x in range(self.grid_x):
             for y in range(self.grid_y):
