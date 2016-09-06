@@ -9,7 +9,7 @@ class Create():
         #workshop_export | boolean | that determines whether the prefab will be zipped for export to the workshop
         #indexLine |  | I have no fucking idea
         #index |  | I have no idea about this either
-
+        self.ent_name_list = [] #list containing all targetnames
         self.LEVEL_HEIGHT = 448 #self.LEVEL_HEIGHT is the constant for the height of each level of the map.
         self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
         self.var_num = 1 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
@@ -173,7 +173,16 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             ent_values = ent_values.replace("sound_plac", "AmbSound"+str(entity_num), 2)
             ent_values = ent_values.replace("relay_plac", "LogicRelay"+str(entity_num),2)
             entity_num += 1
+    
+    """,
+   
+    
+    "#INSERT_ENT_NAME_CODE\n",
+    
+    
+    """
 
+    
     for i in range(valcount.count("entity_name")):
         try:
             ent_values = ent_values.replace("entity_name", "entity" + str(entity_num), 1)
@@ -189,7 +198,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             entity_num += 1
         except Exception as e:
             print(str(e))
-
+    
     for i in range(valcount.count("#ROTATION_")):
         ent_values = ent_values.replace
 
@@ -266,12 +275,33 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))  
                     elif key == "origin":
                         self.assign_var(value)
+                    elif key == "targetname":
+                        #some way for it to add the targetname to a list of targetnames that is added to a list
+                        #here, and when the .py is run, it replaces all instances of the targetname with tgname_<id_num>
+                        
+                        #when it replaces all instances of that targetname, we don't even need to touch the connections
+                        #block_type at all.
+                        
+                        self.ent_name_list.append(value)
+                        
+                        pass
+                    
+                
                     
 
         print("vmf_data: ")
         for i in self.vmf_data:
             print(i)
         print("var_list: ",self.var_list)
+        
+        #ent name shit
+        ent_name_str="    for ent_name in ["
+        ent_name_str+= i+"," for i in self.ent_name_list
+        ent_name_str=ent_name_str[:-1]+"""]:
+        ent_values = ent_values.replace(ent_name,"tname_%d" % entity_num)    
+        """
+        
+        #now replace
                         
     def assign_var(self, p_val):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
