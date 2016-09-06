@@ -296,8 +296,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         
         #ent name shit
         ent_name_str="    for ent_name in ["
-        for i in self.ent_name_list:
-            ent_name_str+= i+"," 
+        for i in self.ent_name_list:ent_name_str+=i+"," 
         ent_name_str=ent_name_str[:-1]+"""]:
         ent_values = ent_values.replace(ent_name,"tname_%d" % entity_num)    
         """
