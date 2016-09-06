@@ -589,12 +589,17 @@ class MainWindow(QMainWindow):
         self.button_grid_all.addLayout(self.button_rotate_layout)
         self.button_grid_all.addLayout(self.gridLayout)
         
-        self.column = QHBoxLayout()
-        self.column.addLayout(self.button_grid_all)
-        self.column.addLayout(self.tile_list_layout)
+        self.bgal = QWidget()
+        self.bgal.setLayout(self.button_grid_all)
+        self.tlw = QWidget()
+        self.tlw.setLayout(self.tile_list_layout)
+        
+        self.column = QSplitter(Qt.Vertical)
+        self.column.addWidget(self.bgaw)
+        self.column.addWidget(self.tllw)
 
         self.row = QVBoxLayout(self.central_widget)
-        self.row.addLayout(self.column)
+        self.row.addWidget(self.column)
         
         #widgets needed for the splitter
         #IMPLEMENT LATER
