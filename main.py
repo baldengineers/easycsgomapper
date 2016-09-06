@@ -591,8 +591,8 @@ class MainWindow(QMainWindow):
         
         self.bgal = QWidget()
         self.bgal.setLayout(self.button_grid_all)
-        self.tlw = QWidget()
-        self.tlw.setLayout(self.tile_list_layout)
+        self.tllw = QWidget()
+        self.tllw.setLayout(self.tile_list_layout)
         
         self.column = QSplitter(Qt.Vertical)
         self.column.addWidget(self.bgaw)
