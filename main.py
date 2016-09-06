@@ -51,14 +51,11 @@ class GridBtn(QWidget):
     def __init__(self, parent, x, y, btn_id):
         super(GridBtn, self).__init__()
         self.button = QPushButton("", parent)
-        self.x = x
-        self.y = y
+        self.x,self.y = x,y
         self.btn_id = btn_id
         self.button.resize(32,32)
         self.button.setFixedSize(32, 32)
-        self.button.pressed.connect(lambda: self.click_func(parent, x, y,
-                                                            btn_id))
-        self.button.setMouseTracking(True)
+        self.button.pressed.connect(lambda: self.click_func(parent, x, y,btn_id))
         self.button.installEventFilter(self)
         self.button.show()
         self.icon = []
@@ -69,8 +66,7 @@ class GridBtn(QWidget):
         self.button.setIcon(QIcon(""))
 
     def click_func(self, parent, x, y, btn_id, clicked=True, h_moduleName="None", h_icon=''): #h_moduleName and h_icon and h_rot are used when undoing/redoing
-        global world_id_num
-        global id_num
+        global world_id_num,id_num
         global entity_num
         global entity_list
         global placeholder_list
@@ -84,7 +80,7 @@ class GridBtn(QWidget):
         global history
         global redo_history
         global prefab_list
-        global xmin,ymin,xmax,ymax
+        
         
 
         current_list = eval('parent.tile_list%s' % str(parent.list_tab_widget.currentIndex()+1))
@@ -100,27 +96,28 @@ class GridBtn(QWidget):
 
         def clear_btn(btn_id):
             self.button.setIcon(QIcon())
-            totalblocks[level][btn_id] = ''
-            entity_list[level][btn_id] = ''
+            for l in [totalblocks,entity_list,stored_info_list]
+                l[level][btn_id] = ''
+                
             iconlist[level][btn_id] = ('','')
-            stored_info_list[level][btn_id]=''
+            
             self.icon[level] = None
         
         if self.checkForCtrl(clicked):
             clear_btn(btn_id)
         else:
             if clicked:
-                if ymin == None or xmin == None:
-                    ymin,xmin = y,x
+                if parent.ymin == None or parent.xmin == None:
+                    parent.ymin,parent.xmin = y,x
                 else:
-                    if y < ymin:
-                        ymin = y
-                    if x < xmin:
-                        xmin = x
-                    if y > ymax:
-                        ymax = y
-                    if x > xmax:
-                        xmax = x
+                    if y < parent.ymin:
+                        parent.ymin = y
+                    if x < parent.xmin:
+                        parent.xmin = x
+                    if y > parent.ymax:
+                        parent.ymax = y
+                    if x > parent.xmax:
+                        parent.xmax = x
                 moduleName = eval(prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
             else:
                 moduleName = h_moduleName if h_moduleName != None else clear_btn(btn_id)
@@ -238,7 +235,7 @@ class MainWindow(QMainWindow):
         newAction = QAction("&New", self)
         newAction.setShortcut("Ctrl+n")
         newAction.setStatusTip("Create a New File")
-        newAction.triggered.connect(lambda: self.grid_change())
+        newAction.triggered.connect(self.grid_change)
 
         hammerAction = QAction("&Open Hammer",self)
         hammerAction.setShortcut("Ctrl+H")
@@ -278,7 +275,7 @@ class MainWindow(QMainWindow):
         gridAction = QAction("&Set Grid Size", self)
         gridAction.setShortcut("Ctrl+G")
         gridAction.setStatusTip("Set Grid Height and Width. RESETS ALL BLOCKS.")
-        gridAction.triggered.connect(lambda: self.grid_change())
+        gridAction.triggered.connect(self.grid_change)
 
         createPrefabAction = QAction("&Create Prefab", self)
         createPrefabAction.setShortcut("Ctrl+I")
@@ -313,6 +310,7 @@ class MainWindow(QMainWindow):
         
         
         fileMenu = mainMenu.addMenu("&File") 
+        editMenu = mainMenu.addMenu("&Edit")
         optionsMenu = mainMenu.addMenu("&Options")
         toolsMenu = mainMenu.addMenu("&Tools")
         helpMenu = mainMenu.addMenu("&Help")
@@ -332,10 +330,10 @@ class MainWindow(QMainWindow):
         
         fileMenu.addSeparator()
 
-        fileMenu.addAction(undoAction)
-        fileMenu.addAction(redoAction)
+        editMenu.addAction(undoAction)
+        editMenu.addAction(redoAction)
         
-        fileMenu.addSeparator()
+        
         
         fileMenu.addAction(exitAction)
 
@@ -418,6 +416,10 @@ class MainWindow(QMainWindow):
         
     def home(self):
         global levels, current_list
+        self.xmin = None
+        self.ymin = None
+        self.xmax = 0
+        self.ymax = 0
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
@@ -425,7 +427,7 @@ class MainWindow(QMainWindow):
 
         self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
 
-        self.scrollArea.setBackgroundRole(QPalette.Light)
+        #self.scrollArea.setBackgroundRole(QPalette.Light)
 
 
     
@@ -442,7 +444,6 @@ class MainWindow(QMainWindow):
             pass
 
 
-        actiondict = {}
         self.buttonLabel = QLabel("Rotation:",self)
         #self.levelLabel = QLabel("Level Select:",self)
         self.listLabel = QLabel("List of prefabs:",self)
@@ -456,15 +457,15 @@ class MainWindow(QMainWindow):
         self.current.setFlat(True)
         self.current.clicked.connect(self.heavy)
 
-##'''
-##        self.level = QPushButton(self)
-##
-##        self.level.setText("Level: 1")
-##        
-##        self.level.setFixedSize(QSize(150,30))
-##        self.level.clicked.connect(self.level_select)
-##'''
-        '''
+'''
+        self.level = QPushButton(self)
+
+        self.level.setText("Level: 1")
+        
+        self.level.setFixedSize(QSize(150,30))
+        self.level.clicked.connect(self.level_select)
+
+        
         self.levelSelect = QComboBox(self)
         self.levelSelect.currentIndexChanged.connect(lambda: self.change_level_new())
 
@@ -493,6 +494,14 @@ class MainWindow(QMainWindow):
         self.rotateCCW.setIconSize(QSize(40,40))
         self.rotateCCW.setFixedSize(QSize(40,40))
         self.rotateCCW.setAutoRaise(True)
+        
+        self.skyboxButtom = QToolButton(self)
+        self.skyboxButton.setIcon(QIcon('icons/sky.png'))
+        self.skyboxButton.setIconSize(QSize(40,40))
+        self.skyboxButton.setFixedSize(QSize(40,40))
+        self.skyboxButton.setAutoRaise(True)  
+        
+        self.skyboxButton.clicked.connect(self.change_skybox)
 
         #sets rotation value. 0 = right, 1 = down, 2 = left, 3 = right
         self.rotateCW.clicked.connect(self.rotateCW_func)
@@ -509,6 +518,7 @@ class MainWindow(QMainWindow):
         #self.button_rotate_layout.addWidget(self.leveldown)
         
         self.button_rotate_layout.addStretch(1)
+        
             
         self.tile_list1 = QListWidget()
         self.tile_list2 = QListWidget()
@@ -540,13 +550,10 @@ class MainWindow(QMainWindow):
         self.add_tool_btn.clicked.connect(self.create_prefab)
         
         self.tile_toolbar = QToolBar()
-        self.tile_toolbar.addWidget(self.up_tool_btn)
-        self.tile_toolbar.addSeparator()
-        self.tile_toolbar.addWidget(self.down_tool_btn)
-        self.tile_toolbar.addSeparator()
-        self.tile_toolbar.addWidget(self.del_tool_btn)
-        self.tile_toolbar.addSeparator()
-        self.tile_toolbar.addWidget(self.add_tool_btn)
+        for t in [self.up_tool_btn,self.down_tool_btn,self.del_tool_btn,self.add_tool_btn]
+            self.tile_toolbar.addWidget(t)
+            self.tile_toolbar.addSeparator()
+
 
 
              
@@ -1224,7 +1231,7 @@ class MainWindow(QMainWindow):
             if widget is not None:
                 widget.deleteLater()
         
-    def grid_change(self):            
+    def grid_change(self):
         dialog = initWindow(False, self)
         dialog.gridChange()
 
@@ -1858,11 +1865,8 @@ save_dict={}
 load_dict={}
 
 #better skybox generation
-global xmin,ymin,xmax,ymax
-xmin = None
-ymin = None
-xmax = 0
-ymax = 0
+
+
 
 stored_info_list=[]
 
