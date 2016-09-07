@@ -11,5 +11,5 @@ for item in all_list[1]:
     else:
         all_list[3].append(cur) #appends the tab that the prefab is in
 
-with open("tf2/prefabs/pfinfo.ezmd","wb") as file:
-    pickle.dump(all_list,file)
+with open("tf2/prefabs/pfinfo.ezmd","wb") as f:
+    pickle.dump(all_list,f)
