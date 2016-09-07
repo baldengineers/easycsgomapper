@@ -1845,46 +1845,46 @@ class initWindow(QMainWindow):
         
 #define some global variables
 #global rotation_icon_list
-level = 0
-levels = 0
-id_num = 1
-rotation = 0
-world_id_num = 2
-entity_num = 1
-btn_id_count = 0
-grid_list=[]
-totalblocks = []
-skybox_list=[]
-last_tuple = 'First'
-skybox_light_list=[]
-iconlist = []
-rotation_icon_list=[]
-skybox_angle_list=[]
-skybox_icon_list=[]
-prefab_list = []
-gridsize_list = []
-count_btns = 0
-entity_list=[]
+self.level = 0
+self.levels = 0
+self.id_num = 1
+self.rotation = 0
+self.world_id_num = 2
+self.entity_num = 1
+self.btn_id_count = 0
+self.grid_list=[]
+self.totalblocks = []
+self.skybox_list=[]
+self.last_tuple = 'First'
+self.skybox_light_list=[]
+self.iconlist = []
+self.rotation_icon_list=[]
+self.skybox_angle_list=[]
+self.skybox_icon_list=[]
+self.prefab_list = []
+self.gridsize_list = []
+self.count_btns = 0
+self.entity_list=[]
 
-save_dict={}
-load_dict={}
+self.save_dict={}
+self.load_dict={}
 
 #better skybox generation
 
 
 
-stored_info_list=[]
+self.stored_info_list=[]
 
-prefab_text_list = []
-prefab_icon_list = []
-openblocks=[]
-placeholder_list = []
-history = []
-redo_history = []
-currentfilename='Untitled'
-file_loaded = False
-current_loaded = ''
-latest_path='/'
+self.prefab_text_list = []
+self.prefab_icon_list = []
+self.openblocks=[]
+self.placeholder_list = []
+self.history = []
+self.redo_history = []
+self.currentfilename='Untitled'
+self.file_loaded = False
+self.current_loaded = ''
+self.latest_path='/'
 
 def TFFormat():
     print('TF2 version of the mapper loading!')
