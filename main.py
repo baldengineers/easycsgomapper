@@ -594,7 +594,7 @@ class MainWindow(QMainWindow):
         self.rotateCCW.setFixedSize(QSize(40,40))
         self.rotateCCW.setAutoRaise(True)
         
-        self.skyboxButtom = QToolButton(self)
+        self.skyboxButton = QToolButton(self)
         self.skyboxButton.setIcon(QIcon('icons/sky.png'))
         self.skyboxButton.setIconSize(QSize(40,40))
         self.skyboxButton.setFixedSize(QSize(40,40))
