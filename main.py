@@ -59,7 +59,7 @@ class GridBtn(QWidget):
         self.button.installEventFilter(self)
         self.button.show()
         self.icon = []
-        for i in range(levels):
+        for i in range(self.levels):
             self.icon.append(None)
 
     def reset_icon(self):
@@ -99,7 +99,7 @@ class GridBtn(QWidget):
             for l in [totalblocks,entity_list,stored_info_list]
                 l[level][btn_id] = ''
                 
-            iconlist[level][btn_id] = ('','')
+            self.iconlist[level][btn_id] = ('','')
             
             self.icon[level] = None
         
@@ -143,7 +143,7 @@ class GridBtn(QWidget):
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                iconlist[level][btn_id] = [gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],rotation]
+                self.iconlist[level][btn_id] = [gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],rotation]
                 stored_info_list[level][btn_id] = [moduleName,x,y,id_num,world_id_num,entity_num,placeholder_list,rotation,level]
 
                 self.icon[level] = icon
@@ -172,11 +172,10 @@ class MainWindow(QMainWindow):
         
 
         #tell which game was chosen on launch
-        global gameVar,gameDirVar,isTFBool
         if whichGame:
-            gameVar,gameDirVar,isTFBool = "TF2","tf2/",True
+            self.gameVar,self.gameDirVar,self.isTFBool = "TF2","tf2/",True
         else:
-            gameVar,gameDirVar,isTFBool = "CS:GO","csgo/",False
+            self.gameVar,self.gameDirVar,self.isTFBool = "CS:GO","csgo/",False
         
         TFFormat() if isTFBool else CSFormat()
         
@@ -189,7 +188,45 @@ class MainWindow(QMainWindow):
         generateSkybox.setGameDirVar(gameDirVar)
         export.setGameDirVar(gameDirVar)
         '''
-        
+
+        #define some variables used throughout the class
+        self.level = 0
+        self.levels = 0
+        self.id_num = 1
+        self.rotation = 0
+        self.world_id_num = 2
+        self.entity_num = 1
+        self.btn_id_count = 0
+        self.grid_list=[]
+        self.totalblocks = []
+        self.skybox_list=[]
+        self.last_tuple = 'First'
+        self.skybox_light_list=[]
+        self.iconlist = []
+        self.rotation_icon_list=[]
+        self.skybox_angle_list=[]
+        self.skybox_icon_list=[]
+        self.prefab_list = []
+        self.gridsize_list = []
+        self.count_btns = 0
+        self.entity_list=[]
+
+        self.save_dict = {}
+        self.load_dict = {}
+
+        self.stored_info_list=[]
+
+        self.prefab_text_list = []
+        self.prefab_icon_list = []
+        self.openblocks=[]
+        self.placeholder_list = []
+        self.history = []
+        self.redo_history = []
+        self.currentfilename='Untitled'
+        self.file_loaded = False
+        self.current_loaded = ''
+        self.latest_path='/'
+
         #create the main window
         super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
@@ -266,11 +303,6 @@ class MainWindow(QMainWindow):
         redoAction.setShortcut("Ctrl+Shift+Z")
         redoAction.setStatusTip("Redo previous action")
         redoAction.triggered.connect(lambda: self.undo(False))
-        
-        removeAction = QAction("&Remove Last Prefab(s)",self)
-        removeAction.setShortcut("Ctrl+R")
-        removeAction.setStatusTip("Delete a variable amount of prefabs from the end of the list")
-        removeAction.triggered.connect(self.remove_prefabs)
 
         gridAction = QAction("&Set Grid Size", self)
         gridAction.setShortcut("Ctrl+G")
@@ -379,10 +411,10 @@ class MainWindow(QMainWindow):
                     subprocess.Popen(self.fileloaded[1])
             except Exception as e:
                 print(str(e))
-                self.pootup = QMessageBox()
-                self.pootup.setText("ERROR!")
-                self.pootup.setInformativeText("Hammer executable/batch moved or renamed!")
-                self.pootup.exec_()
+                self.notFound = QMessageBox()
+                self.notFound.setText("ERROR!")
+                self.notFound.setInformativeText("Hammer executable/batch moved or renamed!")
+                self.notFound.exec_()
 
                 self.file.close()
                 os.remove(gameDirVar+"startupcache/startup.su")
@@ -398,16 +430,6 @@ class MainWindow(QMainWindow):
             self.file = open(gameDirVar+"startupcache/startup.su", "w+")
         self.fileloaded = self.file.readlines()
         self.files = "".join(self.fileloaded)
-
-    def remove_prefabs(self):
-        import removeText
-        num = QInputDialog.getText(self,("Remove Prefabs"),("Remove x number of prefabs from the back of the list. REQUIRES RESTART"))
-        try:
-            num = int(num[0])
-        except:
-            QMessageBox.critical(self, "Error", "Please enter a number.")
-            self.remove_prefabs()
-        removeText.reset(num)
 
     def closeEvent(self, event):
         #closeEvent runs close_application when the x button is pressed
@@ -652,7 +674,7 @@ class MainWindow(QMainWindow):
         self.levellist = QListWidget()
         self.levellist.setIconSize(QSize(200, 25))
         try:
-            for i in range(levels):
+            for i in range(self.levels):
                 item = QListWidgetItem(QIcon("icons/level.jpg"),"Level "+str(i+1))
                 self.levellist.addItem(item)
         except Exception as e:
@@ -692,20 +714,20 @@ class MainWindow(QMainWindow):
             #self.level.setText("Level: " + str(level+1))
         if up:
             self.file_save(True)
-            if level != levels-1:
-                level = int(level+1)
+            if self.level != self.levels-1:
+                self.level = int(self.level+1)
             else:
                 pass
-            print(level)
+            print(self.level)
             self.file_open(True)
             #self.level.setText("Level: " + str(level+1))
         elif not up and but:
             self.file_save(True)
-            if level != 0:
-                level = int(level-1)
+            if self.level != 0:
+                self.level = int(level-1)
             else:
                 pass
-            print(level)
+            print(self.level)
             self.file_open(True)
             #self.level.setText("Level: " + str(level+1))            
         #change grid to grid for level
@@ -713,22 +735,6 @@ class MainWindow(QMainWindow):
         if not undo:
             templist.append((None,None,None,None,level))
             history.append(templist)
-            
-    def update_levels(self):
-        try:
-            for i in range(1000):
-                try:
-                    pass
-                    #self.levelSelect.removeItem(i)
-                except:
-                    break
-        except:
-            pass
-        print(levels)
-        #self.levelSelect.removeItem(0)
-        for i in range(levels):
-            pass
-            #self.levelSelect.addItem("Level %s" % str(i+1))
 
     def changeCurrentList(self):
         global current_list
@@ -852,30 +858,11 @@ class MainWindow(QMainWindow):
             del choice
 
     def changeIcon(self):
-        global rotation
-        
-##        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
-##        try:
-##            #print('1')
-##            current_prefab_icon_list = rotation_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
-##            #print('2')
-##            current_prefab_icon_list = open(gameDirVar+'prefab_template/iconlists/'+current_prefab_icon_list, 'r+')
-##            #print('3')
-##            current_prefab_icon_list = current_prefab_icon_list.readlines()
-##            #print('4')
-##            icon = current_prefab_icon_list[rotation]
-##            #print('5')
-##            if "\n" in icon:
-##                icon = icon[:-1]
-##            self.current.setIcon(QIcon(gameDirVar+icon))
-##            self.current.setIconSize(QSize(32,32))
-##        except Exception as e:
-##            print(str(e))
         icon = gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
 
         #following three lines rotates it
         pixmap = QPixmap(icon)
-        transform = QTransform().rotate(90*rotation)
+        transform = QTransform().rotate(90*self.rotation)
         pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
         
         self.current.setIcon(QIcon(pixmap))
@@ -883,13 +870,12 @@ class MainWindow(QMainWindow):
       
         
     def file_open(self, tmp = False, first = False):
-        global grid_list, iconlist, level, stored_info_list, totalblocks,entity_list, currentfilename, file_loaded, latest_path,save_dict,load_dict
-        print(latest_path)
+        global stored_info_list, totalblocks,entity_list, currentfilename, file_loaded, latest_path,save_dict,load_dict
         if not tmp:
             name = QFileDialog.getOpenFileName(self, "Open File", latest_path,"*.ezm")
             latest_path,file = str(name[0]),open(name[0], "rb")
-            level = 0
-            iconlist=[]
+            self.level = 0
+            self.iconlist=[]
             while True:
                 header = pickle.load(file)
                 if "levels" in header:
@@ -916,12 +902,11 @@ class MainWindow(QMainWindow):
                             except:
                                 stored_info_list[index].append('')
                 elif "icon_list" in header:
-                    global grid_list
-                    iconlist=[]
+                    self.iconlist=[]
                     openlines = pickle.load(file)
 
                     for item in openlines:
-                        iconlist.append(item)
+                        self.iconlist.append(item)
                   
                     
                 elif "skybox2_list" in header:
@@ -932,7 +917,7 @@ class MainWindow(QMainWindow):
         
             for i in range(levelcountload):
                 file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
-                pickle.dump(iconlist[i], file)
+                pickle.dump(self.iconlist[i], file)
                 file.close()
               
             #self.change_skybox()
@@ -945,17 +930,17 @@ class MainWindow(QMainWindow):
             
         else:
             try:
-                file = open(gameDirVar+"leveltemp/level" + str(level)+".tmp", "rb")
-                iconlist[level] = pickle.load(file)
+                file = open(gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "rb")
+                self.iconlist[self.level] = pickle.load(file)
                 file.close()
-                for index, icon in enumerate(iconlist[level]):
-                    grid_list[index].button.setIcon(QIcon(icon))
-                    grid_list[index].button.setIconSize(QSize(32,32))
+                for index, icon in enumerate(self.iconlist[self.level]):
+                    self.grid_list[index].button.setIcon(QIcon(icon))
+                    self.grid_list[index].button.setIconSize(QSize(32,32))
             except Exception as e:
                 print(str(e))
 
     def upd_icns(self):
-        for index, icon in enumerate(iconlist[0]):
+        for index, icon in enumerate(self.iconlist[0]):
             #if "icons" in icon:
             #print(grid_list)
             try:
@@ -963,17 +948,17 @@ class MainWindow(QMainWindow):
                 ptrans = QTransform().rotate(90*icon[1])
                 pmap = QPixmap(icon[0]).transformed(ptrans,Qt.SmoothTransformation)
                 
-                grid_list[index].button.setIcon(QIcon(pmap))
-                grid_list[index].button.setIconSize(QSize(32,32))
+                self.grid_list[index].button.setIcon(QIcon(pmap))
+                self.grid_list[index].button.setIconSize(QSize(32,32))
             except Exception as e:
                 #print(str(e))
-                grid_list[index].button.setIcon(QIcon(''))
-                grid_list[index].button.setIconSize(QSize(32,32))  
+                self.grid_list[index].button.setIcon(QIcon(''))
+                self.grid_list[index].button.setIconSize(QSize(32,32))  
             
     def file_save(self, tmp = False, saveAs = False):
         global grid_x, grid_y, iconlist, levels, level, currentfilename, file_loaded, latest_path, stored_info_list, save_dict,load_dict,skybox2_list
         print(latest_path)
-        gridsize_list = (grid_x,grid_y,levels)
+        gridsize_list = (grid_x,grid_y,self.levels)
         try:
             skybox_sav = skybox2_list.currentRow()
         except:
@@ -989,7 +974,7 @@ class MainWindow(QMainWindow):
                     name = currentfilename
             file = open(name, "wb")
             pickle.dump("<levels>",file)
-            pickle.dump(levels,file)
+            pickle.dump(self.levels,file)
             pickle.dump("<grid_size>", file)
             pickle.dump(gridsize_list, file)
             pickle.dump("<stored_info_list>", file)
@@ -1006,7 +991,7 @@ class MainWindow(QMainWindow):
                         stored_info_list_temp[index].append('')
             pickle.dump(stored_info_list_temp, file)
             pickle.dump("<icon_list>", file)
-            pickle.dump(iconlist, file)
+            pickle.dump(self.iconlist, file)
             pickle.dump("<skybox>", file)
             pickle.dump(skybox_sav, file)
             file.close()
@@ -1018,8 +1003,8 @@ class MainWindow(QMainWindow):
             file_loaded = True
         else:
             try:#writes tmp file to save the icons for each level
-                file = open(gameDirVar+"leveltemp/level" + str(level)+".tmp", "wb")
-                pickle.dump(iconlist[level], file)
+                file = open(gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "wb")
+                pickle.dump(self.iconlist[self.level], file)
                 file.close()
             except Exception as e:
                 
@@ -1078,43 +1063,30 @@ class MainWindow(QMainWindow):
             self.change_skybox()
         light = currentlight
         latest_path = latest_path.replace(".ezm",".vmf")
-        if not bsp:
+
+        totalblocks =[]
+        entity_list=[]
+        for lvl in stored_info_list:
+            for prfb in lvl:
+                if prfb != '':
+                    create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
+                    id_num = create[1]
+                    world_id_num = create[2]
+                    totalblocks.append(create[0])
+                    entity_num = create[3]
+                    placeholder_list = create[5]
+                    entity_list.append(create[4])
+        import export #export contains the code to compile/export the map
+        wholething = export.execute(totalblocks, entity_list, self.levels, skybox,skyboxgeolist, light)
+              
+        if bsp:
+            with open(gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+') as f:
+                f.write(wholething)
+            self.cur_vmf_location = gameDirVar+'output/'+gameVar+'mapperoutput.vmf'
+        else:
             name = QFileDialog.getSaveFileName(self, "Export .vmf", latest_path, "Valve Map File (*.vmf)")
-            file = open(name[0], "w+")
-            totalblocks =[]
-            entity_list=[]
-            for lvl in stored_info_list:
-                for prfb in lvl:
-                    if prfb != '':
-                        try:
-                            try:
-                                try:
-                                    try:
-                                        create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
-                                    except Exception as e:
-                                        create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
-                                except Exception as e:
-                                    create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[8])
-                            except Exception as e:
-                                create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[8])
-                        except Exception as e:
-                            create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[7], prfb[8])
-                        id_num = create[1]
-                        world_id_num = create[2]
-                        totalblocks.append(create[0])
-                        try:
-                            entity_num = create[3]
-                            placeholder_list = create[5]
-                        except IndexError:
-                            pass
-                        try:
-                            entity_list.append(create[4])
-                        except Exception as e:
-                            print(str(e))
-            import export
-            wholething = export.execute(totalblocks, entity_list, levels, skybox,skyboxgeolist, light)
-            file.write(wholething)
-            file.close()
+            with open(name[0], "w+") as f:
+                f.write(wholething)
             popup = QMessageBox(self, "File Exported",
                                     "The .vmf has been outputted to %s" %(name[0]) + " Open it in hammer to compile as a .bsp. Check out the wiki (https://github.com/baldengineers/easytf2_mapper/wiki/Texture-bug) for fixing errors with textures.")
             popup.setWindowTitle("File Exported")
@@ -1128,105 +1100,41 @@ class MainWindow(QMainWindow):
             if popup.clickedButton() == exitButton:
                 popup.deleteLater()
             cur_vmf_location = name[0]
-        else:
-            file = open(gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+')
-            totalblocks =[]
-            entity_list=[]
-            for lvl in stored_info_list:
-                for prfb in lvl:
-                    if prfb != '':
-                        try:
-                            try:
-                                try:
-                                    try:
-                                        create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
-                                    except Exception as e:
-                                        create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
-                                except Exception as e:
-                                    create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[8])
-                            except Exception as e:
-                                create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[8])
-                        except Exception as e:
-                            create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[7], prfb[8])
-                        id_num = create[1]
-                        world_id_num = create[2]
-                        totalblocks.append(create[0])
-                        try:
-                            entity_num = create[3]
-                            placeholder_list = create[5]
-                        except IndexError:
-                            pass
-                        try:
-                            entity_list.append(create[4])
-                        except Exception as e:
-                            print(str(e))
-            import export
-            wholething = export.execute(totalblocks, entity_list, levels, skybox,skyboxgeolist, light)
-            file.write(wholething)
-            file.close()
-            cur_vmf_location = gameDirVar+'output/'+gameVar+'mapperoutput.vmf'
-
-        
-        
+ 
     def file_export_bsp(self):
-        global cur_vmf_location
         self.file_export(True)
         #need to change for multi-game
         #this is fine and can be used, just make an if/then with the cs:go version
         try:
             tf2BinLoc = open(gameDirVar+'startupcache/vbsp.su','r+')
-            tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/')
-            tf2BinLoc.close()
-            subprocess.call('"'+tf2BinLocFile+'/vbsp.exe" "'+cur_vmf_location+'"')
-            subprocess.call('"'+tf2BinLocFile+'/vvis.exe" '+cur_vmf_location.replace('.vmf','.bsp')+'"')
-            subprocess.call('"'+tf2BinLocFile+'/vrad.exe" '+cur_vmf_location.replace('.vmf','.bsp')+'"')
-            shutil.copyfile(cur_vmf_location.replace('.vmf','.bsp'),tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp'))
-            popup = QMessageBox(self)
-            popup.setWindowTitle("File Exported")
-            popup.setText("The .vmf has been outputted to %s" %(tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp')))
-            popup.setInformativeText("Open TF2 and in load up 'tf2mapperoutput.bsp'! You can do this by typing 'map tf2mapperoutput' or by creating a server with that map.\n\nThere also is a .vmf file of your map stored in output/tf2mapperoutput.vmf.")
-            hammerButton = popup.addButton("Open TF2",QMessageBox.ActionRole)
-            exitButton = popup.addButton("OK",QMessageBox.ActionRole)
-            popup.exec_()
-            if popup.clickedButton() == hammerButton:
-                subprocess.Popen('"'+tf2BinLocFile.replace('steamapps/common/Team Fortress 2/bin','')+'steam.exe" "steam://run/440"')
-            if popup.clickedButton() == exitButton:
-                popup.deleteLater()            
-            
+            tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/') #wtf even is this!?!? why do you need it?!?!
+            tf2BinLoc.close() 
 
-            
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            try:
-                tf2BinLoc = open('startupcache/vbsp.su', 'w+')
-                tf2BinLocFile = QFileDialog.getExistingDirectory(self,'LOCATE Team Fortress 2/bin, NOT IN DEFAULT LOCATION!')
-                tf2BinLocFile = str(tf2BinLocFile.replace('\\','/'))
-                tf2BinLoc.write(tf2BinLocFile)
-                tf2BinLoc.close()
-                subprocess.call('"'+tf2BinLocFile+'/vbsp.exe" "'+cur_vmf_location+'"')
-                subprocess.call('"'+tf2BinLocFile+'/vvis.exe" "'+cur_vmf_location.replace('.vmf','.bsp')+'"')
-                subprocess.call('"'+tf2BinLocFile+'/vrad.exe" "'+cur_vmf_location.replace('.vmf','.bsp')+'"')
-                shutil.copyfile(cur_vmf_location.replace('.vmf','.bsp'),tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp'))
-                popup = QMessageBox(self)
-                popup.setWindowTitle("File Exported")
-                popup.setText("The .vmf has been outputted to %s" %(tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp')))
-                popup.setInformativeText("Open TF2 and in load up 'tf2outputmapper.bsp'! You can do this by typing 'map tf2mapperoutput' or by creating a server with that map.\n\nThere also is a .vmf file of your map stored in output/tf2mapperoutput.vmf.")
-                hammerButton = popup.addButton("Open TF2",QMessageBox.ActionRole)
-                exitButton = popup.addButton("OK",QMessageBox.ActionRole)
-                popup.exec_()
-                if popup.clickedButton() == hammerButton:
-                    subprocess.Popen('"'+tf2BinLocFile.replace('steamapps/common/Team Fortress 2/bin','')+'steam.exe" "steam://run/440"')
-                if popup.clickedButton() == exitButton:
-                    popup.deleteLater()
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print(exc_type, fname, exc_tb.tb_lineno)
-                QMessageBox.critical(self, "Error", "Something went wrong while exporting!")
-                
-
+            tf2BinLoc = open('startupcache/vbsp.su', 'w+')
+            tf2BinLocFile = QFileDialog.getExistingDirectory(self,'LOCATE Team Fortress 2/bin, NOT IN DEFAULT LOCATION!')
+            tf2BinLocFile = str(tf2BinLocFile.replace('\\','/'))
+            tf2BinLoc.write(tf2BinLocFile)
+            tf2BinLoc.close()
+            
+        subprocess.call('"'+tf2BinLocFile+'/vbsp.exe" "'+self.cur_vmf_location+'"')
+        subprocess.call('"'+tf2BinLocFile+'/vvis.exe" "'+self.cur_vmf_location.replace('.vmf','.bsp')+'"')
+        subprocess.call('"'+tf2BinLocFile+'/vrad.exe" "'+self.cur_vmf_location.replace('.vmf','.bsp')+'"')
+        shutil.copyfile(cur_vmf_location.replace('.vmf','.bsp'),tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp'))
+        popup = QMessageBox(self)
+        popup.setWindowTitle("File Exported")
+        popup.setText("The .vmf has been outputted to %s" %(tf2BinLocFile.replace('/bin','/tf/maps/tf2mapperoutput.bsp')))
+        popup.setInformativeText("Open TF2 and in load up 'tf2outputmapper.bsp'! You can do this by typing 'map tf2mapperoutput' or by creating a server with that map.\n\nThere also is a .vmf file of your map stored in output/tf2mapperoutput.vmf.")
+        hammerButton = popup.addButton("Open TF2",QMessageBox.ActionRole)
+        exitButton = popup.addButton("OK",QMessageBox.ActionRole)
+        popup.exec_()
+        if popup.clickedButton() == hammerButton:
+            subprocess.Popen('"'+tf2BinLocFile.replace('steamapps/common/Team Fortress 2/bin','')+'steam.exe" "steam://run/440"')
+        if popup.clickedButton() == exitButton:
+            popup.deleteLater()
             
     def removeButtons(self):
 
@@ -1237,50 +1145,47 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
         
     def grid_change(self):
-        dialog = initWindow(False, self)
-        dialog.gridChange()
+        grid_dialog = initWindow(False, self)
+        grid_dialog.gridChange()
 
     def grid_change_func(self,x,y,z):
-        global grid_y, grid_x, levels, file_loaded, currentfilename, level, count_btns,grid_list
-        try:
-            entity_list = []
-            iconlist = []
-            totalblocks = []
-            grid_list = []
-        except Exception as e:
-            print(str(e))
-        level = 0
-        levels = 1
-        count_btns = 0
+        global file_loaded, currentfilename, level, count_btns,grid_list
+        self.entity_list = []
+        self.iconlist = []
+        self.totalblocks = []
+
+        grid_list = []
+
+        self.level = 0
+        self.count_btns = 0
         self.count = 0
         
-        file_loaded = False
+        self.file_loaded = False
 
         self.grid_y = y
         self.grid_x = x
-        levels = z
+        self.levels = z
 
         self.removeButtons()
 
-        for z in range(levels):
-            totalblocks.append([])
-            entity_list.append([])
-            iconlist.append([])
-            stored_info_list.append([])
+        for z in range(self.levels):
+            self.totalblocks.append([])
+            self.entity_list.append([])
+            self.iconlist.append([])
+            self.stored_info_list.append([])
             self.btn_id_count=0
-            count_btns=0
+            self.count_btns=0
         
             for x in range(self.grid_x):
                 
                 for y in range(self.grid_y):
-                    #print('-_-')
-                    totalblocks[z].append("") #This is so that there are no problems with replacing list values
+                    self.totalblocks[z].append("") #This is so that there are no problems with replacing list values
                     
                     
-                    count_btns += 1
-                    entity_list[z].append("")
-                    iconlist[z].append(('',''))
-                    stored_info_list[z].append('')
+                    self.count_btns += 1
+                    self.entity_list[z].append("")
+                    self.iconlist[z].append(('',''))
+                    self.stored_info_list[z].append('')
         for x in range(self.grid_x):
             for y in range(self.grid_y):
                 grid_btn = GridBtn(self, x, y, self.btn_id_count)
@@ -1290,8 +1195,6 @@ class MainWindow(QMainWindow):
         entity_list.append("lighting slot")  
         self.count += 1
         count_btns = self.grid_x*self.grid_y
-        grid_y = self.grid_y
-        grid_x = self.grid_x
 
         self.scrollArea.deleteLater()
         self.scrollArea = QScrollArea()
@@ -1308,9 +1211,9 @@ class MainWindow(QMainWindow):
         self.button_grid_layout.setRowStretch(self.grid_y + 1, 1)
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
 
-        for i in range(levels):
+        for i in range(self.levels):
             file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
-            pickle.dump(iconlist[i], file)
+            pickle.dump(self.iconlist[i], file)
             file.close()
         
         self.gridLayout.addWidget(self.scrollArea)
@@ -1319,10 +1222,9 @@ class MainWindow(QMainWindow):
 
         self.update_levels()
         
-        return grid_list
+        #return grid_list
 
     def change_light(self):
-        global r_input, g_input, b_input, light_input, world_id_num
         
         r_input = QInputDialog.getText(self, ("Red light level 0-255"),
                                        ("Put in the red light ambiance level, 0-255:"))
@@ -1346,12 +1248,10 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", "Please enter a number.")
             self.change_light()
 
-        global currentlight
-        currentlight = light_create.replacevalues(r_input,g_input,b_input,light_input,world_id_num)
+        self.currentlight = light_create.replacevalues(r_input,g_input,b_input,light_input,world_id_num)
 
     def change_skybox(self):
         self.window = QDialog(self)
-        global skybox2_list
         skybox2_list = QListWidget()
         skybox2_list.setIconSize(QSize(200, 25))
         for index, text in enumerate(skybox_list):
@@ -1367,8 +1267,6 @@ class MainWindow(QMainWindow):
         self.window.setLayout(self.layout)
         skybox2_list.itemClicked.connect(self.window.close)
         self.window.exec_()
-
-    #fix this later, it has a breaking bugs if it works
 
     def close_application(self, restart = False):
         if not restart:
@@ -1671,9 +1569,9 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
         elif command == "setlevel":
             try:
-                if int(value)-1 < int(levels):
-                    level = int(value)-1
-                    self.level.setText("Level: " + str(level+1))
+                if int(value)-1 < int(self.levels):
+                    self.level = int(value)-1
+                    self.level.setText("Level: " + str(self.level+1))
                     new_text = text_prefix + "Level set to "+str(value+".")
                 else:
                     new_text = text_prefix + "Level "+str(value+" is out of range.")
@@ -1738,7 +1636,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
                         button.click_func(self, x, y, button.btn_id, False, h_moduleName, h_icon)
                         break
             else:
-                self.level.setText("Level: " + str(h_level+1))
+                #self.level.setText("Level: " + str(h_level+1))
                 self.levellist.setCurrentRow(h_level)
                 self.change_level(False, False, True)
 
@@ -1780,10 +1678,10 @@ class initWindow(QMainWindow):
         try:
             del entity_list
             del totalblocks
-            del iconlist
+            del self.iconlist
             del grid_list
             entity_list = []
-            iconlist = []
+            self.iconlist = []
             totalblocks = []
             grid_list = []
         except Exception as e:
@@ -1842,55 +1740,11 @@ class initWindow(QMainWindow):
             gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
         else:
             self.gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
-        
-#define some global variables
-#global rotation_icon_list
-self.level = 0
-self.levels = 0
-self.id_num = 1
-self.rotation = 0
-self.world_id_num = 2
-self.entity_num = 1
-self.btn_id_count = 0
-self.grid_list=[]
-self.totalblocks = []
-self.skybox_list=[]
-self.last_tuple = 'First'
-self.skybox_light_list=[]
-self.iconlist = []
-self.rotation_icon_list=[]
-self.skybox_angle_list=[]
-self.skybox_icon_list=[]
-self.prefab_list = []
-self.gridsize_list = []
-self.count_btns = 0
-self.entity_list=[]
-
-self.save_dict={}
-self.load_dict={}
-
-#better skybox generation
-
-
-
-self.stored_info_list=[]
-
-self.prefab_text_list = []
-self.prefab_icon_list = []
-self.openblocks=[]
-self.placeholder_list = []
-self.history = []
-self.redo_history = []
-self.currentfilename='Untitled'
-self.file_loaded = False
-self.current_loaded = ''
-self.latest_path='/'
 
 def TFFormat():
     print('TF2 version of the mapper loading!')
-    global gameDirVar,gameVar,rotation_icon_list,prefab_text_list,prefab_text_list,prefab_icon_list,index_section_list,currentlight,prefab_list,skybox
     sys.path.append(gameDirVar+"prefabs/")
-    currentlight = '''
+    self.currentlight = '''
     entity
     {
         "id" "world_idnum"
@@ -1915,66 +1769,66 @@ def TFFormat():
     }
     '''
     #skybox default needs to be based off game chosen
-    skybox = 'sky_tf2_04'
+    self.skybox = 'sky_tf2_04'
 
     #skyboxlight = '255 255 255 200'
     #skyboxangle = '0 0 0'
     #if the user does not change the lighting, it sticks with this.
     #if the user does not choose a skybox it sticks with this
 
-    prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
-    prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
-    prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
+    self.prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
+    self.prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
+    self.prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
 
-    skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
-    skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
-    skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
-    skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
+    self.skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
+    self.skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
+    self.skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
+    self.skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
 
-    prefab_list.append([])
+    self.prefab_list.append([])
     section=0
     for line in prefab_file.readlines():
         if line == '\n':
-            prefab_list.append([])
+            self.prefab_list.append([])
             section+=1
         else:
-            prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+            self.prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
     section=0
-    prefab_text_list.append([])
+    self.prefab_text_list.append([])
     for line in prefab_text_file.readlines():
         if line == '\n':
-            prefab_text_list.append([])
+            self.prefab_text_list.append([])
             section+=1
         else:
-            prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
+            self.prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
 
     section=0
-    prefab_icon_list.append([])
+    self.prefab_icon_list.append([])
     for line in prefab_icon_file.readlines():
         if line == "\n":
-            prefab_icon_list.append([])
+            self.prefab_icon_list.append([])
             section +=1
         else:
-            prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
+            self.prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
 
 
     section = 0
-    rotation_icon_list = []
-    index_section_list = [0]
-    rotation_icon_list.append([])
+    self.rotation_icon_list = []
+    self.index_section_list = [0]
+    self.rotation_icon_list.append([])
 
     #print(rotation_icon_list)
     for line in skybox_file.readlines():
-        skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+        self.skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
 
     for line in skybox_icon.readlines():
-        skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
+        self.skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
 
     for line in skybox_light.readlines():
-        skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
+        self.skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
 
     for line in skybox_angle.readlines():
-        skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
+        self.skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
         
     for file in [prefab_file, prefab_text_file, prefab_icon_file,skybox_file,skybox_icon,skybox_angle,skybox_light]:
         file.close()
@@ -1985,8 +1839,8 @@ def TFFormat():
             if item:
                 globals()[item] = importlib.import_module(item)
                 print("import", item)
-                save_dict[item]=eval(item)
-                load_dict[eval(item)]=item
+                self.save_dict[item]=eval(item)
+                self.load_dict[eval(item)]=item
 
     logo = open('logo.log','r+')
     logo_f = logo.readlines()
