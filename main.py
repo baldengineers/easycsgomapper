@@ -58,7 +58,7 @@ class GridBtn(QWidget):
         self.button.pressed.connect(lambda: self.click_func(parent, x, y,btn_id))
         self.button.installEventFilter(self)
         self.button.show()
-        self.icon = []
+        self.icons = []
         for i in range(self.levels):
             self.icon.append(None)
 
@@ -66,42 +66,25 @@ class GridBtn(QWidget):
         self.button.setIcon(QIcon(""))
 
     def click_func(self, parent, x, y, btn_id, clicked=True, h_moduleName="None", h_icon=''): #h_moduleName and h_icon and h_rot are used when undoing/redoing
-        global world_id_num,id_num
-        global entity_num
-        global entity_list
-        global placeholder_list
-        global icon
-        global rotation
-        global totalblocks
-        global stored_info_list
-        global stored_rotation_list
-        global levels
-        global rotation, currentfilename
-        global history
-        global redo_history
-        global prefab_list
-        
-        
-
         current_list = eval('parent.tile_list%s' % str(parent.list_tab_widget.currentIndex()+1))
 
         #format | history.append((x,y,moduleName,self.icon,level))
         if clicked:
-            redo_history=[]
-            if self.icon[level]:
-                moduleName = eval(prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
+            parent.redo_history=[]
+            if self.icons[parent.level]:
+                moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()])
                 templist=[(x,y,moduleName,self.icon[level],None)]
             else:
                 templist=[(x,y,None,None,None)]
 
         def clear_btn(btn_id):
             self.button.setIcon(QIcon())
-            for l in [totalblocks,entity_list,stored_info_list]
-                l[level][btn_id] = ''
+            for l in [parent.totalblocks,parent.entity_list,parent.stored_info_list]:
+                l[parent.level][btn_id] = ''
                 
-            self.iconlist[level][btn_id] = ('','')
+            parent.iconlist[parent.level][btn_id] = ('','')
             
-            self.icon[level] = None
+            self.icons[parent.level] = None
         
         if self.checkForCtrl(clicked):
             clear_btn(btn_id)
@@ -118,7 +101,7 @@ class GridBtn(QWidget):
                         parent.ymax = y
                     if x > parent.xmax:
                         parent.xmax = x
-                moduleName = eval(prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
+                moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
             else:
                 moduleName = h_moduleName if h_moduleName != None else clear_btn(btn_id)
 
@@ -126,36 +109,36 @@ class GridBtn(QWidget):
                 if clicked:
 
                     try:
-                        icon = gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                        icon = self.gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         if "\n" in icon:
                             icon = icon[:-1]
                         #following three lines rotates it
                         icon = QPixmap(icon)
-                        transform = QTransform().rotate(90*rotation)
+                        transform = QTransform().rotate(90*parent.rotation)
                         icon = icon.transformed(transform, Qt.SmoothTransformation)
 
                     except Exception as e:
                         print(str(e))
-                        icon = gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                        icon = self.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         
                 else:
                     icon = h_icon
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                self.iconlist[level][btn_id] = [gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],rotation]
-                stored_info_list[level][btn_id] = [moduleName,x,y,id_num,world_id_num,entity_num,placeholder_list,rotation,level]
+                parent.iconlist[parent.level][btn_id] = [self.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
+                parent.stored_info_list[parent.level][btn_id] = [moduleName,x,y,parent.id_num,parent.world_id_num,parent.entity_num,parent.placeholder_list,parent.rotation,parent.level]
 
-                self.icon[level] = icon
+                self.icons[parent.level] = icon
             else:
-                stored_info_list[level][btn_id] = ""
+                parent.stored_info_list[parent.level][btn_id] = ""
 
             if "*" not in parent.windowTitle():
-                parent.setWindowTitle("Easy "+gameVar+" Mapper* - ["+currentfilename+"]")
+                parent.setWindowTitle("Easy "+gameVar+" Mapper* - ["+parrent.currentfilename+"]")
             
             if clicked:
-                templist.append((x,y,moduleName,self.icon[level],None))
-                history.append(templist)
+                templist.append((x,y,moduleName,self.icons[parent.level],None))
+                parent.history.append(templist)
 
     def checkForCtrl(self, clicked):
         if clicked:
@@ -168,33 +151,15 @@ class GridBtn(QWidget):
             return False
         
 class MainWindow(QMainWindow):
-    def __init__(self,whichGame):
-        
-
-        #tell which game was chosen on launch
-        if whichGame:
-            self.gameVar,self.gameDirVar,self.isTFBool = "TF2","tf2/",True
-        else:
-            self.gameVar,self.gameDirVar,self.isTFBool = "CS:GO","csgo/",False
-        
-        TFFormat() if isTFBool else CSFormat()
-        
-        util_list = [createPrefab,light_create,generateSkybox,export]
-        for util in util_list:
-            util.setGameDirVar(gameDirVar)
-        '''
-        createPrefab.setGameDirVar(gameDirVar)
-        light_create.setGameDirVar(gameDirVar)
-        generateSkybox.setGameDirVar(gameDirVar)
-        export.setGameDirVar(gameDirVar)
-        '''
+    def __init__(self):
+        super(MainWindow, self).__init__()
 
         #define some variables used throughout the class
         self.level = 0
         self.levels = 0
         self.id_num = 1
-        self.rotation = 0
         self.world_id_num = 2
+        self.rotation = 0
         self.entity_num = 1
         self.btn_id_count = 0
         self.grid_list=[]
@@ -207,15 +172,12 @@ class MainWindow(QMainWindow):
         self.skybox_angle_list=[]
         self.skybox_icon_list=[]
         self.prefab_list = []
-        self.gridsize_list = []
+        self.gridsize = []
         self.count_btns = 0
         self.entity_list=[]
-
         self.save_dict = {}
         self.load_dict = {}
-
         self.stored_info_list=[]
-
         self.prefab_text_list = []
         self.prefab_icon_list = []
         self.openblocks=[]
@@ -226,17 +188,32 @@ class MainWindow(QMainWindow):
         self.file_loaded = False
         self.current_loaded = ''
         self.latest_path='/'
+        self.isTF = True
+
+        #initial startup/gridchange window
+        init_window = GridChangeWindow(self)
+        
+        #tell which game was chosen on launch
+        if self.isTF:
+            self.gameVar,self.gameDirVar = "TF2","tf2/"
+        else:
+            self.gameVar,self.gameDirVar = "CS:GO","csgo/"
+        
+        self.TFFormat() if self.isTF else self.CSFormat()
+        
+        util_list = [createPrefab,light_create,generateSkybox,export]
+        for util in util_list:
+            util.setGameDirVar(self.gameDirVar)
 
         #create the main window
-        super(MainWindow, self).__init__()
         self.setGeometry(100, 25, 875, 750)
-        self.setWindowTitle("Easy "+gameVar+" Mapper")
+        self.setWindowTitle("Easy "+self.gameVar+" Mapper")
         self.setWindowIcon(QIcon("icons\icon.ico"))
         #if tf2...
-        if isTFBool:
+        if self.isTF:
             namelist = ['gravelpit','2fort','upward','mvm']
         palette = QPalette()
-        palette.setBrush(QPalette.Background,QBrush(QPixmap(gameDirVar+"icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
+        palette.setBrush(QPalette.Background,QBrush(QPixmap(self.gameDirVar+"icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
         self.setPalette(palette)
 
         #create menubar
@@ -307,7 +284,7 @@ class MainWindow(QMainWindow):
         gridAction = QAction("&Set Grid Size", self)
         gridAction.setShortcut("Ctrl+G")
         gridAction.setStatusTip("Set Grid Height and Width. RESETS ALL BLOCKS.")
-        gridAction.triggered.connect(self.grid_change)
+        gridAction.triggered.connect(self.grid_change) #change so it just makes grid bigger/smaller, not erase all blocks, or else it would just do the same exact thing as making a new file
 
         createPrefabAction = QAction("&Create Prefab", self)
         createPrefabAction.setShortcut("Ctrl+I")
@@ -385,9 +362,118 @@ class MainWindow(QMainWindow):
         self.change_skybox()
         #self.level_select()
 
+    def TFFormat(self):
+        print('TF2 version of the mapper loading!')
+        sys.path.append(self.gameDirVar+"prefabs/")
+        self.currentlight = '''
+        entity
+        {
+            "id" "world_idnum"
+            "classname" "light_environment"
+            "_ambient" "255 255 255 100"
+            "_ambientHDR" "-1 -1 -1 1"
+            "_AmbientScaleHDR" "1"
+            "_light" "CURRENT_LIGHT"
+            "_lightHDR" "-1 -1 -1 1"
+            "_lightscaleHDR" "1"
+            "angles" "CURRENT_ANGLE"
+            "pitch" "0"
+            "SunSpreadAngle" "0"
+            "origin" "0 0 73"
+            editor
+            {
+                "color" "220 30 220"
+                "visgroupshown" "1"
+                "visgroupautoshown" "1"
+                "logicalpos" "[0 500]"
+            }
+        }
+        '''
+        #skybox default needs to be based off game chosen
+        self.skybox = 'sky_tf2_04'
+
+        #skyboxlight = '255 255 255 200'
+        #skyboxangle = '0 0 0'
+        #if the user does not change the lighting, it sticks with this.
+        #if the user does not choose a skybox it sticks with this
+
+        self.prefab_file = open(self.gameDirVar+"prefab_template/prefab_list.txt")
+        self.prefab_text_file = open(self.gameDirVar+"prefab_template/prefab_text_list.txt")
+        self.prefab_icon_file = open(self.gameDirVar+"prefab_template/prefab_icon_list.txt")
+
+        self.skybox_file = open(self.gameDirVar+"prefab_template/skybox_list.txt")
+        self.skybox_icon = open(self.gameDirVar+"prefab_template/skybox_icons.txt")
+        self.skybox_light = open(self.gameDirVar+"prefab_template/skybox_light.txt")
+        self.skybox_angle = open(self.gameDirVar+"prefab_template/skybox_angle.txt") 
+
+        self.prefab_list.append([])
+        section=0
+        for line in self.prefab_file.readlines():
+            if line == '\n':
+                self.prefab_list.append([])
+                section+=1
+            else:
+                self.prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+        section=0
+        self.prefab_text_list.append([])
+        for line in self.prefab_text_file.readlines():
+            if line == '\n':
+                self.prefab_text_list.append([])
+                section+=1
+            else:
+                self.prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
+
+        section=0
+        self.prefab_icon_list.append([])
+        for line in self.prefab_icon_file.readlines():
+            if line == "\n":
+                self.prefab_icon_list.append([])
+                section +=1
+            else:
+                self.prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
 
 
-        
+        section = 0
+        self.rotation_icon_list = []
+        self.index_section_list = [0]
+        self.rotation_icon_list.append([])
+
+        #print(rotation_icon_list)
+        for line in self.skybox_file.readlines():
+            self.skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+
+        for line in self.skybox_icon.readlines():
+            self.skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
+
+        for line in self.skybox_light.readlines():
+            self.skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
+
+        for line in self.skybox_angle.readlines():
+            self.skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
+            
+        for file in [self.prefab_file, self.prefab_text_file, self.prefab_icon_file,self.skybox_file,self.skybox_icon,self.skybox_angle,self.skybox_light]:
+            file.close()
+
+        #imports that need prefab_list to be defined
+        for sec in self.prefab_list:
+            for item in sec:
+                if item:
+                    globals()[item] = importlib.import_module(item)
+                    print("import", item)
+                    self.save_dict[item]=eval(item)
+                    self.load_dict[eval(item)]=item
+
+        logo = open('logo.log','r+')
+        logo_f = logo.readlines()
+        for i in logo_f:
+            print(i[:-1])
+        logo.close()
+
+        print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
+
+    def CSFormat(self):
+        pass
+
     def open_hammer(self,loaded,file,reloc = False):
         self.open_file()
         if "loaded_first_time" not in self.files or reloc:
@@ -422,12 +508,12 @@ class MainWindow(QMainWindow):
 
     def open_file(self,reloc = False):
         if reloc:
-            os.remove(gameDirVar+"startupcache/startup.su")
+            os.remove(self.gameDirVar+"startupcache/startup.su")
         
         try:
-            self.file = open(gameDirVar+"startupcache/startup.su", "r+")
+            self.file = open(self.gameDirVar+"startupcache/startup.su", "r+")
         except:
-            self.file = open(gameDirVar+"startupcache/startup.su", "w+")
+            self.file = open(self.gameDirVar+"startupcache/startup.su", "w+")
         self.fileloaded = self.file.readlines()
         self.files = "".join(self.fileloaded)
 
@@ -478,31 +564,22 @@ class MainWindow(QMainWindow):
         self.current.setFixedSize(QSize(40,40))
         self.current.setFlat(True)
         self.current.clicked.connect(self.heavy)
+     
+##        self.levelSelect = QComboBox(self)
+##        self.levelSelect.currentIndexChanged.connect(lambda: self.change_level_new())
+##
+##        self.levelup = QToolButton(self)
+##        self.levelup.setIcon(QIcon('icons/up.png'))
+##        self.levelup.setIconSize(QSize(20,20))
+##        self.levelup.clicked.connect(lambda: self.change_level(True, True))
+##        self.levelup.setAutoRaise(True)
+##
+##        self.leveldown = QToolButton(self)
+##        self.leveldown.setIcon(QIcon('icons/down.png'))
+##        self.leveldown.setIconSize(QSize(20,20))
+##        self.leveldown.clicked.connect(lambda: self.change_level(True, False))
+##        self.leveldown.setAutoRaise(True)
 
-'''
-        self.level = QPushButton(self)
-
-        self.level.setText("Level: 1")
-        
-        self.level.setFixedSize(QSize(150,30))
-        self.level.clicked.connect(self.level_select)
-
-        
-        self.levelSelect = QComboBox(self)
-        self.levelSelect.currentIndexChanged.connect(lambda: self.change_level_new())
-
-        self.levelup = QToolButton(self)
-        self.levelup.setIcon(QIcon('icons/up.png'))
-        self.levelup.setIconSize(QSize(20,20))
-        self.levelup.clicked.connect(lambda: self.change_level(True, True))
-        self.levelup.setAutoRaise(True)
-
-        self.leveldown = QToolButton(self)
-        self.leveldown.setIcon(QIcon('icons/down.png'))
-        self.leveldown.setIconSize(QSize(20,20))
-        self.leveldown.clicked.connect(lambda: self.change_level(True, False))
-        self.leveldown.setAutoRaise(True)
-        '''        
         self.rotateCW = QToolButton(self)
         self.rotateCW.setShortcut(QKeySequence(Qt.Key_Right))
         self.rotateCW.setIcon(QIcon('icons/rotate_cw.png'))
@@ -545,6 +622,7 @@ class MainWindow(QMainWindow):
         self.tile_list1 = QListWidget()
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
+        self.current_list = self.tile_list1
         
         self.list_tab_widget = QTabWidget()
         self.list_tab_widget.setMaximumWidth(200)
@@ -565,24 +643,21 @@ class MainWindow(QMainWindow):
         
         self.del_tool_btn = QToolButton(self)
         self.del_tool_btn.setIcon(QIcon('icons/delete.png'))
-        self.del_tool_btn.clicked.connect(lambda: self.prefab_list_del(current_list.currentRow()))
+        self.del_tool_btn.clicked.connect(lambda: self.prefab_list_del(self.current_list.currentRow()))
 
         self.add_tool_btn = QToolButton(self)
         self.add_tool_btn.setIcon(QIcon('icons/add.png'))
         self.add_tool_btn.clicked.connect(self.create_prefab)
         
         self.tile_toolbar = QToolBar()
-        for t in [self.up_tool_btn,self.down_tool_btn,self.del_tool_btn,self.add_tool_btn]
+        for t in [self.up_tool_btn,self.down_tool_btn,self.del_tool_btn,self.add_tool_btn]:
             self.tile_toolbar.addWidget(t)
             self.tile_toolbar.addSeparator()
-
-
-
              
         for index, text in enumerate(prefab_text_list):
             for ind, indiv in enumerate(text):
                 curr_list = eval("self.tile_list%d" % (index+1))
-                item = QListWidgetItem(QIcon(gameDirVar+prefab_icon_list[index][ind]), indiv)
+                item = QListWidgetItem(QIcon(self.gameDirVar+prefab_icon_list[index][ind]), indiv)
                 curr_list.addItem(item)
             
         for i in range(self.list_tab_widget.count()):
@@ -644,15 +719,11 @@ class MainWindow(QMainWindow):
 ##        self.row.addWidget(self.splitter_left)
 ##        self.row.addWidget(self.splitter_right)
         
-        
-
-        current_list = self.tile_list1
-        
         try:
-            f = open(gameDirVar+'startupcache/firsttime.su', 'r+')
+            f = open(self.gameDirVar+'startupcache/firsttime.su', 'r+')
             lines = f.readlines()
         except:
-            f = open(gameDirVar+'startupcache/firsttime.su','w+')
+            f = open(self.gameDirVar+'startupcache/firsttime.su','w+')
             lines = f.readlines()
             
         if "startup" not in lines:
@@ -668,44 +739,16 @@ class MainWindow(QMainWindow):
         
         self.show()
 
-    def level_select(self):
-        self.windowl = QDialog(self)
-        global levels
-        self.levellist = QListWidget()
-        self.levellist.setIconSize(QSize(200, 25))
-        try:
-            for i in range(self.levels):
-                item = QListWidgetItem(QIcon("icons/level.jpg"),"Level "+str(i+1))
-                self.levellist.addItem(item)
-        except Exception as e:
-            print(str(e))
-            pass
-
-        self.levellist.itemClicked.connect(lambda: self.change_level(False, False))
-        self.layoutl = QHBoxLayout()
-        self.layoutl.addWidget(self.levellist)
-        self.windowl.setGeometry(150,150,400,300)
-        self.windowl.setWindowTitle("Choose a level")
-        self.windowl.setWindowIcon(QIcon("icons/icon.ico"))
-        self.windowl.setLayout(self.layoutl)
-        self.windowl.exec_()
-
     def change_level_new(self):
-        global level
         self.file_save(True)
-        level = self.levelSelect.currentIndex()
+        self.level = self.levelSelect.currentIndex()
         self.file_open(True)
 
     def change_level(self, but = False, up = False, undo = False):
-        global level, levels
-
-        if not undo:
-            templist = [(None,None,None,None,level)]
         
         if not but:
             self.file_save(True)
-            level = int(self.levelSelect.currentIndex()) #+1 X First level should be 0
-            print(level)
+            self.level = int(self.levelSelect.currentIndex()) #+1 X First level should be 0
             self.file_open(True)
             try:
                 self.windowl.close()
@@ -733,32 +776,29 @@ class MainWindow(QMainWindow):
         #change grid to grid for level
 
         if not undo:
-            templist.append((None,None,None,None,level))
+            templist.append = (None,None,None,None,level)
             history.append(templist)
 
     def changeCurrentList(self):
-        global current_list
         print("current list: tile_list%s" % str(self.list_tab_widget.currentIndex()+1))
-        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
+        self.current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
 
     def rotateCW_func(self):
-        global rotation
-        if rotation < 3:
-            rotation = rotation + 1
+        if self.rotation < 3:
+            self.rotation = self.rotation + 1
         else:
-            rotation = 0
+            self.rotation = 0
         self.changeIcon()
 
     def rotateCCW_func(self):
-        global rotation
-        if rotation == 0:
-            rotation = 3
+        if self.rotation == 0:
+            self.rotation = 3
         else:
-            rotation = rotation - 1
+            self.rotation = self.rotation - 1
         self.changeIcon()
 
     def prefab_list_up(self):
-        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
+        self.current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
         currentRow = self.current_list.currentRow()
 
         if currentRow > 0:
@@ -769,7 +809,7 @@ class MainWindow(QMainWindow):
             self.changeIcon()
 
     def prefab_list_down(self):
-        current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
+        self.current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
         currentRow = self.current_list.currentRow()
         if currentRow < self.current_list.count() - 1:
             currentItem = self.current_list.takeItem(currentRow)
@@ -782,7 +822,7 @@ class MainWindow(QMainWindow):
 
         #NEEDS TO BE REDONE
         
-        file_list = [gameDirVar+"prefab_template/prefab_list.txt", gameDirVar+"prefab_template/prefab_icon_list.txt", gameDirVar+"prefab_template/prefab_text_list.txt"]
+        file_list = [self.gameDirVar+"prefab_template/prefab_list.txt", self.gameDirVar+"prefab_template/prefab_icon_list.txt", self.gameDirVar+"prefab_template/prefab_text_list.txt"]
         list_list = [prefab_list, prefab_icon_list, prefab_text_list]
 
         for l in list_list:
@@ -791,7 +831,7 @@ class MainWindow(QMainWindow):
             with open(file_list[list_list.index(l)], "w") as file:
 
                 if list_list.index(l) == 0:   
-                    rot_file = open(gameDirVar+"prefab_template/rot_prefab_list.txt", "w")
+                    rot_file = open(self.gameDirVar+"prefab_template/rot_prefab_list.txt", "w")
 
                 for item in l:
                     file.write(item + "\n")
@@ -805,21 +845,13 @@ class MainWindow(QMainWindow):
     def prefab_list_del(self, currentprefab):
 
         #NEEDS TO BE REDONE based off what mode
-        global current_list
-        index_list_index = 0
-        if current_list == self.tile_list2: index_list_index = 1
-        if current_list == self.tile_list3: index_list_index = 2
-        #
-        
-        self.restartCheck = QCheckBox()
-        self.restartCheck.setText("Restart after deletion?")
 
         choice = QMessageBox.question(self,"Delete Prefab (DO NOT DELETE STOCK PREFABS)","Are you sure you want to delete \"%s\"?\nThis is mainly for developers." %(prefab_text_list[self.list_tab_widget.currentIndex()][currentprefab]),
                              QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
            
         if choice == QMessageBox.Yes:
-            text_list = [gameDirVar+'prefab_template/prefab_text_list.txt',gameDirVar+'prefab_template/rot_prefab_list.txt',
-                 gameDirVar+'prefab_template/prefab_list.txt', gameDirVar+'prefab_template/prefab_icon_list.txt']
+            text_list = [self.gameDirVar+'prefab_template/prefab_text_list.txt',self.gameDirVar+'prefab_template/rot_prefab_list.txt',
+                 self.gameDirVar+'prefab_template/prefab_list.txt', self.gameDirVar+'prefab_template/prefab_icon_list.txt']
 
             for cur in text_list:
                 file = open(cur, 'r+')
@@ -858,7 +890,7 @@ class MainWindow(QMainWindow):
             del choice
 
     def changeIcon(self):
-        icon = gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+        icon = self.gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
 
         #following three lines rotates it
         pixmap = QPixmap(icon)
@@ -916,7 +948,7 @@ class MainWindow(QMainWindow):
                     break
         
             for i in range(levelcountload):
-                file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
+                file = open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
                 pickle.dump(self.iconlist[i], file)
                 file.close()
               
@@ -930,7 +962,7 @@ class MainWindow(QMainWindow):
             
         else:
             try:
-                file = open(gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "rb")
+                file = open(self.gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "rb")
                 self.iconlist[self.level] = pickle.load(file)
                 file.close()
                 for index, icon in enumerate(self.iconlist[self.level]):
@@ -958,7 +990,7 @@ class MainWindow(QMainWindow):
     def file_save(self, tmp = False, saveAs = False):
         global grid_x, grid_y, iconlist, levels, level, currentfilename, file_loaded, latest_path, stored_info_list, save_dict,load_dict,skybox2_list
         print(latest_path)
-        gridsize_list = (grid_x,grid_y,self.levels)
+        self.gridsize = (grid_x,grid_y,self.levels)
         try:
             skybox_sav = skybox2_list.currentRow()
         except:
@@ -976,7 +1008,7 @@ class MainWindow(QMainWindow):
             pickle.dump("<levels>",file)
             pickle.dump(self.levels,file)
             pickle.dump("<grid_size>", file)
-            pickle.dump(gridsize_list, file)
+            pickle.dump(self.gridsize, file)
             pickle.dump("<stored_info_list>", file)
             stored_info_list_temp=[]
             for index,lvl in enumerate(stored_info_list):
@@ -1003,7 +1035,7 @@ class MainWindow(QMainWindow):
             file_loaded = True
         else:
             try:#writes tmp file to save the icons for each level
-                file = open(gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "wb")
+                file = open(self.gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "wb")
                 pickle.dump(self.iconlist[self.level], file)
                 file.close()
             except Exception as e:
@@ -1027,23 +1059,23 @@ class MainWindow(QMainWindow):
                 self.file_export(True)
         #generate skybox stuff now
         #needs to be redone to change how skyboxes are rendered
-        create = generateSkybox.createSkyboxLeft(grid_x,grid_y,skyboxz,id_num,world_id_num)
+        create = generateSkybox.createSkyboxLeft(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
-        id_num = create[1]
-        world_id_num = create[2]
-        create = generateSkybox.createSkyboxNorth(grid_x,grid_y,skyboxz,id_num,world_id_num)
+        self.id_num = create[1]
+        self.world_id_num = create[2]
+        create = generateSkybox.createSkyboxNorth(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
-        id_num = create[1]
-        world_id_num = create[2]
-        create = generateSkybox.createSkyboxRight(grid_x,grid_y,skyboxz,id_num,world_id_num)
+        self.id_num = create[1]
+        self.world_id_num = create[2]
+        create = generateSkybox.createSkyboxRight(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
-        id_num = create[1]
-        world_id_num = create[2]
-        create = generateSkybox.createSkyboxTop(grid_x,grid_y,skyboxz,id_num,world_id_num)
+        self.id_num = create[1]
+        self.world_id_num = create[2]
+        create = generateSkybox.createSkyboxTop(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
-        id_num = create[1]
-        world_id_num = create[2]
-        create = generateSkybox.createSkyboxSouth(grid_x,grid_y,skyboxz,id_num,world_id_num)
+        self.id_num = create[1]
+        self.world_id_num = create[2]
+        create = generateSkybox.createSkyboxSouth(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
         try:
             skybox = skybox_list[skybox2_list.currentRow()]
@@ -1064,25 +1096,25 @@ class MainWindow(QMainWindow):
         light = currentlight
         latest_path = latest_path.replace(".ezm",".vmf")
 
-        totalblocks =[]
-        entity_list=[]
+        self.totalblocks =[]
+        self.entity_list=[]
         for lvl in stored_info_list:
             for prfb in lvl:
                 if prfb != '':
                     create = prfb[0].createTile(prfb[1], prfb[2], prfb[3], prfb[4], prfb[5], prfb[6], prfb[7], prfb[8])
-                    id_num = create[1]
-                    world_id_num = create[2]
-                    totalblocks.append(create[0])
-                    entity_num = create[3]
-                    placeholder_list = create[5]
-                    entity_list.append(create[4])
+                    self.id_num = create[1]
+                    self.world_id_num = create[2]
+                    self.totalblocks.append(create[0])
+                    self.entity_num = create[3]
+                    self.placeholder_list = create[5]
+                    self.entity_list.append(create[4])
         import export #export contains the code to compile/export the map
         wholething = export.execute(totalblocks, entity_list, self.levels, skybox,skyboxgeolist, light)
               
         if bsp:
-            with open(gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+') as f:
+            with open(self.gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+') as f:
                 f.write(wholething)
-            self.cur_vmf_location = gameDirVar+'output/'+gameVar+'mapperoutput.vmf'
+            self.cur_vmf_location = self.gameDirVar+'output/'+gameVar+'mapperoutput.vmf'
         else:
             name = QFileDialog.getSaveFileName(self, "Export .vmf", latest_path, "Valve Map File (*.vmf)")
             with open(name[0], "w+") as f:
@@ -1099,14 +1131,14 @@ class MainWindow(QMainWindow):
                 self.open_hammer(1,name[0])
             if popup.clickedButton() == exitButton:
                 popup.deleteLater()
-            cur_vmf_location = name[0]
+            self.cur_vmf_location = name[0]
  
     def file_export_bsp(self):
         self.file_export(True)
         #need to change for multi-game
         #this is fine and can be used, just make an if/then with the cs:go version
         try:
-            tf2BinLoc = open(gameDirVar+'startupcache/vbsp.su','r+')
+            tf2BinLoc = open(self.gameDirVar+'startupcache/vbsp.su','r+')
             tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/') #wtf even is this!?!? why do you need it?!?!
             tf2BinLoc.close() 
 
@@ -1145,11 +1177,9 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
         
     def grid_change(self):
-        grid_dialog = initWindow(False, self)
-        grid_dialog.gridChange()
+        grid_dialog = GridChangeWindow(self,False)
 
-    def grid_change_func(self,x,y,z):
-        global file_loaded, currentfilename, level, count_btns,grid_list
+    def grid_change_func(self,x,y,z,startup=False):
         self.entity_list = []
         self.iconlist = []
         self.totalblocks = []
@@ -1157,7 +1187,6 @@ class MainWindow(QMainWindow):
 
         self.level = 0
         self.count_btns = 0
-        self.count = 0
         
         self.file_loaded = False
 
@@ -1165,7 +1194,8 @@ class MainWindow(QMainWindow):
         self.grid_x = x
         self.levels = z
 
-        self.removeButtons()
+        if not startup:
+            self.removeButtons()
 
         for z in range(self.levels):
             self.totalblocks.append([])
@@ -1179,9 +1209,6 @@ class MainWindow(QMainWindow):
                 
                 for y in range(self.grid_y):
                     self.totalblocks[z].append("") #This is so that there are no problems with replacing list values
-                    
-                    
-                    self.count_btns += 1
                     self.entity_list[z].append("")
                     self.iconlist[z].append(('',''))
                     self.stored_info_list[z].append('')
@@ -1192,8 +1219,7 @@ class MainWindow(QMainWindow):
                 self.btn_id_count += 1
                 self.grid_list.append(grid_btn)
         entity_list.append("lighting slot")  
-        self.count += 1
-        count_btns = self.grid_x*self.grid_y
+        self.count_btns = self.grid_x*self.grid_y
 
         self.scrollArea.deleteLater()
         self.scrollArea = QScrollArea()
@@ -1211,12 +1237,12 @@ class MainWindow(QMainWindow):
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
 
         for i in range(self.levels):
-            with open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
+            with open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
                 pickle.dump(self.iconlist[i], f)
         
         self.gridLayout.addWidget(self.scrollArea)
         self.button_grid_all.addLayout(self.gridLayout)
-        self.setWindowTitle("Easy "+gameVar+" Mapper ")
+        self.setWindowTitle("Easy "+self.gameVar+" Mapper ")
 
         self.update_levels()
 
@@ -1251,7 +1277,7 @@ class MainWindow(QMainWindow):
         skybox2_list = QListWidget()
         skybox2_list.setIconSize(QSize(200, 25))
         for index, text in enumerate(skybox_list):
-            item = QListWidgetItem(QIcon(gameDirVar+skybox_icon_list[index]), text)
+            item = QListWidgetItem(QIcon(self.gameDirVar+skybox_icon_list[index]), text)
             skybox2_list.addItem(item)
         
         self.layout = QHBoxLayout()
@@ -1278,7 +1304,7 @@ class MainWindow(QMainWindow):
                     close = False
                 
             if close:
-                folder = gameDirVar+'leveltemp/'
+                folder = self.gameDirVar+'leveltemp/'
                 for f in os.listdir(folder):
                     if "level" in f: 
                         print("removing", f)
@@ -1293,7 +1319,7 @@ class MainWindow(QMainWindow):
                                           QMessageBox.Yes | QMessageBox.No,
                                           QMessageBox.No)
             if choice == QMessageBox.Yes:
-                folder = gameDirVar+'leveltemp/'
+                folder = self.gameDirVar+'leveltemp/'
                 for f in os.listdir(folder):
                     if "level" in f: 
                         print("removing", f)
@@ -1351,7 +1377,7 @@ class MainWindow(QMainWindow):
 
         self.sectionSelect = QComboBox()
         #needs to have a cs:go version
-        if isTFBool:
+        if self.isTF:
             self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
         else:
             pass
@@ -1434,51 +1460,51 @@ class MainWindow(QMainWindow):
         with open("info.txt", "r+") as f:
             zip_info = f.readlines()
             if zip_info[3] == 2:
-                with open(gameDirVar+'prefab_template/rot_prefab_list.txt',"a") as d:
+                with open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"a") as d:
                     tempfil = zip_info[0]
                     tempfil = tempfil.replace('\n','')
-                    d.write(gameDirVar+tempfil+"_icon_list.txt\n")
-                with open(gameDirVar+'prefab_template/prefab_list.txt',"a") as d:
+                    d.write(self.gameDirVar+tempfil+"_icon_list.txt\n")
+                with open(self.gameDirVar+'prefab_template/prefab_list.txt',"a") as d:
                     tempfil = zip_info[0]
                     tempfil = tempfil.replace('\n','')
                     d.write(tempfil+'\n')
-                with open(gameDirVar+'prefab_template/prefab_text_list.txt',"a") as d:
+                with open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"a") as d:
                     d.write(zip_info[2])
-                with open(gameDirVar+'prefab_template/prefab_icon_list.txt',"a") as d:
+                with open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"a") as d:
                     tempfil = zip_info[1]
                     tempfil = tempfil.replace('\n','')
-                    d.write(gameDirVar+'icons/'+tempfil+'_right.jpg\n')
+                    d.write(self.gameDirVar+'icons/'+tempfil+'_right.jpg\n')
             else:
                 #most childish code 2016
-                z = open(gameDirVar+'prefab_template/rot_prefab_list.txt',"r")
+                z = open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"r")
                 zlines = z.readlines()
                 z.close()
-                y = open(gameDirVar+'prefab_template/prefab_list.txt',"r")
+                y = open(self.gameDirVar+'prefab_template/prefab_list.txt',"r")
                 ylines = y.readlines()
                 y.close()
-                x = open(gameDirVar+'prefab_template/prefab_text_list.txt',"r")
+                x = open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"r")
                 xlines = x.readlines()
                 x.close()
-                w = open(gameDirVar+'prefab_template/prefab_icon_list.txt',"r")
+                w = open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"r")
                 wlines = w.readlines()
                 w.close()
                 
-                z = open(gameDirVar+'prefab_template/rot_prefab_list.txt',"w")
-                zlines.insert(self.index_section_index[int(zip_info[3])]-1,gameDirVar+zip_info[0]+"_icon_list.txt\n")
+                z = open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"w")
+                zlines.insert(self.index_section_index[int(zip_info[3])]-1,self.gameDirVar+zip_info[0]+"_icon_list.txt\n")
                 zlines = "".join(zlines)
                 z.write(zlines)
                 z.close()
-                y = open(gameDirVar+'prefab_template/prefab_list.txt',"w")
+                y = open(self.gameDirVar+'prefab_template/prefab_list.txt',"w")
                 ylines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[0])
                 ylines = "".join(ylines)
                 y.write(ylines)
                 y.close()
-                x = open(gameDirVar+'prefab_template/prefab_text_list.txt',"w")
+                x = open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"w")
                 xlines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[2])
                 xlines = "".join(xlines)
                 x.write(xlines)
                 x.close()
-                w = open(gameDirVar+'prefab_template/prefab_icon_list.txt',"w")
+                w = open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"w")
                 wlines.insert(self.index_section_index[int(zip_info[3])]-1,'icons/'+zip_info[1]+'_right.jpg\n')
                 wlines = "".join(wlines)
                 w.write(wlines)
@@ -1661,31 +1687,17 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
         movie.start()
 
-class initWindow(QMainWindow):
-    def __init__(self,startup=True,gui=None):   
-        super(initWindow,self).__init__()
-        self.startup = startup #if the window is being run when program starts up
-        self.gui = gui #is not none only when changing grid size when main ui is open. when this happens, gui is the main ui's "self"
-    def gridChange(self):
-        global totalblocks,entity_list,grid_list,iconlist
-        self.count = 0
-        count_btns=0
+class GridChangeWindow(QWidget):
+    def __init__(self, parent, startup=True):
+        super(GridChangeWindow,self).__init__()
+        #parent - references the main window's attributes
+        #startup | Boolean | - if the window is being run when program starts up
 
-        try:
-            del entity_list
-            del totalblocks
-            del self.iconlist
-            del grid_list
-            entity_list = []
-            self.iconlist = []
-            totalblocks = []
-            grid_list = []
-        except Exception as e:
-            print(str(e))
-            pass
-
-        #gridsize_list = []
-        self.btn_id_count = 0
+        if not startup:
+            parent.entity_list = []
+            parent.iconlist = []
+            parent.totalblocks = []
+            parent.grid_list = []
     
         self.window = QDialog(self)
         self.window.setWindowIcon(QIcon("icons\icon.ico"))
@@ -1698,160 +1710,47 @@ class initWindow(QMainWindow):
             spin.setRange(0,1000)
             spin.setSingleStep(5)
             spin.setValue(5)
-
-        self.group = QButtonGroup()
         
-        self.radioLayout = QHBoxLayout()
         self.radioTF2 = QRadioButton("&TF2",self)
         self.radioTF2.setChecked(True)
         self.radioTF2.setWhatsThis("TF2- The best game xd")
         self.radioCSGO = QRadioButton("&CS:GO",self)
+
+        self.group = QButtonGroup()
         self.group.addButton(self.radioTF2)
         self.group.addButton(self.radioCSGO)
         self.group.setExclusive(True)
+
+        self.radioLayout = QHBoxLayout()
         self.radioLayout.addWidget(self.radioTF2)
         self.radioLayout.addWidget(self.radioCSGO)
         
-
         self.okay_btn = QPushButton("OK",self)
-        self.okay_btn.clicked.connect(self.clickFunction)
+        self.okay_btn.clicked.connect(lambda: self.clickFunction(parent, startup))
 
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.widthSpin)
         self.form.addRow("Set Grid Height:",self.heightSpin)
         #self.form.addRow("Set Amount of Levels:",self.text3)
-        if self.startup:
+        if startup:
             self.form.addRow("Choose game:",self.radioLayout)
         self.form.addRow(self.okay_btn)
 
         self.window.setLayout(self.form)
         self.window.setWindowTitle("Set Grid Size")
         self.window.exec_()
-        #return radioTF2.isClicked()
-    def clickFunction(self):
+
+    def clickFunction(self, parent, startup):
         self.window.hide()
         self.window.deleteLater()
-        if self.startup:
-            gui = MainWindow(self.radioTF2.isChecked())
-            gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
-        else:
-            self.gui.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1)
+        parent.isTF = self.radioTF2.isChecked()
+        parent.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1, startup)
 
-def TFFormat():
-    print('TF2 version of the mapper loading!')
-    sys.path.append(gameDirVar+"prefabs/")
-    self.currentlight = '''
-    entity
-    {
-        "id" "world_idnum"
-        "classname" "light_environment"
-        "_ambient" "255 255 255 100"
-        "_ambientHDR" "-1 -1 -1 1"
-        "_AmbientScaleHDR" "1"
-        "_light" "CURRENT_LIGHT"
-        "_lightHDR" "-1 -1 -1 1"
-        "_lightscaleHDR" "1"
-        "angles" "CURRENT_ANGLE"
-        "pitch" "0"
-        "SunSpreadAngle" "0"
-        "origin" "0 0 73"
-        editor
-        {
-            "color" "220 30 220"
-            "visgroupshown" "1"
-            "visgroupautoshown" "1"
-            "logicalpos" "[0 500]"
-        }
-    }
-    '''
-    #skybox default needs to be based off game chosen
-    self.skybox = 'sky_tf2_04'
+    def closeEvent(self, event):
+        sys.exit()
 
-    #skyboxlight = '255 255 255 200'
-    #skyboxangle = '0 0 0'
-    #if the user does not change the lighting, it sticks with this.
-    #if the user does not choose a skybox it sticks with this
-
-    self.prefab_file = open(gameDirVar+"prefab_template/prefab_list.txt")
-    self.prefab_text_file = open(gameDirVar+"prefab_template/prefab_text_list.txt")
-    self.prefab_icon_file = open(gameDirVar+"prefab_template/prefab_icon_list.txt")
-
-    self.skybox_file = open(gameDirVar+"prefab_template/skybox_list.txt")
-    self.skybox_icon = open(gameDirVar+"prefab_template/skybox_icons.txt")
-    self.skybox_light = open(gameDirVar+"prefab_template/skybox_light.txt")
-    self.skybox_angle = open(gameDirVar+"prefab_template/skybox_angle.txt") 
-
-    self.prefab_list.append([])
-    section=0
-    for line in prefab_file.readlines():
-        if line == '\n':
-            self.prefab_list.append([])
-            section+=1
-        else:
-            self.prefab_list[section].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
-    section=0
-    self.prefab_text_list.append([])
-    for line in prefab_text_file.readlines():
-        if line == '\n':
-            self.prefab_text_list.append([])
-            section+=1
-        else:
-            self.prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-    section=0
-    self.prefab_icon_list.append([])
-    for line in prefab_icon_file.readlines():
-        if line == "\n":
-            self.prefab_icon_list.append([])
-            section +=1
-        else:
-            self.prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-
-    section = 0
-    self.rotation_icon_list = []
-    self.index_section_list = [0]
-    self.rotation_icon_list.append([])
-
-    #print(rotation_icon_list)
-    for line in skybox_file.readlines():
-        self.skybox_list.append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
-
-    for line in skybox_icon.readlines():
-        self.skybox_icon_list.append(line[:-1] if line.endswith("\n") else line)
-
-    for line in skybox_light.readlines():
-        self.skybox_light_list.append(line[:-1] if line.endswith("\n") else line)
-
-    for line in skybox_angle.readlines():
-        self.skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
-        
-    for file in [prefab_file, prefab_text_file, prefab_icon_file,skybox_file,skybox_icon,skybox_angle,skybox_light]:
-        file.close()
-
-    #imports that need prefab_list to be defined
-    for sec in prefab_list:
-        for item in sec:
-            if item:
-                globals()[item] = importlib.import_module(item)
-                print("import", item)
-                self.save_dict[item]=eval(item)
-                self.load_dict[eval(item)]=item
-
-    logo = open('logo.log','r+')
-    logo_f = logo.readlines()
-    for i in logo_f:
-        print(i[:-1])
-    logo.close()
-
-    print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
-
-def CSFormat(self):
-    pass
 #Main Program
 app = QApplication(sys.argv)
-info = initWindow()
-sys.exit(info.gridChange())
-
+main = MainWindow()
 app.exec_()
 
