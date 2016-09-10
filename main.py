@@ -1153,8 +1153,7 @@ class MainWindow(QMainWindow):
         self.entity_list = []
         self.iconlist = []
         self.totalblocks = []
-
-        grid_list = []
+        self.grid_list = []
 
         self.level = 0
         self.count_btns = 0
@@ -1191,7 +1190,7 @@ class MainWindow(QMainWindow):
                 grid_btn = GridBtn(self, x, y, self.btn_id_count)
                 self.button_grid_layout.addWidget(grid_btn.button,y,x)
                 self.btn_id_count += 1
-                grid_list.append(grid_btn)
+                self.grid_list.append(grid_btn)
         entity_list.append("lighting slot")  
         self.count += 1
         count_btns = self.grid_x*self.grid_y
@@ -1212,17 +1211,14 @@ class MainWindow(QMainWindow):
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
 
         for i in range(self.levels):
-            file = open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb")
-            pickle.dump(self.iconlist[i], file)
-            file.close()
+            with open(gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
+                pickle.dump(self.iconlist[i], f)
         
         self.gridLayout.addWidget(self.scrollArea)
         self.button_grid_all.addLayout(self.gridLayout)
         self.setWindowTitle("Easy "+gameVar+" Mapper ")
 
         self.update_levels()
-        
-        #return grid_list
 
     def change_light(self):
         
