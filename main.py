@@ -59,8 +59,8 @@ class GridBtn(QWidget):
         self.button.installEventFilter(self)
         self.button.show()
         self.icons = []
-        for i in range(self.levels):
-            self.icon.append(None)
+        for i in range(parent.levels):
+            self.icons.append(None)
 
     def reset_icon(self):
         self.button.setIcon(QIcon(""))
@@ -73,7 +73,7 @@ class GridBtn(QWidget):
             parent.redo_history=[]
             if self.icons[parent.level]:
                 moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()])
-                templist=[(x,y,moduleName,self.icon[level],None)]
+                templist=[(x,y,moduleName,self.icons[parent.level],None)]
             else:
                 templist=[(x,y,None,None,None)]
 
@@ -101,7 +101,7 @@ class GridBtn(QWidget):
                         parent.ymax = y
                     if x > parent.xmax:
                         parent.xmax = x
-                moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()])
+                moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()])
             else:
                 moduleName = h_moduleName if h_moduleName != None else clear_btn(btn_id)
 
@@ -109,7 +109,7 @@ class GridBtn(QWidget):
                 if clicked:
 
                     try:
-                        icon = self.gameDirVar+prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                        icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()]
                         if "\n" in icon:
                             icon = icon[:-1]
                         #following three lines rotates it
@@ -119,14 +119,14 @@ class GridBtn(QWidget):
 
                     except Exception as e:
                         print(str(e))
-                        icon = self.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                        icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
                         
                 else:
                     icon = h_icon
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                parent.iconlist[parent.level][btn_id] = [self.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
+                parent.iconlist[parent.level][btn_id] = [parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
                 parent.stored_info_list[parent.level][btn_id] = [moduleName,x,y,parent.id_num,parent.world_id_num,parent.entity_num,parent.placeholder_list,parent.rotation,parent.level]
 
                 self.icons[parent.level] = icon
@@ -134,7 +134,7 @@ class GridBtn(QWidget):
                 parent.stored_info_list[parent.level][btn_id] = ""
 
             if "*" not in parent.windowTitle():
-                parent.setWindowTitle("Easy "+gameVar+" Mapper* - ["+parrent.currentfilename+"]")
+                parent.setWindowTitle("Easy "+parent.gameVar+" Mapper* - ["+parent.currentfilename+"]")
             
             if clicked:
                 templist.append((x,y,moduleName,self.icons[parent.level],None))
@@ -153,6 +153,8 @@ class GridBtn(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+
+        #QApplication.setStyle(QStyleFactory.create("Cleanlooks")) #comment out if unwanted
 
         #define some variables used throughout the class
         self.level = 0
@@ -191,7 +193,8 @@ class MainWindow(QMainWindow):
         self.isTF = True
 
         #initial startup/gridchange window
-        init_window = GridChangeWindow(self)
+        initWindow = GridChangeWindow(self, True)
+        values = initWindow.returnVal()
         
         #tell which game was chosen on launch
         if self.isTF:
@@ -209,12 +212,12 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 25, 875, 750)
         self.setWindowTitle("Easy "+self.gameVar+" Mapper")
         self.setWindowIcon(QIcon("icons\icon.ico"))
-        #if tf2...
-        if self.isTF:
-            namelist = ['gravelpit','2fort','upward','mvm']
-        palette = QPalette()
-        palette.setBrush(QPalette.Background,QBrush(QPixmap(self.gameDirVar+"icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
-        self.setPalette(palette)
+        #removed for now to see how gui looks without it
+##        if self.isTF:
+##            namelist = ['gravelpit','2fort','upward','mvm']
+##        palette = QPalette()
+##        palette.setBrush(QPalette.Background,QBrush(QPixmap(self.gameDirVar+"icons/backgrounds/background_"+namelist[random.randint(0,3)]+".jpg")))
+##        self.setPalette(palette)
 
         #create menubar
         exitAction = QAction("&Exit", self)
@@ -359,6 +362,7 @@ class MainWindow(QMainWindow):
         helpMenu.addAction(helpAction)
         
         self.home()
+        self.grid_change_func(values[0], values[1], values[2])
         self.change_skybox()
         #self.level_select()
 
@@ -533,24 +537,9 @@ class MainWindow(QMainWindow):
 
         self.scrollArea = QScrollArea()
 
-        self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
+        #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
 
         #self.scrollArea.setBackgroundRole(QPalette.Light)
-
-
-    
-        try:
-            self.scrollArea.setGeometry(QRect(0, 0, self.grid_x*32, self.grid_y*32))
-        except:
-            self.scrollArea.setGeometry(QRect(0,0,580,580))
-        try:
-            if self.grid_x > 16:
-                self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-            if self.grid_y > 16:
-                self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        except:
-            pass
-
 
         self.buttonLabel = QLabel("Rotation:",self)
         #self.levelLabel = QLabel("Level Select:",self)
@@ -580,6 +569,7 @@ class MainWindow(QMainWindow):
 ##        self.leveldown.clicked.connect(lambda: self.change_level(True, False))
 ##        self.leveldown.setAutoRaise(True)
 
+        #add rotation buttons
         self.rotateCW = QToolButton(self)
         self.rotateCW.setShortcut(QKeySequence(Qt.Key_Right))
         self.rotateCW.setIcon(QIcon('icons/rotate_cw.png'))
@@ -593,14 +583,13 @@ class MainWindow(QMainWindow):
         self.rotateCCW.setIconSize(QSize(40,40))
         self.rotateCCW.setFixedSize(QSize(40,40))
         self.rotateCCW.setAutoRaise(True)
-        
-        self.skyboxButton = QToolButton(self)
-        self.skyboxButton.setIcon(QIcon('icons/sky.png'))
-        self.skyboxButton.setIconSize(QSize(40,40))
-        self.skyboxButton.setFixedSize(QSize(40,40))
-        self.skyboxButton.setAutoRaise(True)  
-        
-        self.skyboxButton.clicked.connect(self.change_skybox)
+
+        #add the main tool bar
+        self.skyboxAction = QAction(QIcon('icons/sky.png'), "Change Skybox", self)
+        self.skyboxAction.triggered.connect(self.change_skybox)
+
+        self.mainToolBar = self.addToolBar("Main")
+        self.mainToolBar.addAction(self.skyboxAction)
 
         #sets rotation value. 0 = right, 1 = down, 2 = left, 3 = right
         self.rotateCW.clicked.connect(self.rotateCW_func)
@@ -654,10 +643,10 @@ class MainWindow(QMainWindow):
             self.tile_toolbar.addWidget(t)
             self.tile_toolbar.addSeparator()
              
-        for index, text in enumerate(prefab_text_list):
+        for index, text in enumerate(self.prefab_text_list):
             for ind, indiv in enumerate(text):
                 curr_list = eval("self.tile_list%d" % (index+1))
-                item = QListWidgetItem(QIcon(self.gameDirVar+prefab_icon_list[index][ind]), indiv)
+                item = QListWidgetItem(QIcon(self.gameDirVar+self.prefab_icon_list[index][ind]), indiv)
                 curr_list.addItem(item)
             
         for i in range(self.list_tab_widget.count()):
@@ -686,15 +675,17 @@ class MainWindow(QMainWindow):
         self.button_grid_all.addLayout(self.button_rotate_layout)
         self.button_grid_all.addLayout(self.gridLayout)
         
-        self.bgal = QWidget()
-        self.bgal.setLayout(self.button_grid_all)
-        self.tllw = QWidget()
-        self.tllw.setLayout(self.tile_list_layout)
+        self.left = QWidget()
+        self.left.setLayout(self.button_grid_all)
+        self.right = QWidget()
+        self.right.setLayout(self.tile_list_layout)
         
-        self.column = QSplitter(Qt.Vertical)
-        self.column.addWidget(self.bgaw)
-        self.column.addWidget(self.tllw)
-
+        self.column = QSplitter(Qt.Horizontal)
+        self.column.addWidget(self.left)
+        self.column.addWidget(self.right)
+        self.column.setStretchFactor(0,0)
+        self.column.setStretchFactor(1,0)
+        
         self.row = QVBoxLayout(self.central_widget)
         self.row.addWidget(self.column)
         
@@ -890,7 +881,7 @@ class MainWindow(QMainWindow):
             del choice
 
     def changeIcon(self):
-        icon = self.gameDirVar+prefab_icon_list[self.list_tab_widget.currentIndex()][current_list.currentRow()]
+        icon = self.gameDirVar+self.prefab_icon_list[self.list_tab_widget.currentIndex()][self.current_list.currentRow()]
 
         #following three lines rotates it
         pixmap = QPixmap(icon)
@@ -1078,9 +1069,9 @@ class MainWindow(QMainWindow):
         create = generateSkybox.createSkyboxSouth(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
         try:
-            skybox = skybox_list[skybox2_list.currentRow()]
-            skyboxlight = skybox_light_list[skybox2_list.currentRow()]
-            skyboxangle = skybox_angle_list[skybox2_list.currentRow()]
+            skybox = self.skybox_list[skybox2_list.currentRow()]
+            skyboxlight = self.skybox_light_list[skybox2_list.currentRow()]
+            skyboxangle = self.skybox_angle_list[skybox2_list.currentRow()]
         except:
             skyboxangle = '0 145 0'
             skyboxlight = '216 207 194 700'
@@ -1177,9 +1168,11 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
         
     def grid_change(self):
-        grid_dialog = GridChangeWindow(self,False)
+        grid_dialog = GridChangeWindow(self)
+        values = grid_dialog.returnVal()
+        self.grid_change_func(values[0], values[1], values[2])
 
-    def grid_change_func(self,x,y,z,startup=False):
+    def grid_change_func(self,x,y,z):
         self.entity_list = []
         self.iconlist = []
         self.totalblocks = []
@@ -1194,8 +1187,7 @@ class MainWindow(QMainWindow):
         self.grid_x = x
         self.levels = z
 
-        if not startup:
-            self.removeButtons()
+        self.removeButtons()
 
         for z in range(self.levels):
             self.totalblocks.append([])
@@ -1218,7 +1210,7 @@ class MainWindow(QMainWindow):
                 self.button_grid_layout.addWidget(grid_btn.button,y,x)
                 self.btn_id_count += 1
                 self.grid_list.append(grid_btn)
-        entity_list.append("lighting slot")  
+        self.entity_list.append("lighting slot")  
         self.count_btns = self.grid_x*self.grid_y
 
         self.scrollArea.deleteLater()
@@ -1243,8 +1235,6 @@ class MainWindow(QMainWindow):
         self.gridLayout.addWidget(self.scrollArea)
         self.button_grid_all.addLayout(self.gridLayout)
         self.setWindowTitle("Easy "+self.gameVar+" Mapper ")
-
-        self.update_levels()
 
     def change_light(self):
         
@@ -1276,8 +1266,8 @@ class MainWindow(QMainWindow):
         self.window = QDialog(self)
         skybox2_list = QListWidget()
         skybox2_list.setIconSize(QSize(200, 25))
-        for index, text in enumerate(skybox_list):
-            item = QListWidgetItem(QIcon(self.gameDirVar+skybox_icon_list[index]), text)
+        for index, text in enumerate(self.skybox_list):
+            item = QListWidgetItem(QIcon(self.gameDirVar+self.skybox_icon_list[index]), text)
             skybox2_list.addItem(item)
         
         self.layout = QHBoxLayout()
@@ -1645,15 +1635,15 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
         self.curr_text.setText("")
 
     def undo(self, undo):
-        if history if undo else redo_history:
-            x = history[-1][0][0] if undo else redo_history[-1][1][0]
-            y = history[-1][0][1] if undo else redo_history[-1][1][1]
-            h_moduleName = history[-1][0][2] if undo else redo_history[-1][1][2]
-            h_icon = history[-1][0][3] if undo else redo_history[-1][1][3]
-            h_level = history[-1][0][4] if undo else redo_history[-1][1][4]
+        if self.history if undo else self.redo_history:
+            x = self.history[-1][0][0] if undo else self.redo_history[-1][1][0]
+            y = self.history[-1][0][1] if undo else self.redo_history[-1][1][1]
+            h_moduleName = self.history[-1][0][2] if undo else self.redo_history[-1][1][2]
+            h_icon = self.history[-1][0][3] if undo else self.redo_history[-1][1][3]
+            h_level = self.history[-1][0][4] if undo else self.redo_history[-1][1][4]
 
             if h_level == None:   
-                for button in grid_list:
+                for button in self.grid_list:
                     if button.x == x and button.y == y:
                         button.click_func(self, x, y, button.btn_id, False, h_moduleName, h_icon)
                         break
@@ -1662,7 +1652,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
                 self.levellist.setCurrentRow(h_level)
                 self.change_level(False, False, True)
 
-            redo_history.append(history.pop(-1)) if undo else history.append(redo_history.pop(-1))
+            self.redo_history.append(self.history.pop(-1)) if undo else self.history.append(self.redo_history.pop(-1))
         else:
             winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
         
@@ -1687,21 +1677,19 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
         movie.start()
 
-class GridChangeWindow(QWidget):
-    def __init__(self, parent, startup=True):
+class GridChangeWindow(QDialog):
+    def __init__(self, parent, startup = False):
         super(GridChangeWindow,self).__init__()
         #parent - references the main window's attributes
         #startup | Boolean | - if the window is being run when program starts up
 
-        if not startup:
+        self.startup = startup
+        
+        if not self.startup:
             parent.entity_list = []
             parent.iconlist = []
             parent.totalblocks = []
             parent.grid_list = []
-    
-        self.window = QDialog(self)
-        self.window.setWindowIcon(QIcon("icons\icon.ico"))
-        #limit to num only
 
         self.widthSpin = QSpinBox()
         self.heightSpin = QSpinBox()
@@ -1711,43 +1699,47 @@ class GridChangeWindow(QWidget):
             spin.setSingleStep(5)
             spin.setValue(5)
         
-        self.radioTF2 = QRadioButton("&TF2",self)
-        self.radioTF2.setChecked(True)
-        self.radioTF2.setWhatsThis("TF2- The best game xd")
-        self.radioCSGO = QRadioButton("&CS:GO",self)
-
-        self.group = QButtonGroup()
-        self.group.addButton(self.radioTF2)
-        self.group.addButton(self.radioCSGO)
-        self.group.setExclusive(True)
-
-        self.radioLayout = QHBoxLayout()
-        self.radioLayout.addWidget(self.radioTF2)
-        self.radioLayout.addWidget(self.radioCSGO)
-        
         self.okay_btn = QPushButton("OK",self)
-        self.okay_btn.clicked.connect(lambda: self.clickFunction(parent, startup))
+        self.okay_btn.clicked.connect(lambda: self.clickFunction(parent))
 
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.widthSpin)
         self.form.addRow("Set Grid Height:",self.heightSpin)
         #self.form.addRow("Set Amount of Levels:",self.text3)
-        if startup:
+        if self.startup:
+            self.radioTF2 = QRadioButton("&TF2",self)
+            self.radioTF2.setChecked(True)
+            self.radioTF2.setWhatsThis("TF2- The best game xd")
+            self.radioCSGO = QRadioButton("&CS:GO",self)
+
+            self.group = QButtonGroup()
+            self.group.addButton(self.radioTF2)
+            self.group.addButton(self.radioCSGO)
+            self.group.setExclusive(True)
+
+            self.radioLayout = QHBoxLayout()
+            self.radioLayout.addWidget(self.radioTF2)
+            self.radioLayout.addWidget(self.radioCSGO)
+            
             self.form.addRow("Choose game:",self.radioLayout)
         self.form.addRow(self.okay_btn)
 
-        self.window.setLayout(self.form)
-        self.window.setWindowTitle("Set Grid Size")
-        self.window.exec_()
+        self.setLayout(self.form)
+        self.setWindowTitle("Set Grid Size")
+        self.setWindowIcon(QIcon("icons\icon.ico"))
+        self.exec_()
 
-    def clickFunction(self, parent, startup):
-        self.window.hide()
-        self.window.deleteLater()
+    def clickFunction(self, parent):
+        self.hide()
+        self.deleteLater()
         parent.isTF = self.radioTF2.isChecked()
-        parent.grid_change_func(self.widthSpin.value(), self.heightSpin.value(), 1, startup)
+
+    def returnVal(self):
+        return (self.widthSpin.value(), self.heightSpin.value(), 1)
 
     def closeEvent(self, event):
-        sys.exit()
+        if self.startup:
+            sys.exit()
 
 #Main Program
 app = QApplication(sys.argv)
