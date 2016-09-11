@@ -62,6 +62,9 @@ class GridBtn(QWidget):
         for i in range(parent.levels):
             self.icons.append(None)
 
+        parent.progress += 100/(parent.grid_x*parent.grid_y)
+        parent.progressBar.setValue(parent.progress)        
+
     def reset_icon(self):
         self.button.setIcon(QIcon(""))
 
@@ -313,11 +316,7 @@ class MainWindow(QMainWindow):
         bspExportAction.setStatusTip("Export as .bsp")
         bspExportAction.setShortcut("Ctrl+Shift+E")
         bspExportAction.triggered.connect(self.file_export_bsp)
-        
-        self.statusBar()
 
-        
-        
         mainMenu = self.menuBar()
         
         
@@ -345,8 +344,6 @@ class MainWindow(QMainWindow):
         editMenu.addAction(undoAction)
         editMenu.addAction(redoAction)
         
-        
-        
         fileMenu.addAction(exitAction)
 
         optionsMenu.addAction(gridAction)
@@ -360,7 +357,12 @@ class MainWindow(QMainWindow):
         
         helpMenu.addAction(tutorialAction)
         helpMenu.addAction(helpAction)
+
+        #create the status bar
+        self.status = QStatusBar(self)
+        self.setStatusBar(self.status)
         
+        #perform some necessary functions for startup of program
         self.home()
         self.grid_change_func(values[0], values[1], values[2])
         self.change_skybox()
@@ -536,9 +538,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.scrollArea = QScrollArea()
-
         #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
-
         #self.scrollArea.setBackgroundRole(QPalette.Light)
 
         self.buttonLabel = QLabel("Rotation:",self)
@@ -547,6 +547,7 @@ class MainWindow(QMainWindow):
         self.gridLabel = QLabel("Work Area:",self)
         self.toolsLabel = QLabel("Prefab Controls:",self)
 
+        #Add the current prefab icon
         self.current = QPushButton("",self)
         self.current.setIcon(QIcon(''))
         self.current.setIconSize(QSize(40,40))
@@ -584,19 +585,12 @@ class MainWindow(QMainWindow):
         self.rotateCCW.setFixedSize(QSize(40,40))
         self.rotateCCW.setAutoRaise(True)
 
-        #add the main tool bar
-        self.skyboxAction = QAction(QIcon('icons/sky.png'), "Change Skybox", self)
-        self.skyboxAction.triggered.connect(self.change_skybox)
-
-        self.mainToolBar = self.addToolBar("Main")
-        self.mainToolBar.addAction(self.skyboxAction)
-
         #sets rotation value. 0 = right, 1 = down, 2 = left, 3 = right
         self.rotateCW.clicked.connect(self.rotateCW_func)
         self.rotateCCW.clicked.connect(self.rotateCCW_func)
         
         self.button_rotate_layout = QHBoxLayout()
-        self.button_rotate_layout.addWidget(self.buttonLabel)
+        #self.button_rotate_layout.addWidget(self.buttonLabel)
         self.button_rotate_layout.addWidget(self.rotateCCW)
         self.button_rotate_layout.addWidget(self.current)
         self.button_rotate_layout.addWidget(self.rotateCW)
@@ -606,13 +600,20 @@ class MainWindow(QMainWindow):
         #self.button_rotate_layout.addWidget(self.leveldown)
         
         self.button_rotate_layout.addStretch(1)
+
+        #add the main tool bar
+        self.skyboxAction = QAction(QIcon('icons/sky.png'), "Change Skybox", self)
+        self.skyboxAction.triggered.connect(self.change_skybox)
+
+        self.mainToolBar = self.addToolBar("Main")
+        self.mainToolBar.addAction(self.skyboxAction)
         
-            
+        #add the many sections of the tile_list    
         self.tile_list1 = QListWidget()
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
         self.current_list = self.tile_list1
-        
+                
         self.list_tab_widget = QTabWidget()
         self.list_tab_widget.setMaximumWidth(200)
         self.list_tab_widget.addTab(self.tile_list1,'Geometry')
@@ -622,6 +623,7 @@ class MainWindow(QMainWindow):
 
         print("len:", self.list_tab_widget.count())
         
+        #add the prefab tools
         self.up_tool_btn = QToolButton(self)
         self.up_tool_btn.setIcon(QIcon('icons/up.png'))
         self.up_tool_btn.clicked.connect(self.prefab_list_up)
@@ -654,9 +656,9 @@ class MainWindow(QMainWindow):
         
         #contains label and list vertically
         self.tile_list_layout = QVBoxLayout()
-        self.tile_list_layout.addWidget(self.listLabel)
+        #self.tile_list_layout.addWidget(self.listLabel)
         self.tile_list_layout.addWidget(self.list_tab_widget)
-        self.tile_list_layout.addWidget(self.toolsLabel)
+        #self.tile_list_layout.addWidget(self.toolsLabel)
         self.tile_list_layout.addWidget(self.tile_toolbar)
         
         self.button_grid_layout = QGridLayout()
@@ -668,17 +670,23 @@ class MainWindow(QMainWindow):
         self.scrollArea.setWidgetResizable(True)
 
         #contains label and grid vertically
-        self.gridLayout = QVBoxLayout()
-        self.gridLayout.addWidget(self.gridLabel)
-        self.gridLayout.addWidget(self.scrollArea)
-        self.button_grid_all = QVBoxLayout()
-        self.button_grid_all.addLayout(self.button_rotate_layout)
-        self.button_grid_all.addLayout(self.gridLayout)
+        #need self.button_rotate_layout in a dock
         
-        self.left = QWidget()
-        self.left.setLayout(self.button_grid_all)
+##        self.gridLayout = QVBoxLayout()
+##        self.gridLayout.addWidget(self.gridLabel)
+##        self.gridLayout.addWidget(self.scrollArea)
+##        self.button_grid_all = QVBoxLayout()
+##        self.button_grid_all.addLayout(self.button_rotate_layout)
+##        self.button_grid_all.addLayout(self.gridLayout)
+        
+        self.button_rotate_widget = QWidget()
+        self.button_rotate_widget.setLayout(self.button_rotate_layout)
         self.tile_list_widget = QWidget()
         self.tile_list_widget.setLayout(self.tile_list_layout)
+
+        self.button_rotate_dock = QDockWidget("Current Prefab", self)
+        self.button_rotate_dock.setWidget(self.button_rotate_widget)
+        self.button_rotate_dock.setFloating(True)
 
         self.tile_list_dock = QDockWidget("Prefab List", self)
         self.tile_list_dock.setWidget(self.tile_list_widget)
@@ -687,7 +695,7 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
         
         self.column = QHBoxLayout()
-        self.column.addWidget(self.left)
+        self.column.addWidget(self.scrollArea)
         
         self.row = QVBoxLayout(self.central_widget)
         self.row.addLayout(self.column)
@@ -1192,6 +1200,11 @@ class MainWindow(QMainWindow):
 
         self.removeButtons()
 
+        #create the progress bar 
+        self.progressBar = QProgressBar()
+        self.progress = 0 #how much progress is on the progressBar
+        self.status.addWidget(self.progressBar)
+
         for z in range(self.levels):
             self.totalblocks.append([])
             self.entity_list.append([])
@@ -1213,30 +1226,33 @@ class MainWindow(QMainWindow):
                 self.button_grid_layout.addWidget(grid_btn.button,y,x)
                 self.btn_id_count += 1
                 self.grid_list.append(grid_btn)
-        self.entity_list.append("lighting slot")  
-        self.count_btns = self.grid_x*self.grid_y
 
-        self.scrollArea.deleteLater()
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setBackgroundRole(QPalette.Light)
-        self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
-
-
-        self.grid_widget = QWidget()
-        self.grid_widget.setLayout(self.button_grid_layout)
-        self.scrollArea.setWidget(self.grid_widget)
-        self.scrollArea.ensureWidgetVisible(self.grid_widget)
-        self.scrollArea.setWidgetResizable(True)
-        
+##                self.progress += 100/(self.grid_x*self.grid_y) MOVED TO BUTTONS' __INIT__
+##                self.progressBar.setValue(self.progress)
         self.button_grid_layout.setRowStretch(self.grid_y + 1, 1)
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
+        self.entity_list.append("lighting slot")  
+        self.count_btns = self.grid_x*self.grid_y
+        self.status.removeWidget(self.progressBar)
+
+        #self.scrollArea.deleteLater()
+        #self.scrollArea = QScrollArea()
+        #self.scrollArea.setBackgroundRole(QPalette.Light)
+        #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
+
+
+##        self.grid_widget = QWidget()
+##        self.grid_widget.setLayout(self.button_grid_layout)
+##        self.scrollArea.setWidget(self.grid_widget)
+##        self.scrollArea.ensureWidgetVisible(self.grid_widget)
+##        self.scrollArea.setWidgetResizable(True)
 
         for i in range(self.levels):
             with open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
                 pickle.dump(self.iconlist[i], f)
         
-        self.gridLayout.addWidget(self.scrollArea)
-        self.button_grid_all.addLayout(self.gridLayout)
+        #self.gridLayout.addWidget(self.scrollArea)
+        #self.button_grid_all.addLayout(self.gridLayout)
         self.setWindowTitle("Easy "+self.gameVar+" Mapper ")
 
     def change_light(self):
