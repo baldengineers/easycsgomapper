@@ -677,17 +677,20 @@ class MainWindow(QMainWindow):
         
         self.left = QWidget()
         self.left.setLayout(self.button_grid_all)
-        self.right = QWidget()
-        self.right.setLayout(self.tile_list_layout)
+        self.tile_list_widget = QWidget()
+        self.tile_list_widget.setLayout(self.tile_list_layout)
+
+        self.tile_list_dock = QDockWidget("Prefab List", self)
+        self.tile_list_dock.setWidget(self.tile_list_widget)
+        self.tile_list_dock.setFloating(False)
+
+        self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
         
-        self.column = QSplitter(Qt.Horizontal)
+        self.column = QHBoxLayout()
         self.column.addWidget(self.left)
-        self.column.addWidget(self.right)
-        self.column.setStretchFactor(0,0)
-        self.column.setStretchFactor(1,0)
         
         self.row = QVBoxLayout(self.central_widget)
-        self.row.addWidget(self.column)
+        self.row.addLayout(self.column)
         
         #widgets needed for the splitter
         #IMPLEMENT LATER
@@ -1732,7 +1735,8 @@ class GridChangeWindow(QDialog):
     def clickFunction(self, parent):
         self.hide()
         self.deleteLater()
-        parent.isTF = self.radioTF2.isChecked()
+        if self.startup:
+            parent.isTF = self.radioTF2.isChecked()
 
     def returnVal(self):
         return (self.widthSpin.value(), self.heightSpin.value(), 1)
