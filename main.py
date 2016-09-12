@@ -541,11 +541,11 @@ class MainWindow(QMainWindow):
         #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
         #self.scrollArea.setBackgroundRole(QPalette.Light)
 
-        self.buttonLabel = QLabel("Rotation:",self)
+        #self.buttonLabel = QLabel("Rotation:",self)
         #self.levelLabel = QLabel("Level Select:",self)
-        self.listLabel = QLabel("List of prefabs:",self)
-        self.gridLabel = QLabel("Work Area:",self)
-        self.toolsLabel = QLabel("Prefab Controls:",self)
+        #self.listLabel = QLabel("List of prefabs:",self)
+        #self.gridLabel = QLabel("Work Area:",self)
+        #self.toolsLabel = QLabel("Prefab Controls:",self)
 
         #Add the current prefab icon
         self.current = QPushButton("",self)
@@ -605,8 +605,16 @@ class MainWindow(QMainWindow):
         self.skyboxAction = QAction(QIcon('icons/sky.png'), "Change Skybox", self)
         self.skyboxAction.triggered.connect(self.change_skybox)
 
+        self.tileListAction = QAction(QIcon('icons/tile_list.png'), "Re-open Tile list", self)
+        self.tileListAction.triggered.connect(self.loadTileList)
+
+        self.rotateDockAction = QAction(QIcon('icons/rotate_dock.png'), "Re-open Rotation Dock", self)
+        self.rotateDockAction.triggered.connect(self.loadButtonRotate)
+
         self.mainToolBar = self.addToolBar("Main")
         self.mainToolBar.addAction(self.skyboxAction)
+        self.mainToolBar.addAction(self.tileListAction)
+        self.mainToolBar.addAction(self.rotateDockAction)
         
         #add the many sections of the tile_list    
         self.tile_list1 = QListWidget()
@@ -684,13 +692,15 @@ class MainWindow(QMainWindow):
         self.tile_list_widget = QWidget()
         self.tile_list_widget.setLayout(self.tile_list_layout)
 
-        self.button_rotate_dock = QDockWidget("Current Prefab", self)
-        self.button_rotate_dock.setWidget(self.button_rotate_widget)
-        self.button_rotate_dock.setFloating(True)
+        self.loadButtonRotate()
+##        self.button_rotate_dock = QDockWidget("Current Prefab", self)
+##        self.button_rotate_dock.setWidget(self.button_rotate_widget)
+##        self.button_rotate_dock.setFloating(True)
 
-        self.tile_list_dock = QDockWidget("Prefab List", self)
-        self.tile_list_dock.setWidget(self.tile_list_widget)
-        self.tile_list_dock.setFloating(False)
+        self.loadTileList()
+##        self.tile_list_dock = QDockWidget("Prefab List", self)
+##        self.tile_list_dock.setWidget(self.tile_list_widget)
+##        self.tile_list_dock.setFloating(False)
 
         self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
         
@@ -741,6 +751,21 @@ class MainWindow(QMainWindow):
         
         self.show()
 
+    def loadTileList(self):
+        self.tile_list_dock = QDockWidget("Prefab List", self)
+        self.tile_list_dock.setWidget(self.tile_list_widget)
+        self.tile_list_dock.setFloating(False)
+
+        self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
+        
+    def loadButtonRotate(self):
+        self.button_rotate_dock = QDockWidget("Current Prefab", self)
+        self.button_rotate_dock.setWidget(self.button_rotate_widget)
+        self.button_rotate_dock.setFloating(True)
+
+        self.addDockWidget(Qt.TopDockWidgetArea,self.button_rotate_dock)
+        #i am.... the top dock
+        
     def change_level_new(self):
         self.file_save(True)
         self.level = self.levelSelect.currentIndex()
