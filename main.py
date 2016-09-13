@@ -406,17 +406,19 @@ class MainWindow(QMainWindow):
         #self.prefab_file = open(self.gameDirVar+"prefab_template/prefab_list.txt")
         #self.prefab_text_file = open(self.gameDirVar+"prefab_template/prefab_text_list.txt")
         #self.prefab_icon_file = open(self.gameDirVar+"prefab_template/prefab_icon_list.txt")
-        self.prefab_file = pickle.open(self.gameDirVar+"prefabs/pinfo.ezmd")
+        self.prefab_file = pickle.load(open(self.gameDirVar+"prefabs/pfinfo.ezmd","rb"))
         
         self.skybox_file = open(self.gameDirVar+"prefab_template/skybox_list.txt")
         self.skybox_icon = open(self.gameDirVar+"prefab_template/skybox_icons.txt")
         self.skybox_light = open(self.gameDirVar+"prefab_template/skybox_light.txt")
         self.skybox_angle = open(self.gameDirVar+"prefab_template/skybox_angle.txt") 
 
-        for main_index,file in ["prefab_list","prefab_icon_list","prefab_text_list"]
+        for main_index,file in enumerate(["prefab_list","prefab_icon_list","prefab_text_list"]):
+            #what the fuck were you even thin(smo)king?!
             curlst = eval(file+" = [[],[],[]]")
+            
             for index,line in self.prefab_file[main_index]:
-                    self.curlst[prefab_file[3][index]].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
+                    curlst[self.prefab_file[3][index]].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
         #section=0
         '''
         self.prefab_text_list.append([])

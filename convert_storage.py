@@ -13,3 +13,6 @@ for item in all_list[1]:
 
 with open("tf2/prefabs/pfinfo.ezmd","wb") as f:
     pickle.dump(all_list,f)
+
+l = pickle.load(open("tf2/prefabs/pfinfo.ezmd","rb"))
+print(line for line in l)
