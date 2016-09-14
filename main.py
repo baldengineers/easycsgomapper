@@ -176,15 +176,15 @@ class MainWindow(QMainWindow):
         self.rotation_icon_list=[]
         self.skybox_angle_list=[]
         self.skybox_icon_list=[]
-        self.prefab_list = []
+        self.prefab_list = [[],[],[]]
         self.gridsize = []
         self.count_btns = 0
         self.entity_list=[]
         self.save_dict = {}
         self.load_dict = {}
         self.stored_info_list=[]
-        self.prefab_text_list = []
-        self.prefab_icon_list = []
+        self.prefab_text_list = [[],[],[]]
+        self.prefab_icon_list = [[],[],[]]
         self.openblocks=[]
         self.placeholder_list = []
         self.history = []
@@ -194,6 +194,10 @@ class MainWindow(QMainWindow):
         self.current_loaded = ''
         self.latest_path='/'
         self.isTF = True
+
+        self.TLBool = False
+        self.SLBool = False
+        self.BRBool = False
 
         #initial startup/gridchange window
         initWindow = GridChangeWindow(self, True)
@@ -365,7 +369,7 @@ class MainWindow(QMainWindow):
         #perform some necessary functions for startup of program
         self.home()
         self.grid_change_func(values[0], values[1], values[2])
-        self.change_skybox()
+        #self.change_skybox()
         #self.level_select()
 
     def TFFormat(self):
@@ -412,34 +416,10 @@ class MainWindow(QMainWindow):
         self.skybox_icon = open(self.gameDirVar+"prefab_template/skybox_icons.txt")
         self.skybox_light = open(self.gameDirVar+"prefab_template/skybox_light.txt")
         self.skybox_angle = open(self.gameDirVar+"prefab_template/skybox_angle.txt") 
-
-        for main_index,file in enumerate(["prefab_list","prefab_icon_list","prefab_text_list"]):
-            #what the fuck were you even thin(smo)king?!
-            curlst = eval(file)
-            curlst = [[],[],[]]
-            
-            for index,line in enumerate(self.prefab_file[main_index]):
-                    curlst[self.prefab_file[3][index]].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
-        #section=0
-        '''
-        self.prefab_text_list.append([])
-        for line in self.prefab_text_file.readlines():
-            if line == '\n':
-                self.prefab_text_list.append([])
-                section+=1
-            else:
-                self.prefab_text_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-        section=0
-        self.prefab_icon_list.append([])
-        for line in self.prefab_icon_file.readlines():
-            if line == "\n":
-                self.prefab_icon_list.append([])
-                section +=1
-            else:
-                self.prefab_icon_list[section].append(line[:-1] if line.endswith("\n") else line)
-
-        '''
+        
+        for main_index,file in enumerate(["prefab_list","prefab_icon_list","prefab_text_list"]):        
+            for index,line in enumerate(self.prefab_file[main_index+1]):     
+                eval("self."+file+"""[int(self.prefab_file[0][index])].append(line)""")# need to do this because reading the file generates a \n after every line
         
         section = 0
         self.rotation_icon_list = []
@@ -459,8 +439,11 @@ class MainWindow(QMainWindow):
         for line in self.skybox_angle.readlines():
             self.skybox_angle_list.append(line[:-1] if line.endswith("\n") else line)
             
-        for file in [self.prefab_file, self.prefab_text_file, self.prefab_icon_file,self.skybox_file,self.skybox_icon,self.skybox_angle,self.skybox_light]:
+        for file in [self.skybox_file,self.skybox_icon,self.skybox_angle,self.skybox_light]:
             file.close()
+
+        print(self.prefab_list)
+
 
         #imports that need prefab_list to be defined
         for sec in self.prefab_list:
@@ -605,7 +588,7 @@ class MainWindow(QMainWindow):
 
         #add the main tool bar
         self.skyboxAction = QAction(QIcon('icons/sky.png'), "Change Skybox", self)
-        self.skyboxAction.triggered.connect(self.change_skybox)
+        self.skyboxAction.triggered.connect(self.loadSkyboxList)
 
         self.tileListAction = QAction(QIcon('icons/tile_list.png'), "Re-open Tile list", self)
         self.tileListAction.triggered.connect(self.loadTileList)
@@ -623,6 +606,16 @@ class MainWindow(QMainWindow):
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
         self.current_list = self.tile_list1
+
+        self.gui_skybox_laout = QVBoxLayout()
+        self.gui_skybox_list = QListWidget()
+
+        #print(self.skybox_icon_list)
+        self.gui_skybox_list.setIconSize(QSize(140, 20))
+        self.gui_skybox_list.setMaximumWidth(160)
+        for index, text in enumerate(self.skybox_list):
+            item = QListWidgetItem(QIcon(self.gameDirVar+self.skybox_icon_list[index]),'')
+            self.gui_skybox_list.addItem(item)
                 
         self.list_tab_widget = QTabWidget()
         self.list_tab_widget.setMaximumWidth(200)
@@ -679,32 +672,16 @@ class MainWindow(QMainWindow):
         self.scrollArea.setWidget(self.grid_widget)
         self.scrollArea.setWidgetResizable(True)
 
-        #contains label and grid vertically
-        #need self.button_rotate_layout in a dock
-        
-##        self.gridLayout = QVBoxLayout()
-##        self.gridLayout.addWidget(self.gridLabel)
-##        self.gridLayout.addWidget(self.scrollArea)
-##        self.button_grid_all = QVBoxLayout()
-##        self.button_grid_all.addLayout(self.button_rotate_layout)
-##        self.button_grid_all.addLayout(self.gridLayout)
+
         
         self.button_rotate_widget = QWidget()
         self.button_rotate_widget.setLayout(self.button_rotate_layout)
         self.tile_list_widget = QWidget()
         self.tile_list_widget.setLayout(self.tile_list_layout)
 
-        self.loadButtonRotate()
-##        self.button_rotate_dock = QDockWidget("Current Prefab", self)
-##        self.button_rotate_dock.setWidget(self.button_rotate_widget)
-##        self.button_rotate_dock.setFloating(True)
-
-        self.loadTileList()
-##        self.tile_list_dock = QDockWidget("Prefab List", self)
-##        self.tile_list_dock.setWidget(self.tile_list_widget)
-##        self.tile_list_dock.setFloating(False)
-
-        self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
+        self.loadTileList(True)
+        self.loadSkyboxList(True)
+        self.loadButtonRotate(True)
         
         self.column = QHBoxLayout()
         self.column.addWidget(self.scrollArea)
@@ -712,26 +689,7 @@ class MainWindow(QMainWindow):
         self.row = QVBoxLayout(self.central_widget)
         self.row.addLayout(self.column)
         
-        #widgets needed for the splitter
-        #IMPLEMENT LATER
-##        self.left_top = QWidget()
-##        self.left_top.setLayout(self.button_rotate_layout)
-##        self.left_bot = QWidget()
-##        self.left_bot.setLayout(self.gridLayout)
-##        self.right = QWidget()
-##        self.right.setLayout(self.tile_list_layout)
-##
-##        self.splitter_left = QSplitter()
-##        self.splitter_left.setOrientation(Qt.Vertical)
-##        self.splitter_left.addWidget(self.left_top)
-##        self.splitter_left.addWidget(self.left_bot)
-##
-##        self.splitter_right = QSplitter()
-##        self.splitter_right.addWidget(self.right)
-##
-##        self.row = QVBoxLayout(self.central_widget)
-##        self.row.addWidget(self.splitter_left)
-##        self.row.addWidget(self.splitter_right)
+
         
         try:
             f = open(self.gameDirVar+'startupcache/firsttime.su', 'r+')
@@ -753,20 +711,59 @@ class MainWindow(QMainWindow):
         
         self.show()
 
-    def loadTileList(self):
-        self.tile_list_dock = QDockWidget("Prefab List", self)
-        self.tile_list_dock.setWidget(self.tile_list_widget)
-        self.tile_list_dock.setFloating(False)
+    def loadSkyboxList(self,startup=False):
+        if not self.SLBool:
+            self.skybox_list_dock = QDockWidget("Skybox List", self)
+            self.skybox_list_dock.visibilityChanged.connect(self.toggleSLBool)
 
-        self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
+            self.skybox_list_dock.setWidget(self.gui_skybox_list)
+            self.skybox_list_dock.setFloating(False)
+
+            self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
+            #if startup:
+                #self.SLBool = True
+            
+    def toggleSLBool(self):
+        if self.SLBool:
+            self.SLBool = False
+        else:
+            self.SLBool = True
+
+    def loadTileList(self,startup=False):
+        if not self.TLBool:
+            self.tile_list_dock = QDockWidget("Prefab List", self)
+            self.tile_list_dock.visibilityChanged.connect(self.toggleTLBool)
+            self.tile_list_dock.setWidget(self.tile_list_widget)
+            self.tile_list_dock.setFloating(False)
+
+            self.addDockWidget(Qt.RightDockWidgetArea, self.tile_list_dock)
+            #if startup:
+                #self.TLBool = True
+    def toggleTLBool(self):
+        if self.TLBool:
+            self.TLBool = False
+        else:
+            self.TLBool = True
         
-    def loadButtonRotate(self):
-        self.button_rotate_dock = QDockWidget("Current Prefab", self)
-        self.button_rotate_dock.setWidget(self.button_rotate_widget)
-        self.button_rotate_dock.setFloating(True)
+    def loadButtonRotate(self,startup = False):
+        if not self.BRBool:
+            self.button_rotate_dock = QDockWidget("Current Prefab", self)
+            self.button_rotate_dock.visibilityChanged.connect(self.toggleBRBool)
+            self.button_rotate_dock.setWidget(self.button_rotate_widget)
+            self.button_rotate_dock.setFloating(False)
 
-        self.addDockWidget(Qt.TopDockWidgetArea,self.button_rotate_dock)
+            self.addDockWidget(Qt.LeftDockWidgetArea,self.button_rotate_dock)
+            #if startup:
+                #self.BRBool = True
         #i am.... the top dock
+        #   ^
+        #   |
+        #this comment is perfect and i will leave it in because the pun is wasted because it's no longer on the top dock widget area     
+    def toggleBRBool(self):
+        if self.BRBool:
+            self.BRBool = False
+        else:
+            self.BRBool = True
         
     def change_level_new(self):
         self.file_save(True)
@@ -970,9 +967,9 @@ class MainWindow(QMainWindow):
                         self.iconlist.append(item)
                   
                     
-                elif "skybox2_list" in header:
+                elif "GSList" in header:
                     openlines = pickle.load(file)
-                    skybox2_list.setCurrentRow(openlines)
+                    self.gui_skybox_list.setCurrentRow(openlines)
                 else:
                     break
         
@@ -1021,9 +1018,9 @@ class MainWindow(QMainWindow):
         print(latest_path)
         self.gridsize = (grid_x,grid_y,self.levels)
         try:
-            skybox_sav = skybox2_list.currentRow()
+            skybox_sav = self.gui_skybox_list.currentRow()
         except:
-            pass
+            skybox_sav = 0
         if not tmp:
             if not file_loaded or saveAs:
                 name = QFileDialog.getSaveFileName(self, "Save File", latest_path, "*.ezm")[0]
@@ -1053,7 +1050,7 @@ class MainWindow(QMainWindow):
             pickle.dump(stored_info_list_temp, file)
             pickle.dump("<icon_list>", file)
             pickle.dump(self.iconlist, file)
-            pickle.dump("<skybox>", file)
+            pickle.dump("<GSList>", file)
             pickle.dump(skybox_sav, file)
             file.close()
             QMessageBox.information(self, "File Saved", "File saved as %s" %(name))
@@ -1107,9 +1104,9 @@ class MainWindow(QMainWindow):
         create = generateSkybox.createSkyboxSouth(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
         try:
-            skybox = self.skybox_list[skybox2_list.currentRow()]
-            skyboxlight = self.skybox_light_list[skybox2_list.currentRow()]
-            skyboxangle = self.skybox_angle_list[skybox2_list.currentRow()]
+            skybox = self.skybox_list[self.gui_skybox_list.currentRow()]
+            skyboxlight = self.skybox_light_list[self.gui_skybox_list.currentRow()]
+            skyboxangle = self.skybox_angle_list[self.gui_skybox_list.currentRow()]
         except:
             skyboxangle = '0 145 0'
             skyboxlight = '216 207 194 700'

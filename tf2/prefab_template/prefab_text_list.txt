@@ -23,6 +23,6 @@ Spike
 Mini-Spire
 Spire
 
-Death Pit (bottom level only)
+Death Pit
 Laser Array
 Nuke
