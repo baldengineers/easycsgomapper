@@ -1489,61 +1489,23 @@ class MainWindow(QMainWindow):
     def import_prefab(self):
         name = QFileDialog.getOpenFileName(self, "Import Zipped Prefab", latest_path,"*.zip")[0]
         prefab_zip = zipfile.ZipFile(name).extractall("")
+        
+        lists = pickle.load(gameDirVar+'prefabs/pinfo.ezmd')
 
-        with open("info.txt", "r+") as f:
-            zip_info = f.readlines()
-            if zip_info[3] == 2:
-                with open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"a") as d:
-                    tempfil = zip_info[0]
-                    tempfil = tempfil.replace('\n','')
-                    d.write(self.gameDirVar+tempfil+"_icon_list.txt\n")
-                with open(self.gameDirVar+'prefab_template/prefab_list.txt',"a") as d:
-                    tempfil = zip_info[0]
-                    tempfil = tempfil.replace('\n','')
-                    d.write(tempfil+'\n')
-                with open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"a") as d:
-                    d.write(zip_info[2])
-                with open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"a") as d:
-                    tempfil = zip_info[1]
-                    tempfil = tempfil.replace('\n','')
-                    d.write(self.gameDirVar+'icons/'+tempfil+'_right.jpg\n')
-            else:
-                #most childish code 2016
-                z = open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"r")
-                zlines = z.readlines()
-                z.close()
-                y = open(self.gameDirVar+'prefab_template/prefab_list.txt',"r")
-                ylines = y.readlines()
-                y.close()
-                x = open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"r")
-                xlines = x.readlines()
-                x.close()
-                w = open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"r")
-                wlines = w.readlines()
-                w.close()
-                
-                z = open(self.gameDirVar+'prefab_template/rot_prefab_list.txt',"w")
-                zlines.insert(self.index_section_index[int(zip_info[3])]-1,self.gameDirVar+zip_info[0]+"_icon_list.txt\n")
-                zlines = "".join(zlines)
-                z.write(zlines)
-                z.close()
-                y = open(self.gameDirVar+'prefab_template/prefab_list.txt',"w")
-                ylines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[0])
-                ylines = "".join(ylines)
-                y.write(ylines)
-                y.close()
-                x = open(self.gameDirVar+'prefab_template/prefab_text_list.txt',"w")
-                xlines.insert(self.index_section_index[int(zip_info[3])]-1,zip_info[2])
-                xlines = "".join(xlines)
-                x.write(xlines)
-                x.close()
-                w = open(self.gameDirVar+'prefab_template/prefab_icon_list.txt',"w")
-                wlines.insert(self.index_section_index[int(zip_info[3])]-1,'icons/'+zip_info[1]+'_right.jpg\n')
-                wlines = "".join(wlines)
-                w.write(wlines)
-                w.close()                
-
-        os.remove("info.txt")
+        lns = pickle.load('info.pfb')
+        
+        #there need to be 4 items in the list that is info.pfb
+        #1) what section it is (int) [eg. 0]
+        #2) prefab name (str) [eg. "ground_prefab"]
+        #3) prefab icon dir (str) [eg. "icons/ground_prefab.png"]
+        #4) prefab text name (str) [eg. Ground Prefab]
+        for list_index,line in enumerate(lns):
+            lists[list_index].append(line)
+        
+        os.remove('info.pfb')
+        
+        with tfile as open(gameDirVar+'prefabs/pinfo.ezmd', "w"):
+            pickle.dump(lists,tfile)
         
         restart_btn = QPushButton("Restart")
         later_btn = QPushButton("Later")
