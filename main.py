@@ -415,9 +415,10 @@ class MainWindow(QMainWindow):
 
         for main_index,file in enumerate(["prefab_list","prefab_icon_list","prefab_text_list"]):
             #what the fuck were you even thin(smo)king?!
-            curlst = eval(file+" = [[],[],[]]")
+            curlst = eval(file)
+            curlst = [[],[],[]]
             
-            for index,line in self.prefab_file[main_index]:
+            for index,line in enumerate(self.prefab_file[main_index]):
                     curlst[self.prefab_file[3][index]].append(line[:-1] if line.endswith("\n") else line)# need to do this because reading the file generates a \n after every line
         #section=0
         '''
