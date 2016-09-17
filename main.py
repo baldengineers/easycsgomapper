@@ -611,8 +611,10 @@ class MainWindow(QMainWindow):
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
         self.current_list = self.tile_list1
+        
+        for l in [self.tile_list1, self.tile_list2, self.tile_list3]:
+            l.setDragEnabled(True)
 
-        self.gui_skybox_laout = QVBoxLayout()
         self.gui_skybox_list = QListWidget()
 
         #print(self.skybox_icon_list)
