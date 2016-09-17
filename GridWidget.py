@@ -7,15 +7,16 @@ class GridWidget(QWidget):
         #spacing controls how spaced out the lines are
         super(GridWidget, self).__init__()
         self.spacing = spacing
+        self.pList = []#list of points where gridlines intersect
         self.setCursor(Qt.CrossCursor)
         self.SetAcceptDrops(True)
         #vars for rubber band
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
         
-    def dragEnterEvent(self, e):
+    def dragEnterEvent(self, e:)
         #http://www.pythonstudio.us/pyqt-programming/drag-and-drop.html
-        print(e.mimeData().formats) #for testing purposes
+        print(e.mimeData().formats()) #for testing purposes
         
         if e.mimeData().hasImage:
             e.setDropAction(Qt.CopyAction)
@@ -25,6 +26,7 @@ class GridWidget(QWidget):
             
     def dropEvent(self, e):
         #e.mimeData().imageData
+        #multiply the image size by 32/self.spacing
         
 
     def mousePressEvent(self, e):
@@ -63,16 +65,20 @@ class GridWidget(QWidget):
         #draw the grid
         x, y = 0, 0
         qp.setPen(Qt.blue)
-        
-        while x <= w:
+            
+        self.pList = []
+        for x in range(w/self.spacing):
+            x_ind = x
+            x *= self.spacing
             line = QLineF(x,0.0,x,h)
             qp.drawLine(line)
-            x += self.spacing
-
-        while y <= h:
-            line = QLineF(0.0,y,w,y)
-            qp.drawLine(line)
-            y += self.spacing
+            self.plist.append([x])
+            
+            for y in range(h/self.spacing):
+                y *= self.spacing
+                line = QLineF(x,y,x+self.spacing,y)
+                qp.drawLine(line)
+                self.plist[x_ind].append(y)
 
     def setSpacing(self, spacing):
         self.spacing = spacing
