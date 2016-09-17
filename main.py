@@ -176,13 +176,18 @@ class MainWindow(QMainWindow):
         self.rotation_icon_list=[]
         self.skybox_angle_list=[]
         self.skybox_icon_list=[]
-        self.prefab_list = [[],[],[]]
         self.gridsize = []
         self.count_btns = 0
         self.entity_list=[]
         self.save_dict = {}
         self.load_dict = {}
         self.stored_info_list=[]
+        #tabs should be more reusable
+        #for example: the following lists should be this instead:
+        #self.prefab_list = [[] for i in self.tabs] where self.tabs is the # of tabs
+        #i.e. We should be able to create new tabs whenever we want, just by
+        #changing the self.tabs variable. 
+        self.prefab_list = [[],[],[]]
         self.prefab_text_list = [[],[],[]]
         self.prefab_icon_list = [[],[],[]]
         self.openblocks=[]
