@@ -1509,7 +1509,7 @@ class MainWindow(QMainWindow):
         
         os.remove('info.pfb')
         
-        with tfile as open(gameDirVar+'prefabs/pinfo.ezmd', "w"):
+        with open(gameDirVar+'prefabs/pinfo.ezmd', "w") as tfile:
             pickle.dump(lists,tfile)
         
         restart_btn = QPushButton("Restart")
