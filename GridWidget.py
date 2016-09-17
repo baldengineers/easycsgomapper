@@ -8,30 +8,45 @@ class GridWidget(QWidget):
         super(GridWidget, self).__init__()
         self.spacing = spacing
         self.setCursor(Qt.CrossCursor)
+        self.SetAcceptDrops(True)
         #vars for rubber band
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
+        
+    def dragEnterEvent(self, e):
+        #http://www.pythonstudio.us/pyqt-programming/drag-and-drop.html
+        print(e.mimeData().formats) #for testing purposes
+        
+        if e.mimeData().hasImage:
+            e.setDropAction(Qt.CopyAction)
+            e.accept()
+        else:
+            e.ignore()
+            
+    def dropEvent(self, e):
+        #e.mimeData().imageData
+        
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, e):
 
         #rubber band
-        if event.button() == Qt.LeftButton:
+        if e.button() == Qt.LeftButton:
         
-            self.origin = QPoint(event.pos())
+            self.origin = QPoint(e.pos())
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.show()
     
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, e):
 
         #rubber band
         if not self.origin.isNull():
-            self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
+            self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
     
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, e):
 
         #rubber band
-        if event.button() == Qt.LeftButton:
-            print(QRect(self.origin, event.pos()))
+        if e.button() == Qt.LeftButton:
+            print(QRect(self.origin, e.pos()))
             self.rubberBand.hide()
         
     def paintEvent(self, e):
