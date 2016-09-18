@@ -32,7 +32,7 @@ class GridWidget(QWidget):
         #multiply the image size by 32/self.spacing
         for p in self.pList:
             if e.pos().x() < p.x() and e.pos().y() < p.y():
-                coor_ind = self.pList.index(QPointF(p.x() - self.spacing, p.y() - self.spacing))
+                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))
                 break
 
         self.prefabs.append([e.mimeData().imageData(), coor])
@@ -42,8 +42,10 @@ class GridWidget(QWidget):
 
         #rubber band
         if e.button() == Qt.RightButton:
-        
-            self.origin = QPoint(e.pos())
+            for p in self.pList:
+                if e.pos().x() < p.x() and e.pos().y() < p.y():
+                    self.origin = p - QPoint(self.spacing,self.spacing)
+                    break
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.show()
     
@@ -51,7 +53,10 @@ class GridWidget(QWidget):
 
         #rubber band
         if not self.origin.isNull():
-            self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
+            for p in self.pList:
+                if e.pos().x() < p.x() and e.pos().y() < p.y():
+                    self.rubberBand.setGeometry(QRect(self.origin, p).normalized())
+                    break
     
     def mouseReleaseEvent(self, e):
 
@@ -104,7 +109,7 @@ class GridWidget(QWidget):
 
         self.pList = []
         for c in coors:
-            p = QPointF(c[0],c[1])
+            p = QPoint(c[0],c[1])
             self.pList.append(p)
         #print(self.pList)
 
