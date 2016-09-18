@@ -3,7 +3,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 class GridWidget(QWidget):
-    def __init__(self, spacing):
+    def __init__(self, spacing=25):
         #spacing controls how spaced out the lines are
         super(GridWidget, self).__init__()
         self.spacing = spacing
@@ -30,22 +30,20 @@ class GridWidget(QWidget):
     def dropEvent(self, e):
         #e.mimeData().imageData
         #multiply the image size by 32/self.spacing
-        for p in self.pList:
-            if e.pos().x() < p.x() and e.pos().y() < p.y():
-                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))
-                break
+##        for p in self.pList:
+##            if e.pos().x() < p.x() and e.pos().y() < p.y():
+##                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))
+##                break
 
-        self.prefabs.append([e.mimeData().imageData(), coor])
-        print(e.mimeData().imageData())
+##        self.prefabs.append([e.mimeData().imageData(), coor])
+##        print(e.mimeData().imageData())
+        pass
 
     def mousePressEvent(self, e):
 
         #rubber band
         if e.button() == Qt.RightButton:
-            for p in self.pList:
-                if e.pos().x() < p.x() and e.pos().y() < p.y():
-                    self.origin = p - QPoint(self.spacing,self.spacing)
-                    break
+            self.origin = self.closestP(e,"top-left")
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.show()
     
@@ -53,16 +51,13 @@ class GridWidget(QWidget):
 
         #rubber band
         if not self.origin.isNull():
-            for p in self.pList:
-                if e.pos().x() < p.x() and e.pos().y() < p.y():
-                    self.rubberBand.setGeometry(QRect(self.origin, p).normalized())
-                    break
+            self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e,"bot-right")).normalized())
     
     def mouseReleaseEvent(self, e):
 
         #rubber band
         if e.button() == Qt.RightButton:
-            print(QRect(self.origin, e.pos()))
+            print(QRect(self.origin, self.closestP(e,"bot-right")))
             self.rubberBand.hide()
 
     def wheelEvent(self, e):
@@ -119,9 +114,27 @@ class GridWidget(QWidget):
     def changeSpacing(self, spacing):
         self.spacing += spacing
 
+    def closestP(self, e, d):
+        #finds the closest point to the mouse cursor(e) 
+        #d is the direction the point is in relative to mouse cursor: "top-left", "top-right", "bot-left", "bot-right"
+        for p in self.pList:
+            if e.pos().x() < p.x() and e.pos().y() < p.y():
+                if d == "top-left":
+                    return p - QPoint(self.spacing,self.spacing)
+                elif d == "top-right":
+                    return p - QPoint(0,self.spacing)
+                elif d == "bot-left":
+                    return p - QPoint(self.spacing,0)
+                elif d == "bot-right":
+                    return p
+                else:
+                    return QPoint(0, 0)
+
+        return QPoint(0, 0)
+
 def main():
     app = QApplication(sys.argv)
-    grid = GridWidget(25)
+    grid = GridWidget()
     grid.show()
     sys.exit(app.exec_())
 
