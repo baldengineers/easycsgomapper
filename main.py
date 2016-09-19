@@ -463,6 +463,7 @@ class MainWindow(QMainWindow):
         print("\n~~~~~~~~~~~~~~~~~~~~~\nMapper loaded! You may have to alt-tab to find the input values dialog.\n")
 
     def CSFormat(self):
+        #for cs area
         pass
 
     def open_hammer(self,loaded,file,reloc = False):
@@ -488,8 +489,7 @@ class MainWindow(QMainWindow):
                     subprocess.Popen(self.fileloaded[1])
             except Exception as e:
                 print(str(e))
-                self.notFound = QMessageBox()
-                self.notFound.setText("ERROR!")
+                self.notFound = QMessageBox().setText("ERROR!")
                 self.notFound.setInformativeText("Hammer executable/batch moved or renamed!")
                 self.notFound.exec_()
 
@@ -523,39 +523,14 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.scrollArea = QScrollArea()
-        #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
-        #self.scrollArea.setBackgroundRole(QPalette.Light)
 
-        #self.buttonLabel = QLabel("Rotation:",self)
-        #self.levelLabel = QLabel("Level Select:",self)
-        #self.listLabel = QLabel("List of prefabs:",self)
-        #self.gridLabel = QLabel("Work Area:",self)
-        #self.toolsLabel = QLabel("Prefab Controls:",self)
 
-        #Add the current prefab icon
         self.current = QPushButton("",self)
         self.current.setIcon(QIcon(''))
         self.current.setIconSize(QSize(40,40))
         self.current.setFixedSize(QSize(40,40))
         self.current.setFlat(True)
-        self.current.clicked.connect(self.heavy)
-     
-##        self.levelSelect = QComboBox(self)
-##        self.levelSelect.currentIndexChanged.connect(lambda: self.change_level_new())
-##
-##        self.levelup = QToolButton(self)
-##        self.levelup.setIcon(QIcon('icons/up.png'))
-##        self.levelup.setIconSize(QSize(20,20))
-##        self.levelup.clicked.connect(lambda: self.change_level(True, True))
-##        self.levelup.setAutoRaise(True)
-##
-##        self.leveldown = QToolButton(self)
-##        self.leveldown.setIcon(QIcon('icons/down.png'))
-##        self.leveldown.setIconSize(QSize(20,20))
-##        self.leveldown.clicked.connect(lambda: self.change_level(True, False))
-##        self.leveldown.setAutoRaise(True)
 
-        #add rotation buttons
         self.rotateCW = QToolButton(self)
         self.rotateCW.setShortcut(QKeySequence(Qt.Key_Right))
         self.rotateCW.setIcon(QIcon('icons/rotate_cw.png'))
@@ -575,14 +550,11 @@ class MainWindow(QMainWindow):
         self.rotateCCW.clicked.connect(self.rotateCCW_func)
         
         self.button_rotate_layout = QHBoxLayout()
-        #self.button_rotate_layout.addWidget(self.buttonLabel)
+
         self.button_rotate_layout.addWidget(self.rotateCCW)
         self.button_rotate_layout.addWidget(self.current)
         self.button_rotate_layout.addWidget(self.rotateCW)
-        #self.button_rotate_layout.addWidget(self.levelLabel)
-        #self.button_rotate_layout.addWidget(self.levelSelect)
-        #self.button_rotate_layout.addWidget(self.levelup)
-        #self.button_rotate_layout.addWidget(self.leveldown)
+
         
         self.button_rotate_layout.addStretch(1)
 
@@ -730,8 +702,6 @@ class MainWindow(QMainWindow):
             self.skybox_list_dock.setFloating(False)
 
             self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
-            #if startup:
-                #self.SLBool = True
             
     def toggleSLBool(self):
         if self.SLBool:
