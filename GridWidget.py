@@ -1,18 +1,21 @@
 import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
+import main
 
 class GridWidget(QWidget):
-    def __init__(self, spacing=25):
+    def __init__(self, parent=None, spacing=25):
         #spacing controls how spaced out the lines are
         super(GridWidget, self).__init__()
+        self.parent = parent
         self.spacing = spacing
         self.pList = []#list of points where gridlines intersect
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
         self.setCursor(Qt.CrossCursor)
         self.setAcceptDrops(True)
         #vars for rubber band
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        #self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        self.rubberBand = Selection(self)
         self.origin = QPoint()
         
     def dragEnterEvent(self, e):
@@ -41,36 +44,56 @@ class GridWidget(QWidget):
 
     def mousePressEvent(self, e):
 
-        #rubber band
-        if e.button() == Qt.RightButton:
-            self.origin = self.closestP(e,"top-left")
+        if e.button() == Qt.LeftButton or e.button() == Qt.RightButton:
+            self.origin = self.closestP(e)
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+            self.rubberBand.setShowImage(False)
+
+            if e.button() == Qt.LeftButton:
+                icon = self.parent.gameDirVar+self.parent.prefab_icon_list[self.parent.list_tab_widget.currentIndex()][self.parent.current_list.currentRow()]
+                if "\n" in icon:
+                    icon = icon[:-1]
+                #following three lines rotates it
+                icon = QPixmap(icon)
+                transform = QTransform().rotate(90*self.parent.rotation)
+                icon = icon.transformed(transform, Qt.SmoothTransformation)
+
+##                p = QPalette()
+##                p.setBrush(QPalette.Highlight, icon)
+##                self.rubberBand.setPalette(p)
+                self.rubberBand.setShowImage(True)
+                self.rubberBand.setPixmap(icon)
+
             self.rubberBand.show()
     
     def mouseMoveEvent(self, e):
 
         #rubber band
         if not self.origin.isNull():
-            self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e,"bot-right")).normalized())
+            self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e)).normalized())
     
     def mouseReleaseEvent(self, e):
 
+        if e.button() == Qt.LeftButton:
+            pass   
         #rubber band
-        if e.button() == Qt.RightButton:
-            print(QRect(self.origin, self.closestP(e,"bot-right")))
+        elif e.button() == Qt.RightButton:
+            print(QRect(self.origin, self.closestP(e)))
             self.rubberBand.hide()
 
     def wheelEvent(self, e):
-        if self.spacing <= 50 and self.spacing >= 5:
-            e.accept
+        if self.spacing <= 50 and self.spacing >= 16:
+            e.accept()
             self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
         else:
             e.ignore()
 
         if self.spacing > 50:
             self.spacing = 50
-        elif self.spacing < 10:
-            self.spacing = 10
+        elif self.spacing < 16:
+            self.spacing = 16
+
+        print(self.spacing)
 
         self.repaint()
         
@@ -87,7 +110,7 @@ class GridWidget(QWidget):
 
         #draw the grid
         x, y = 0, 0
-        qp.setPen(Qt.blue)
+        qp.setPen(Qt.lightGray)
             
         coors = []
         for x in range(int(w/self.spacing)+1):
@@ -114,23 +137,47 @@ class GridWidget(QWidget):
     def changeSpacing(self, spacing):
         self.spacing += spacing
 
-    def closestP(self, e, d):
-        #finds the closest point to the mouse cursor(e) 
-        #d is the direction the point is in relative to mouse cursor: "top-left", "top-right", "bot-left", "bot-right"
+    def closestP(self, e):
+        #finds the closest point to the mouse cursor(e)
+        dist = []
+        #print(e.pos())
         for p in self.pList:
-            if e.pos().x() < p.x() and e.pos().y() < p.y():
-                if d == "top-left":
-                    return p - QPoint(self.spacing,self.spacing)
-                elif d == "top-right":
-                    return p - QPoint(0,self.spacing)
-                elif d == "bot-left":
-                    return p - QPoint(self.spacing,0)
-                elif d == "bot-right":
-                    return p
-                else:
-                    return QPoint(0, 0)
+            dist.append([abs(e.pos().x() - p.x()),abs(e.pos().y() - p.y())])
+        xy = min(d for d in dist)
+        return self.pList[dist.index(xy)]
 
-        return QPoint(0, 0)
+class Selection(QRubberBand):
+    def __init__(self, parent):
+        super(Selection, self).__init__(QRubberBand.Rectangle, parent)
+        self.showImage = False #whether to display the prefab icon while selecting
+        self.pixmap = None
+
+    def setShowImage(self, image):
+        self.showImage = image
+
+    def setPixmap(self, pixmap):
+        self.pixmap = pixmap
+        print(self.pixmap.rect())
+    
+    def paintEvent(self, e):
+        qp = QPainter()
+        pen = QPen(Qt.black)
+        pen.setWidth(5)
+        pen.setStyle(Qt.DashLine)
+        if self.showImage:
+            pScaled = self.pixmap.scaled(e.rect().width(), e.rect().height(), Qt.KeepAspectRatio)
+            #pRect.setSize(QSize(e.rect().width(),e.rect().height()))
+            brush = QBrush(Qt.green, pScaled)
+        else:
+            brush = QBrush(Qt.white)
+
+        qp.begin(self)
+        qp.setPen(pen)
+        qp.setOpacity(0.5)
+        qp.setBrush(brush)
+        qp.drawRect(e.rect())
+        qp.end()
+        
 
 def main():
     app = QApplication(sys.argv)

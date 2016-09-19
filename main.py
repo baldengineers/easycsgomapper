@@ -46,6 +46,7 @@ import wave
 import zipfile
 import shutil
 import winsound
+import GridWidget
 
 class GridBtn(QWidget):
     def __init__(self, parent, x, y, btn_id):
@@ -110,19 +111,13 @@ class GridBtn(QWidget):
 
             if h_moduleName != None:
                 if clicked:
-
-                    try:
-                        icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()]
-                        if "\n" in icon:
-                            icon = icon[:-1]
-                        #following three lines rotates it
-                        icon = QPixmap(icon)
-                        transform = QTransform().rotate(90*parent.rotation)
-                        icon = icon.transformed(transform, Qt.SmoothTransformation)
-
-                    except Exception as e:
-                        print(str(e))
-                        icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()]
+                    icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()]
+                    if "\n" in icon:
+                        icon = icon[:-1]
+                    #following three lines rotates it
+                    icon = QPixmap(icon)
+                    transform = QTransform().rotate(90*parent.rotation)
+                    icon = icon.transformed(transform, Qt.SmoothTransformation)
                         
                 else:
                     icon = h_icon
@@ -695,8 +690,16 @@ class MainWindow(QMainWindow):
         
         self.row = QVBoxLayout(self.central_widget)
         self.row.addLayout(self.column)
-        
 
+        #TESTING
+        self.grid = GridWidget.GridWidget(self)
+        self.grid_dock = QDockWidget("Skybox List", self)
+
+        self.grid_dock.setWidget(self.grid)
+        self.grid_dock.setFloating(True)
+
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
+        #END TESTING
         
         try:
             f = open(self.gameDirVar+'startupcache/firsttime.su', 'r+')
@@ -1754,8 +1757,9 @@ class GridChangeWindow(QDialog):
         if self.startup:
             sys.exit()
 
-#Main Program
-app = QApplication(sys.argv)
-main = MainWindow()
-app.exec_()
+if __name__ == '__main__':
+    #Main Program
+    app = QApplication(sys.argv)
+    main = MainWindow()
+    sys.exit(app.exec_())
 
