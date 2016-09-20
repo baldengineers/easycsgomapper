@@ -59,9 +59,8 @@ class GridBtn(QWidget):
         self.button.pressed.connect(lambda: self.click_func(parent, x, y,btn_id))
         self.button.installEventFilter(self)
         self.button.show()
-        self.icons = []
-        for i in range(parent.levels):
-            self.icons.append(None)
+        self.icons = None
+        
 
         parent.progress += 100/(parent.grid_x*parent.grid_y)
         parent.progressBar.setValue(parent.progress)        
@@ -75,20 +74,20 @@ class GridBtn(QWidget):
         #format | history.append((x,y,moduleName,self.icon,level))
         if clicked:
             parent.redo_history=[]
-            if self.icons[parent.level]:
+            if self.icons:
                 moduleName = eval(parent.prefab_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()])
-                templist=[(x,y,moduleName,self.icons[parent.level],None)]
+                templist=[(x,y,moduleName,self.icons,None)]
             else:
                 templist=[(x,y,None,None,None)]
 
         def clear_btn(btn_id):
             self.button.setIcon(QIcon())
             for l in [parent.totalblocks,parent.entity_list,parent.stored_info_list]:
-                l[parent.level][btn_id] = ''
+                l[btn_id] = ''
                 
-            parent.iconlist[parent.level][btn_id] = ('','')
+            parent.iconlist[btn_id] = ('','')
             
-            self.icons[parent.level] = None
+            self.icons = None
         
         if self.checkForCtrl(clicked):
             clear_btn(btn_id)
@@ -124,18 +123,18 @@ class GridBtn(QWidget):
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                parent.iconlist[parent.level][btn_id] = [parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
-                parent.stored_info_list[parent.level][btn_id] = [moduleName,x,y,parent.id_num,parent.world_id_num,parent.entity_num,parent.placeholder_list,parent.rotation,parent.level]
+                parent.iconlist[btn_id] = [parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
+                parent.stored_info_list[btn_id] = [moduleName,x,y,parent.id_num,parent.world_id_num,parent.entity_num,parent.placeholder_list,parent.rotation]
 
-                self.icons[parent.level] = icon
+                self.icons = icon
             else:
-                parent.stored_info_list[parent.level][btn_id] = ""
+                parent.stored_info_list[btn_id] = ""
 
             if "*" not in parent.windowTitle():
                 parent.setWindowTitle("Easy "+parent.gameVar+" Mapper* - ["+parent.currentfilename+"]")
             
             if clicked:
-                templist.append((x,y,moduleName,self.icons[parent.level],None))
+                templist.append((x,y,moduleName,self.icons,None))
                 parent.history.append(templist)
 
     def checkForCtrl(self, clicked):
@@ -968,10 +967,10 @@ class MainWindow(QMainWindow):
             
         else:
             try:
-                file = open(self.gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "rb")
-                self.iconlist[self.level] = pickle.load(file)
+                file = open(self.gameDirVar+"leveltemp/level.tmp", "rb")
+                self.iconlist = pickle.load(file)
                 file.close()
-                for index, icon in enumerate(self.iconlist[self.level]):
+                for index, icon in enumerate(self.iconlist):
                     self.grid_list[index].button.setIcon(QIcon(icon))
                     self.grid_list[index].button.setIconSize(QSize(32,32))
             except Exception as e:
@@ -996,7 +995,7 @@ class MainWindow(QMainWindow):
     def file_save(self, tmp = False, saveAs = False):
         global grid_x, grid_y, iconlist, levels, level, currentfilename, file_loaded, latest_path, stored_info_list, save_dict,load_dict,skybox2_list
         print(latest_path)
-        self.gridsize = (grid_x,grid_y,self.levels)
+        self.gridsize = (grid_x,grid_y)
         try:
             skybox_sav = self.gui_skybox_list.currentRow()
         except:
@@ -1041,8 +1040,8 @@ class MainWindow(QMainWindow):
             file_loaded = True
         else:
             try:#writes tmp file to save the icons for each level
-                file = open(self.gameDirVar+"leveltemp/level" + str(self.level)+".tmp", "wb")
-                pickle.dump(self.iconlist[self.level], file)
+                file = open(self.gameDirVar+"leveltemp/level.tmp", "wb")
+                pickle.dump(self.iconlist, file)
                 file.close()
             except Exception as e:
                 
@@ -1115,7 +1114,7 @@ class MainWindow(QMainWindow):
                     self.placeholder_list = create[5]
                     self.entity_list.append(create[4])
         import export #export contains the code to compile/export the map
-        wholething = export.execute(totalblocks, entity_list, self.levels, skybox,skyboxgeolist, light)
+        wholething = export.execute(totalblocks, entity_list, skybox,skyboxgeolist, light)
               
         if bsp:
             with open(self.gameDirVar+'output/'+gameVar+'mapperoutput.vmf','w+') as f:
@@ -1188,12 +1187,21 @@ class MainWindow(QMainWindow):
         self.grid_change_func(values[0], values[1], values[2])
 
     def grid_change_func(self,x,y,z):
+        #needs to be changed to accomodate grid widget
+        #basically: reset entitylist, totalblocks, and iconlist
+        #reset grid widget
+        #set mins and maxs to None
         self.entity_list = []
         self.iconlist = []
         self.totalblocks = []
         self.grid_list = []
+        
+        self.xmin = None
+        self.ymin = None
+        self.xmax = None
+        self.ymax = None
 
-        self.level = 0
+        #self.level = 0
         self.count_btns = 0
         
         self.file_loaded = False
@@ -1209,21 +1217,21 @@ class MainWindow(QMainWindow):
         self.progress = 0 #how much progress is on the progressBar
         self.status.addWidget(self.progressBar)
 
-        for z in range(self.levels):
-            self.totalblocks.append([])
-            self.entity_list.append([])
-            self.iconlist.append([])
-            self.stored_info_list.append([])
-            self.btn_id_count=0
-            self.count_btns=0
         
-            for x in range(self.grid_x):
-                
-                for y in range(self.grid_y):
-                    self.totalblocks[z].append("") #This is so that there are no problems with replacing list values
-                    self.entity_list[z].append("")
-                    self.iconlist[z].append(('',''))
-                    self.stored_info_list[z].append('')
+        self.totalblocks.append([])
+        self.entity_list.append([])
+        self.iconlist.append([])
+        self.stored_info_list.append([])
+        self.btn_id_count=0
+        self.count_btns=0
+        
+        for x in range(self.grid_x):
+            
+            for y in range(self.grid_y):
+                self.totalblocks[z].append("") #This is so that there are no problems with replacing list values
+                self.entity_list[z].append("")
+                self.iconlist[z].append(('',''))
+                self.stored_info_list[z].append('')
         for x in range(self.grid_x):
             for y in range(self.grid_y):
                 grid_btn = GridBtn(self, x, y, self.btn_id_count)
@@ -1251,9 +1259,9 @@ class MainWindow(QMainWindow):
 ##        self.scrollArea.ensureWidgetVisible(self.grid_widget)
 ##        self.scrollArea.setWidgetResizable(True)
 
-        for i in range(self.levels):
-            with open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
-                pickle.dump(self.iconlist[i], f)
+#        for i in range(self.levels):
+#            with open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
+#                pickle.dump(self.iconlist[i], f)
         
         #self.gridLayout.addWidget(self.scrollArea)
         #self.button_grid_all.addLayout(self.gridLayout)
