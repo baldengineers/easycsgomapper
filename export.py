@@ -4,7 +4,7 @@ def setGameDirVar(var):
     global gameDirVar
     gameDirVar = var
 
-def execute(totalblocks, entity_list,levels, skybox, skyboxgeolist, light):
+def execute(totalblocks, entity_list,skybox, skyboxgeolist, light):
     compiledblocks=''
     totalentities=''
     beg_template = open(gameDirVar+'prefab_template/beginning_template.txt', 'r+')
