@@ -14,8 +14,8 @@ class GridWidget(QWidget):
         self.setCursor(Qt.CrossCursor)
         self.setAcceptDrops(True)
         #vars for rubber band
-        #self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
-        self.rubberBand = Selection(self)
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        #self.rubberBand = Selection(self)
         self.origin = QPoint()
         
     def dragEnterEvent(self, e):
@@ -146,6 +146,7 @@ class GridWidget(QWidget):
         xy = min(d for d in dist)
         return self.pList[dist.index(xy)]
 
+"""
 class Selection(QRubberBand):
     def __init__(self, parent):
         super(Selection, self).__init__(QRubberBand.Rectangle, parent)
@@ -177,7 +178,7 @@ class Selection(QRubberBand):
         qp.setBrush(brush)
         qp.drawRect(e.rect())
         qp.end()
-        
+"""
 
 def main():
     app = QApplication(sys.argv)
