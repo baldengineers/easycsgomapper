@@ -44,27 +44,14 @@ class GridWidget(QWidget):
 
     def mousePressEvent(self, e):
 
-        if e.button() == Qt.LeftButton or e.button() == Qt.RightButton:
+        if e.button() == Qt.RightButton:
             self.origin = self.closestP(e)
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.setShowImage(False)
-
-            if e.button() == Qt.LeftButton:
-                icon = self.parent.gameDirVar+self.parent.prefab_icon_list[self.parent.list_tab_widget.currentIndex()][self.parent.current_list.currentRow()]
-                if "\n" in icon:
-                    icon = icon[:-1]
-                #following three lines rotates it
-                icon = QPixmap(icon)
-                transform = QTransform().rotate(90*self.parent.rotation)
-                icon = icon.transformed(transform, Qt.SmoothTransformation)
-
-##                p = QPalette()
-##                p.setBrush(QPalette.Highlight, icon)
-##                self.rubberBand.setPalette(p)
-                self.rubberBand.setShowImage(True)
-                self.rubberBand.setPixmap(icon)
-
             self.rubberBand.show()
+        elif e.button() == Qt.LeftButton:
+            #self.parent.cur_icon
+            pass
     
     def mouseMoveEvent(self, e):
 
