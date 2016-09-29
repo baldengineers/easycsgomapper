@@ -110,20 +110,13 @@ class GridBtn(QWidget):
 
             if h_moduleName != None:
                 if clicked:
-                    icon = parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][parent.current_list.currentRow()]
-                    if "\n" in icon:
-                        icon = icon[:-1]
-                    #following three lines rotates it
-                    icon = QPixmap(icon)
-                    transform = QTransform().rotate(90*parent.rotation)
-                    icon = icon.transformed(transform, Qt.SmoothTransformation)
-                        
+                    icon = parent.cur_icon
                 else:
                     icon = h_icon
 
                 self.button.setIcon(QIcon(icon))
                 self.button.setIconSize(QSize(32,32))
-                parent.iconlist[btn_id] = [parent.gameDirVar+parent.prefab_icon_list[parent.list_tab_widget.currentIndex()][current_list.currentRow()],parent.rotation]
+                parent.iconlist[btn_id] = [icon]
                 parent.stored_info_list[btn_id] = [moduleName,x,y,parent.id_num,parent.world_id_num,parent.entity_num,parent.placeholder_list,parent.rotation]
 
                 self.icons = icon
@@ -153,7 +146,7 @@ class MainWindow(QMainWindow):
 
         #QApplication.setStyle(QStyleFactory.create("Cleanlooks")) #comment out if unwanted
 
-        #define some variables used throughout the class
+        #define some variables used throughout the class 
         self.level = 0
         self.levels = 0
         self.id_num = 1
@@ -167,6 +160,7 @@ class MainWindow(QMainWindow):
         self.last_tuple = 'First'
         self.skybox_light_list=[]
         self.iconlist = []
+        self.cur_icon = ""
         self.rotation_icon_list=[]
         self.skybox_angle_list=[]
         self.skybox_icon_list=[]
@@ -787,7 +781,7 @@ class MainWindow(QMainWindow):
     def changeCurrentList(self):
         print("current list: tile_list%s" % str(self.list_tab_widget.currentIndex()+1))
         self.current_list = eval('self.tile_list%s' % str(self.list_tab_widget.currentIndex()+1))
-
+        
     def rotateCW_func(self):
         if self.rotation < 3:
             self.rotation = self.rotation + 1
@@ -895,14 +889,11 @@ class MainWindow(QMainWindow):
             del choice
 
     def changeIcon(self):
-        icon = self.gameDirVar+self.prefab_icon_list[self.list_tab_widget.currentIndex()][self.current_list.currentRow()]
-
-        #following three lines rotates it
-        pixmap = QPixmap(icon)
+        pixmap = QPixmap(self.gameDirVar+self.prefab_icon_list[self.list_tab_widget.currentIndex()][self.current_list.currentRow()])
         transform = QTransform().rotate(90*self.rotation)
-        pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
+        self.cur_icon = pixmap.transformed(transform, Qt.SmoothTransformation)
         
-        self.current.setIcon(QIcon(pixmap))
+        self.current.setIcon(QIcon(self.cur_icon))
         self.current.setIconSize(QSize(32,32))
       
         
@@ -966,15 +957,12 @@ class MainWindow(QMainWindow):
 
             
         else:
-            try:
-                file = open(self.gameDirVar+"leveltemp/level.tmp", "rb")
-                self.iconlist = pickle.load(file)
-                file.close()
-                for index, icon in enumerate(self.iconlist):
-                    self.grid_list[index].button.setIcon(QIcon(icon))
-                    self.grid_list[index].button.setIconSize(QSize(32,32))
-            except Exception as e:
-                print(str(e))
+            file = open(self.gameDirVar+"leveltemp/level.tmp", "rb")
+            self.iconlist = pickle.load(file)
+            file.close()
+            for index, icon in enumerate(self.iconlist):
+                self.grid_list[index].button.setIcon(QIcon(icon))
+                self.grid_list[index].button.setIconSize(QSize(32,32))
 
     def upd_icns(self):
         for index, icon in enumerate(self.iconlist[0]):
