@@ -1,3 +1,10 @@
+"""
+Every prefab file should include 
+* Algorithm to construct prefab (current method needs to be changed entirely)
+* a set of points, with the origin in the top-left corner, defining the vertices of the icon. This will help the grid widget draw the icon
+* something to calculate the colors in the icon - e.g. list of pixels, jpg image. list of pixels may save space
+"""
+
 import re
 
 class Create():
@@ -7,8 +14,6 @@ class Create():
         #prefab_text | string | is the name of the prefab as it will appear in the main application window
         #prefab_icon | string | is the filepath of the icon of the prefab as it will appear in the main application window
         #workshop_export | boolean | that determines whether the prefab will be zipped for export to the workshop
-        #indexLine |  | I have no fucking idea
-        #index |  | I have no idea about this either
         self.ent_name_list = [] #list containing all targetnames
         self.LEVEL_HEIGHT = 448 #self.LEVEL_HEIGHT is the constant for the height of each level of the map.
         self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
@@ -241,6 +246,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     else:
                         continue
                     self.vmf_data[index] = self.vmf_data[index].replace(value, id_var)
+                    
+                    
                 elif block_title == "solid":
                     if header:
                         header = False
@@ -253,6 +260,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_type = "entity"
                 elif block_title == "cameras":
                     del self.vmf_data[index:]
+                    
+                    
                 elif block_type == "side":
                     if key == "plane":
                         curr_p = 0 #current point that program is iterating through, increases at every "("
