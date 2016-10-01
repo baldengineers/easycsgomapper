@@ -15,8 +15,8 @@ class Create():
         #prefab_icon | string | is the filepath of the icon of the prefab as it will appear in the main application window
         #workshop_export | boolean | that determines whether the prefab will be zipped for export to the workshop
         self.ent_name_list = [] #list containing all targetnames
-        self.LEVEL_HEIGHT = 448 #self.LEVEL_HEIGHT is the constant for the height of each level of the map.
         self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
+        self.draw_list = [] #self.draw_list contains the points of the planes to draw when placing tile on gridWidget
         self.var_num = 1 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
         self.compile_list = [ #self.compilelist is the outline of the prefab.py file
         """import os
@@ -221,7 +221,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             for index, line in enumerate(self.vmf_data):
                 key = ""
                 value = ""
-                block_title = "" #note: don't reset block_type because that carries lasts until the bracket
+                block_title = "" #note: don't reset block_type because that lasts until the bracket
                 if "\"" in line:
                     line_sep = self.separate("Q",line) #line separated by the quotes as a tuple
                     key = line_sep[0]
@@ -264,17 +264,15 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     
                 elif block_type == "side":
                     if key == "plane":
-                        curr_p = 0 #current point that program is iterating through, increases at every "("
-                        for char_index, char in enumerate(line):
-                            if char == "(":
-                                curr_p += 1
-                                #num = ["","",""] #num is for the numbers in the parenthesis that are the x y z coords of the point, it is a list of STRINGS
-                                num_index = 0 #current index for the num variable above
-                                p_vals = self.separate("P",value) #contains all the point values of the plane in a tuple
-                                if "x" not in p_vals[curr_p-1]: #must subtract 1 from curr_p to get INDEX
-                                    self.assign_var(p_vals[curr_p-1])
-                                else:
-                                    pass
+                        p_vals = list(self.separate("P",value)) #contains all 3 point values of the plane
+                        for i, p_val in enumerate(p_vals):
+                            p_vals[i] = p_val.split(" ")
+                            if not "x" in p_val:
+                                self.assign_var(p_val, index)
+                        #TODO: find a way to tell if face is vertical (you can't see from top) and then decide which faces to draw based upon that
+##                        X,Y = 0,1
+##                        if p_vals[0][X] != p_vals[1][X] != p_vals[2][X] or p_vals[0][Y] != p_vals[1][Y] != p_vals[2][Y]:
+##                            self.draw_list.append(p_vals)
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
@@ -283,7 +281,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         anglevallist = value.split(" ")
                         self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))  
                     elif key == "origin":
-                        self.assign_var(value)
+                        if "x" not in value:
+                            self.assign_var(value, index)
                     elif key == "targetname":
                         #some way for it to add the targetname to a list of targetnames that is added to a list
                         #here, and when the .py is run, it replaces all instances of the targetname with tgname_<id_num>
@@ -302,6 +301,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         for i in self.vmf_data:
             print(i)
         print("var_list: ",self.var_list)
+        print("draw_list: ",self.draw_list)
         
         #ent name shit
         ent_name_str="    for ent_name in ["
@@ -313,23 +313,24 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         
         #now replace
                         
-    def assign_var(self, p_val):
+    def assign_var(self, p_val, index):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         #p_val is the coord values for the point
         
         nums = p_val.split(" ")
         X,Y,Z = 0,1,2 #Constants to make managing the indices of nums[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*512+256,posy*-1*512-256), (posx*512%s, posy*-512%s), (360 if rotation!=0 else 0)-90*rotation))" %(self.var_num, "+" + nums[X], "+" + nums[Y]))
+        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale%s, posy*-scale%s), (360 if rotation!=0 else 0)-90*rotation))" %(self.var_num, "+" + nums[X], "+" + nums[Y]))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" %(var, self.var_num, self.var_num, 0 if var == "x" else 1))
-        self.var_list.append("z%d = level*%d + %s" %(self.var_num, self.LEVEL_HEIGHT, nums[Z]))
+        self.var_list.append("z%d = %s" %(self.var_num, nums[Z]))
 
-        for index in range(len(self.vmf_data)):
+        for index in range(index,len(self.vmf_data)):
             line_sep = self.separate("Q",self.vmf_data[index])
             key = line_sep[0]
             if not key == "angles":
-                self.vmf_data[index] = self.vmf_data[index].replace(p_val, "x%d y%d z%d" %(self.var_num, self.var_num, self.var_num))
+                if p_val in self.vmf_data[index]:
+                    self.vmf_data[index] = self.vmf_data[index].replace(p_val, "x%d y%d z%d" %(self.var_num, self.var_num, self.var_num))
         self.var_num += 1
         
     def separate(self, t, s, first="", last=""):
