@@ -241,7 +241,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
                 if key == "id":
                     if block_type == "solid" or block_type == "entity":
-                        id_var = "world_idnum"
+                        id_var = "world_id_num"
                     elif block_type == "side":
                         id_var = "id_num"
                     else:
@@ -311,6 +311,10 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             print(i)
         print("var_list: ",self.var_list)
         print("draw_list: ",self.draw_list)
+
+##        with open('tf2/prefabs/prefab_new.py', 'a') as f:
+##            for item in self.vmf_data:
+##                f.write(item)
         
         #ent name shit
         ent_name_str="    for ent_name in ["
