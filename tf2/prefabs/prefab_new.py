@@ -4,43 +4,44 @@ This contains new algorithms for new and improved prefab system.
 import re
 
 def create(posx, posy, id_num, world_id_num, scale, rotation):
-    xy1 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-scale+0), (360 if rotation!=0 else 0)-90*rotation))
+    xy0 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
+    x0 = xy0[0]
+    y0 = xy0[1]
+    z0 = 64
+    xy1 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
     x1 = xy1[0]
     y1 = xy1[1]
     z1 = 64
-    xy2 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-scale+0), (360 if rotation!=0 else 0)-90*rotation))
+    xy2 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-1*scale+-512), (360 if rotation!=0 else 0)-90*rotation))
     x2 = xy2[0]
     y2 = xy2[1]
     z2 = 64
-    xy3 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-scale+-512), (360 if rotation!=0 else 0)-90*rotation))
+    xy3 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+-512), (360 if rotation!=0 else 0)-90*rotation))
     x3 = xy3[0]
     y3 = xy3[1]
-    z3 = 64
-    xy4 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-scale+-512), (360 if rotation!=0 else 0)-90*rotation))
+    z3 = 0
+    xy4 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-1*scale+-512), (360 if rotation!=0 else 0)-90*rotation))
     x4 = xy4[0]
     y4 = xy4[1]
     z4 = 0
-    xy5 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-scale+-512), (360 if rotation!=0 else 0)-90*rotation))
+    xy5 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
     x5 = xy5[0]
     y5 = xy5[1]
     z5 = 0
-    xy6 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+512, posy*-scale+0), (360 if rotation!=0 else 0)-90*rotation))
+    xy6 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+-512), (360 if rotation!=0 else 0)-90*rotation))
     x6 = xy6[0]
     y6 = xy6[1]
-    z6 = 0
-    xy7 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-scale+-512), (360 if rotation!=0 else 0)-90*rotation))
+    z6 = 64
+    xy7 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
     x7 = xy7[0]
     y7 = xy7[1]
-    z7 = 64
-    xy8 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-scale+0), (360 if rotation!=0 else 0)-90*rotation))
+    z7 = 0
+    xy8 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+256, posy*-1*scale+-256), (360 if rotation!=0 else 0)-90*rotation))
     x8 = xy8[0]
     y8 = xy8[1]
-    z8 = 0
-    xy9 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+256, posy*-scale+-256), (360 if rotation!=0 else 0)-90*rotation))
-    x9 = xy9[0]
-    y9 = xy9[1]
-    z9 = 73
-    var_list = [[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4],[x5,y5,z5],[x6,y6,z6],[x7,y7,z7],[x8,y8,z8],[x9,y9,z9]]
+    z8 = 73
+
+    var_list = [[x0,y0,z0],[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4],[x5,y5,z5],[x6,y6,z6],[x7,y7,z7],[x8,y8,z8]]
     var_count = 9
 
     vmf_template = """
@@ -143,14 +144,46 @@ entity
 	}
 }
 """
-
+    X,Y,Z = 0,1,2
     for i in range(var_count):
-        vmf_template.replace("x%d y%d z%d" % (i+1, i+1, i+1), "%d %d %d" % (var_list[i][0], var_list[i][1], var_list[i][2]))
+        vmf_template.replace("x%d y%d z%d" % (i, i, i), "%d %d %d" % (var_list[i][X], var_list[i][Y], var_list[i][Z]))
     for i in range(vmf_template.count("world_id_num")):
         vmf_template.replace("world_id_num", world_id_num, 1)
         world_id_num += 1
     for i in range(vmf_template.count("id_num")):
         vmf_template.replace("id_num", id_num, 1)
         id_num += 1
-    
+    axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
+    negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
+    #move the following funcs into separate 'pf.py' file
+    def evaluate(coords):
+        dist_x,dist_y,dist_z = abs(coords[0]),abs(coords[1]),abs(coords[2]) 
+        if dist_x >= dist_y and dist_x >= dist_z:
+            return axislist[0] #why do you return a val from the axis list if you never use the returned value?
+        elif dist_y >= dist_z:
+            return axislist[1]
+        return axislist[2]
+
+    def get_normal(coord_list):
+        vector_a = (coord_list[1][0]-coord_list[0][0],coord_list[1][1]-coord_list[0][1],coord_list[1][2]-coord_list[0][2])
+        vector_b = (coord_list[2][0]-coord_list[0][0],coord_list[2][1]-coord_list[0][1],coord_list[2][2]-coord_list[0][2])
         
+        normal = (vector_a[1]*vector_b[2]-vector_a[2]*vector_b[1],vector_a[2]*vector_b[0]-vector_a[0]*vector_b[2],vector_a[0]*vector_b[1]-vector_a[1]*vector_b[0])
+        return normal
+    for normal_num in range(0,var_count,3):
+        normal_list=[]
+        for i in range(3):
+            normal_list.append([])
+            for var in [X, Y, Z]:
+                normal_list[i].append(var_list[normal_num+i][var])
+        response = evalutate(get_normal(normal_list))
+        if response == axislist[0]:
+            uaxis = axislist[1]
+        else:
+            uaxis = axislist[0]
+        if response == axislist[2]:
+            vaxis = negaxislist[1]
+        else:
+            vaxis = negaxislist[2]
+        values = values.replace('AXIS_REPLACE_U',uaxis,1)
+        values = values.replace('AXIS_REPLACE_V',vaxis,1)

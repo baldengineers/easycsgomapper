@@ -18,7 +18,7 @@ class Create():
         self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
         self.draw_list = [] #self.draw_list contains the points of the planes to draw when placing tile on gridWidget
         self.c_dict = {} #self.c_dict (coordinate dict.) is a dictionary of the x, y, and z's so you can reference them later. ex: {x1 : 512, y1 : -512, z1: 192}
-        self.var_num = 1 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
+        self.var_num = 0 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
         self.compile_list = [ #self.compilelist is the outline of the prefab.py file
         """import os
 import math
@@ -315,6 +315,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 ##        with open('tf2/prefabs/prefab_new.py', 'a') as f:
 ##            for item in self.vmf_data:
 ##                f.write(item)
+##            for item in self.var_list:
+##                f.write(item+'\n')
         
         #ent name shit
         ent_name_str="    for ent_name in ["
@@ -333,7 +335,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
         nums = p_val.split()
         X,Y,Z = 0,1,2 #Constants to make managing the indices of nums[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale%s, posy*-scale%s), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, "+" + nums[X], "+" + nums[Y]))
+        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale%s, posy*-1*scale%s), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, "+" + nums[X], "+" + nums[Y]))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" % (var, self.var_num, self.var_num, 0 if var == "x" else 1))
         self.var_list.append("z%d = %s" % (self.var_num, nums[Z]))
