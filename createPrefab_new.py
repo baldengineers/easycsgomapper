@@ -6,12 +6,87 @@ Every prefab file should include
 """
 
 import re
+import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-class Create(QDialog):
-    def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
-        super(Create,self).__init__()
+class Create():
+    def __init__(self, show=True):
+        if show:
+            self.dialog = QDialog()
+
+            self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
+            self.textLineEdit = QLineEdit()
+            self.nameLineEdit = QLineEdit()
+            
+            self.vmfLineEdit = QLineEdit()
+            self.vmfBrowse = QPushButton("Browse",self.dialog)
+            self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
+            self.vmfLayout = QHBoxLayout()
+            self.vmfLayout.addWidget(self.vmfLineEdit)
+            self.vmfLayout.addWidget(self.vmfBrowse)
+            
+            self.iconLineEdit = QLineEdit()
+            self.iconBrowse = QPushButton("Browse",self.dialog)
+            self.iconBrowse.clicked.connect(lambda: self.iconLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .jpg File", "/","*.jpg")[0]))
+            self.iconLayout = QHBoxLayout()
+            self.iconLayout.addWidget(self.iconLineEdit)
+            self.iconLayout.addWidget(self.iconBrowse)
+
+            self.expCheckBox = QCheckBox(self.dialog)
+            self.sectionSelect = QComboBox()
+            #needs to have a cs:go version
+            #if self.isTF:
+            self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
+            #else:
+            #    pass
+
+            self.radioLayout = QHBoxLayout()
+            self.radioTF2 = QRadioButton("TF2",self.dialog)
+            self.radioTF2.setChecked(True)
+            self.radioCSGO = QRadioButton("CS:GO",self.dialog)
+            self.group = QButtonGroup()
+            self.group.addButton(self.radioTF2)
+            self.group.addButton(self.radioCSGO)
+            self.group.setExclusive(True)
+            self.radioLayout.addWidget(self.radioTF2)
+            self.radioLayout.addWidget(self.radioCSGO)
+            
+            self.okay_btn = QPushButton("Create Prefab", self.dialog)
+            self.okay_btn.clicked.connect(self.dialog.accept)
+            self.cancel_btn = QPushButton("Cancel", self.dialog)
+            self.cancel_btn.clicked.connect(self.dialog.reject)
+            self.btn_layout = QHBoxLayout()
+            self.btn_layout.addStretch(1)
+            self.btn_layout.addWidget(self.okay_btn)
+            self.btn_layout.addWidget(self.cancel_btn)
+
+            #self.blankstring = QWidget()
+            
+            self.form = QFormLayout()
+            self.form.addRow(self.buggyText)
+            self.form.addRow("Prefab Text:", self.textLineEdit)
+            self.form.addRow("Prefab Name:", self.nameLineEdit)
+            self.form.addRow("VMF file (.vmf):", self.vmfLayout)
+            self.form.addRow("Icon (.jpg):", self.iconLayout)
+            self.form.addRow("Export prefab?", self.expCheckBox)
+            self.form.addRow("Which section?",self.sectionSelect)
+            self.form.addRow("Which game?", self.radioLayout)
+##            for i in range(5):
+##                self.form.addRow(self.blankstring)
+            self.form.addRow(self.btn_layout)
+
+            self.dialog.accepted.connect(lambda: self.create_prefab(self.vmfLineEdit.text(), self.nameLineEdit.text(), self.textLineEdit.text(), self.iconLineEdit.text(), self.expCheckBox.isChecked(), self.radioTF2.isChecked()))
+            
+            #self.dialog.setGeometry(150,150,400,300)
+            self.dialog.setWindowTitle("Create Prefab")
+            self.dialog.setWindowIcon(QIcon("icons\icon.ico"))
+
+            self.dialog.setLayout(self.form)
+            self.dialog.exec_()
+
+    def create_prefab(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
+        #begin creating prefab
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
         #prefab_text | string | is the name of the prefab as it will appear in the main application window
@@ -371,6 +446,11 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
  
         return re.search(ex,s).groups() if re.search(ex,s) else None #check if NoneType
 
-#xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+if __name__ == '__main__':
+    #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
-xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    ##xd = Create(False)
+    ##xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    app = QApplication(sys.argv)
+    main = Create()
+    
