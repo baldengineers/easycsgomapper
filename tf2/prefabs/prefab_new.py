@@ -1,8 +1,7 @@
 """
 This contains new algorithms for new and improved prefab system.
 """
-import re
-
+from pf import evaluate, get_normal, rotatePoint
 def create(posx, posy, id_num, world_id_num, scale, rotation):
     xy0 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
     x0 = xy0[0]
@@ -155,21 +154,6 @@ entity
         id_num += 1
     axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
     negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
-    #move the following funcs into separate 'pf.py' file
-    def evaluate(coords):
-        dist_x,dist_y,dist_z = abs(coords[0]),abs(coords[1]),abs(coords[2]) 
-        if dist_x >= dist_y and dist_x >= dist_z:
-            return axislist[0] #why do you return a val from the axis list if you never use the returned value?
-        elif dist_y >= dist_z:
-            return axislist[1]
-        return axislist[2]
-
-    def get_normal(coord_list):
-        vector_a = (coord_list[1][0]-coord_list[0][0],coord_list[1][1]-coord_list[0][1],coord_list[1][2]-coord_list[0][2])
-        vector_b = (coord_list[2][0]-coord_list[0][0],coord_list[2][1]-coord_list[0][1],coord_list[2][2]-coord_list[0][2])
-        
-        normal = (vector_a[1]*vector_b[2]-vector_a[2]*vector_b[1],vector_a[2]*vector_b[0]-vector_a[0]*vector_b[2],vector_a[0]*vector_b[1]-vector_a[1]*vector_b[0])
-        return normal
     for normal_num in range(0,var_count,3):
         normal_list=[]
         for i in range(3):
@@ -177,13 +161,13 @@ entity
             for var in [X, Y, Z]:
                 normal_list[i].append(var_list[normal_num+i][var])
         response = evalutate(get_normal(normal_list))
-        if response == axislist[0]:
+        if response == "x":
             uaxis = axislist[1]
         else:
             uaxis = axislist[0]
-        if response == axislist[2]:
+        if response == "z":
             vaxis = negaxislist[1]
         else:
             vaxis = negaxislist[2]
-        values = values.replace('AXIS_REPLACE_U',uaxis,1)
-        values = values.replace('AXIS_REPLACE_V',vaxis,1)
+        vmf_template.replace('AXIS_REPLACE_U',uaxis,1)
+        vmf_template.replace('AXIS_REPLACE_V',vaxis,1)

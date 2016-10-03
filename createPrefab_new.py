@@ -6,9 +6,12 @@ Every prefab file should include
 """
 
 import re
+from PySide.QtCore import *
+from PySide.QtGui import *
 
-class Create():
+class Create(QDialog):
     def __init__(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
+        super(Create,self).__init__()
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
         #prefab_text | string | is the name of the prefab as it will appear in the main application window
@@ -342,7 +345,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         for index in range(index,len(self.vmf_data)):
             line_sep = self.separate("Q",self.vmf_data[index])
-            key = line_sep[0]
+            key = line_sep[0] if line_sep else None
             if not key == "angles":
                 if p_val in self.vmf_data[index]:
                     self.vmf_data[index] = self.vmf_data[index].replace(p_val, "x%d y%d z%d" % (self.var_num, self.var_num, self.var_num))
@@ -365,11 +368,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             ex = r'%s(.*?)%s' % (first, last)
         else:
             return print("%s is is not a valid separate command" % (t))
-
-        try:    
-            return re.search(ex,s).groups()
-        except AttributeError: #happens if the above is NoneType
-            return [""]
+ 
+        return re.search(ex,s).groups() if re.search(ex,s) else None #check if NoneType
 
 #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
