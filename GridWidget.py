@@ -4,11 +4,68 @@ from PySide.QtGui import *
 import main
 
 class GridWidget(QWidget):
-    def __init__(self, parent=None, spacing=25):
-        #spacing controls how spaced out the lines are
+    def __init__(self, spacing=25):
         super(GridWidget, self).__init__()
-        self.parent = parent
         self.spacing = spacing
+        self.pList = []
+        self.setCursor(Qt.CrossCursor)
+        
+    def paintEvent(self, e):
+        qp = QPainter()
+        qp.begin(self)
+        self.draw(qp)
+        qp.end()
+
+    def draw(self, qp):
+        size = self.size()
+        w = size.width()
+        h = size.height()
+
+        #draw the grid
+        x, y = 0, 0
+        qp.setPen(Qt.lightGray)
+            
+        coors = []
+        for x in range(int(w/self.spacing)+1):
+            x_ind = x
+            x *= self.spacing
+            line = QLineF(x,0.0,x,h)
+            qp.drawLine(line)
+            
+            for y in range(int(h/self.spacing)+1):
+                y *= self.spacing
+                line = QLineF(x,y,x+self.spacing,y)
+                qp.drawLine(line)
+                coors.append([x,y])
+
+        self.pList = []
+        for c in coors:
+            p = QPoint(c[0],c[1])
+            self.pList.append(p)
+        #print(self.pList)
+
+    def setSpacing(self, spacing):
+        self.spacing = spacing
+
+    def changeSpacing(self, spacing):
+        self.spacing += spacing
+
+    def closestP(self, e):
+        #finds the closest point to the mouse cursor(e)
+        dist = []
+        #print(e.pos())
+        for p in self.pList:
+            dist.append([abs(e.pos().x() - p.x()),abs(e.pos().y() - p.y())])
+        xy = min(d for d in dist)
+        return self.pList[dist.index(xy)]
+
+class MainGridWidget(GridWidget):
+    #This is the grid for the main program, where you place the prefabs
+    def __init__(self, spacing=25, parent=None):
+        #spacing controls how spaced out the lines are
+        super(MainGridWidget, self).__init__(spacing)
+        self.parent = parent
+        #self.spacing = spacing #commented out because using the parameter in init function above should do the same thing
         self.pList = []#list of points where gridlines intersect
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
         self.setCursor(Qt.CrossCursor)
@@ -83,55 +140,10 @@ class GridWidget(QWidget):
         print(self.spacing)
 
         self.repaint()
-        
-    def paintEvent(self, e):
-        qp = QPainter()
-        qp.begin(self)
-        self.draw(qp)
-        qp.end()
 
-    def draw(self, qp):
-        size = self.size()
-        w = size.width()
-        h = size.height()
-
-        #draw the grid
-        x, y = 0, 0
-        qp.setPen(Qt.lightGray)
-            
-        coors = []
-        for x in range(int(w/self.spacing)+1):
-            x_ind = x
-            x *= self.spacing
-            line = QLineF(x,0.0,x,h)
-            qp.drawLine(line)
-            
-            for y in range(int(h/self.spacing)+1):
-                y *= self.spacing
-                line = QLineF(x,y,x+self.spacing,y)
-                qp.drawLine(line)
-                coors.append([x,y])
-
-        self.pList = []
-        for c in coors:
-            p = QPoint(c[0],c[1])
-            self.pList.append(p)
-        #print(self.pList)
-
-    def setSpacing(self, spacing):
-        self.spacing = spacing
-
-    def changeSpacing(self, spacing):
-        self.spacing += spacing
-
-    def closestP(self, e):
-        #finds the closest point to the mouse cursor(e)
-        dist = []
-        #print(e.pos())
-        for p in self.pList:
-            dist.append([abs(e.pos().x() - p.x()),abs(e.pos().y() - p.y())])
-        xy = min(d for d in dist)
-        return self.pList[dist.index(xy)]
+class CreatePrefabGridWidget(GridWidget):
+    def __init__(self, spacing=25):
+        super(CreatePrefabGridWidget, self).__init__(spacing)
 
 """
 class Selection(QRubberBand):
