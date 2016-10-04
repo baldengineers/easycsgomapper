@@ -449,8 +449,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
-    ##xd = Create(False)
-    ##xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
-    app = QApplication(sys.argv)
-    main = Create()
+    xd = Create(False)
+    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    #app = QApplication(sys.argv)
+    #main = Create()
     
