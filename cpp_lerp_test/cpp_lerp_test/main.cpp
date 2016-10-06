@@ -29,7 +29,8 @@ void loadPoints(const char *filename){
 void renderPoints(void){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBegin(GL_POINTS);
-	glVertex3f(0.0, 0.0, 1.0);
+	for (int ind = 0; ind < pointSet.size();ind++){
+		glVertex3f(pointSet[ind].getPointX(),pointSet[ind].getPointY(),pointSet[ind].getPointZ());
 	glEnd();
 
 	glutSwapBuffers();
