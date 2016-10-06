@@ -309,7 +309,14 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                 elif "{" not in line and "}" not in line:
                     block_title = line.strip() #isolates the title of code blocks such as "solid" or "side"
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
-                    #block_type = ""
+                    if block_type == "solid":
+                        X,Y,Z = 0,1,2
+                        for p_vals in cur_p_vals:
+                            a,b,c = p_vals[0], p_vals[1], p_vals[2]
+                            if a[X]*(b[Y] - c[Y]) + b[X]*(c[Y] - a[Y]) + c[X]*(a[Y] - b[Y]) == 0: #if triangle's area is not 0 (meaning it's not a straight line)
+                                self.cur_p_vals.remove(p_vals)
+                        z = [p_vals[0][Z] for p_vals in cur_p_vals]
+                        self.draw_list.append(cur_p_vals[z.index(max(z))]) #append the plane with the greatest z value/height
                     continue
                 
                 #structure for the below if statement:
@@ -332,6 +339,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         header = False
                         for i in range(index):
                             self.vmf_data[i] = ""
+                    curr_p_vals = [] #resets the list used for determining the current points in the current solid
                     block_type = "solid"
                 elif block_title == "side":
                     block_type = "side"
@@ -356,10 +364,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                             else:
                                 var_num = int(p_val.split()[0][1:])
                                 p_vals[i] = [self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]]
-                        X,Y = 0,1
-                        a,b,c = p_vals[0], p_vals[1], p_vals[2]
-                        if a[X]*(b[Y] - c[Y]) + b[X]*(c[Y] - a[Y]) + c[X]*(a[Y] - b[Y]) != 0: #if triangle's area is not 0 (meaning it's not a straight line)
-                            self.draw_list.append(p_vals) 
+                        cur_p_vals.append(p_vals)
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
