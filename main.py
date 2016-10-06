@@ -475,15 +475,15 @@ class MainWindow(QMainWindow):
                 subprocess.Popen(hammer_location)
         else:
             
-            try:
+            if os.path.isfile(self.fileloaded[1]):
                 if loaded == 1:
                     subprocess.Popen(self.fileloaded[1] + " "+file)
                 else:
                     subprocess.Popen(self.fileloaded[1])
-            except Exception as e:
+            else:
                 print(str(e))
                 self.notFound = QMessageBox().setText("ERROR!")
-                self.notFound.setInformativeText("Hammer executable/batch moved or renamed!")
+                self.notFound.setInformativeText("Hammer executable/batch moved or renamed! (or something else went wrong...)")
                 self.notFound.exec_()
 
                 self.file.close()
@@ -494,9 +494,9 @@ class MainWindow(QMainWindow):
         if reloc:
             os.remove(self.gameDirVar+"startupcache/startup.su")
         
-        try:
+        if os.path.isfile(self.gameDirVar+"startupcache/startup.su"):
             self.file = open(self.gameDirVar+"startupcache/startup.su", "r+")
-        except:
+        else:
             self.file = open(self.gameDirVar+"startupcache/startup.su", "w+")
         self.fileloaded = self.file.readlines()
         self.files = "".join(self.fileloaded)
@@ -666,10 +666,10 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
         #END TESTING
         
-        try:
+        if os.path.isfile(self.gameDirVar+'startupcache/firsttime.su'):
             f = open(self.gameDirVar+'startupcache/firsttime.su', 'r+')
             lines = f.readlines()
-        except:
+        else:
             f = open(self.gameDirVar+'startupcache/firsttime.su','w+')
             lines = f.readlines()
             
@@ -738,45 +738,6 @@ class MainWindow(QMainWindow):
         else:
             self.BRBool = True
         
-    def change_level_new(self):
-        self.file_save(True)
-        self.level = self.levelSelect.currentIndex()
-        self.file_open(True)
-
-    def change_level(self, but = False, up = False, undo = False):
-        
-        if not but:
-            self.file_save(True)
-            self.level = int(self.levelSelect.currentIndex()) #+1 X First level should be 0
-            self.file_open(True)
-            try:
-                self.windowl.close()
-            except:
-                pass
-            #self.level.setText("Level: " + str(level+1))
-        if up:
-            self.file_save(True)
-            if self.level != self.levels-1:
-                self.level = int(self.level+1)
-            else:
-                pass
-            print(self.level)
-            self.file_open(True)
-            #self.level.setText("Level: " + str(level+1))
-        elif not up and but:
-            self.file_save(True)
-            if self.level != 0:
-                self.level = int(level-1)
-            else:
-                pass
-            print(self.level)
-            self.file_open(True)
-            #self.level.setText("Level: " + str(level+1))            
-        #change grid to grid for level
-
-        if not undo:
-            templist.append = (None,None,None,None,level)
-            history.append(templist)
 
     def changeCurrentList(self):
         print("current list: tile_list%s" % str(self.list_tab_widget.currentIndex()+1))
@@ -819,7 +780,7 @@ class MainWindow(QMainWindow):
 
     def update_list_file(self, old_index, new_index):
 
-        #NEEDS TO BE REDONE
+        
         
         file_list = [self.gameDirVar+"prefab_template/prefab_list.txt", self.gameDirVar+"prefab_template/prefab_icon_list.txt", self.gameDirVar+"prefab_template/prefab_text_list.txt"]
         list_list = [prefab_list, prefab_icon_list, prefab_text_list]
@@ -877,9 +838,9 @@ class MainWindow(QMainWindow):
 
             #needs to be redone-- final redist will not be called easytf2mapper as it is no longer just that                 
             if choice.exec_() == 0:
-                try:
+                if os.path.isfile('EasyTF2Mapper.exe'):
                     subprocess.Popen('EasyTF2Mapper.exe')
-                except:
+                else:
                     subprocess.Popen('python main.py')
                 sys.exit()
             else:
@@ -968,14 +929,14 @@ class MainWindow(QMainWindow):
         for index, icon in enumerate(self.iconlist[0]):
             #if "icons" in icon:
             #print(grid_list)
-            try:
+            if icon != '':
                 #print("index: "+str(index)+" icon name: "+icon[0])
                 ptrans = QTransform().rotate(90*icon[1])
                 pmap = QPixmap(icon[0]).transformed(ptrans,Qt.SmoothTransformation)
                 
                 self.grid_list[index].button.setIcon(QIcon(pmap))
                 self.grid_list[index].button.setIconSize(QSize(32,32))
-            except Exception as e:
+            else:
                 #print(str(e))
                 self.grid_list[index].button.setIcon(QIcon(''))
                 self.grid_list[index].button.setIconSize(QSize(32,32))  
@@ -984,10 +945,9 @@ class MainWindow(QMainWindow):
         global grid_x, grid_y, iconlist, levels, level, currentfilename, file_loaded, latest_path, stored_info_list, save_dict,load_dict,skybox2_list
         print(latest_path)
         self.gridsize = (grid_x,grid_y)
-        try:
-            skybox_sav = self.gui_skybox_list.currentRow()
-        except:
-            skybox_sav = 0
+        
+        skybox_sav = self.gui_skybox_list.currentRow()
+        
         if not tmp:
             if not file_loaded or saveAs:
                 name = QFileDialog.getSaveFileName(self, "Save File", latest_path, "*.ezm")[0]
@@ -1008,11 +968,11 @@ class MainWindow(QMainWindow):
                 stored_info_list_temp.append([])
                 for info in lvl:
                     #print(info)
-                    try:
+                    if info != '':
                         temp = load_dict[info[0]]
                         info[0] = temp
                         stored_info_list_temp[index].append(info)
-                    except:
+                    else:
                         stored_info_list_temp[index].append('')
             pickle.dump(stored_info_list_temp, file)
             pickle.dump("<icon_list>", file)
@@ -1027,29 +987,24 @@ class MainWindow(QMainWindow):
             currentfilename = name
             file_loaded = True
         else:
-            try:#writes tmp file to save the icons for each level
-                file = open(self.gameDirVar+"leveltemp/level.tmp", "wb")
-                pickle.dump(self.iconlist, file)
-                file.close()
-            except Exception as e:
-                
-                print(str(e))
-        
+            #writes tmp file to save the icons for each level
+            file = open(self.gameDirVar+"leveltemp/level.tmp", "wb")
+            pickle.dump(self.iconlist, file)
+            file.close()
+
         
 
     def file_export(self,bsp=False):
         global cur_vmf_location,id_num,stored_info_list, grid_y, grid_x, world_id_num, count_btns, currentlight, skybox, skybox2_list, entity_list, skybox_light_list, skybox_angle_list, latest_path
         skyboxgeolist = []
         #make recommended height based off tallest prefab in the map
-        skyboxz = QInputDialog.getText(self,("Set Skybox Height"),("Skybox Height(hammer units, %d minimum recommended):" %(1024)), QLineEdit.Normal, "%d" %(1024))
-        try:
-            skyboxz = int(skyboxz[0])
-        except:
-            QMessageBox.critical(self, "Error", "Please enter a number.")
-            if bsp == False:
-                self.file_export()
-            else:
-                self.file_export(True)
+        skyboxz = QInputDialog.getInt(self,("Set Skybox Height"),("Skybox Height(hammer units, %d minimum recommended):" %(1024)), QLineEdit.Normal, 1024)
+
+
+     
+        skyboxz = int(skyboxz[0])
+        
+
         #generate skybox stuff now
         #needs to be redone to change how skyboxes are rendered
         create = generateSkybox.createSkyboxLeft(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
@@ -1070,22 +1025,22 @@ class MainWindow(QMainWindow):
         self.world_id_num = create[2]
         create = generateSkybox.createSkyboxSouth(grid_x,grid_y,skyboxz,self.id_num,world_id_num)
         skyboxgeolist.append(create[0])
-        try:
-            skybox = self.skybox_list[self.gui_skybox_list.currentRow()]
-            skyboxlight = self.skybox_light_list[self.gui_skybox_list.currentRow()]
-            skyboxangle = self.skybox_angle_list[self.gui_skybox_list.currentRow()]
-        except:
-            skyboxangle = '0 145 0'
-            skyboxlight = '216 207 194 700'
-            skybox = 'sky_tf2_04'
+        
+        skybox = self.skybox_list[self.gui_skybox_list.currentRow()]
+        skyboxlight = self.skybox_light_list[self.gui_skybox_list.currentRow()]
+        skyboxangle = self.skybox_angle_list[self.gui_skybox_list.currentRow()]
+        
+        skyboxangle = '0 145 0'
+        skyboxlight = '216 207 194 700'
+        skybox = 'sky_tf2_04'
 
-        try:
-            currentlight = currentlight.replace("world_idnum",str(world_id_num))
-            currentlight = currentlight.replace("CURRENT_LIGHT",skyboxlight)
-            currentlight = currentlight.replace("CURRENT_ANGLE",skyboxangle)
-        except:
-            QMessageBox.critical(self, "Error", "Please choose a skybox.")
-            self.change_skybox()
+        
+        currentlight = currentlight.replace("world_idnum",str(world_id_num))
+        currentlight = currentlight.replace("CURRENT_LIGHT",skyboxlight)
+        currentlight = currentlight.replace("CURRENT_ANGLE",skyboxangle)
+        
+        QMessageBox.critical(self, "Error", "Please choose a skybox.")
+        self.change_skybox()
         light = currentlight
         latest_path = latest_path.replace(".ezm",".vmf")
 
@@ -1130,12 +1085,11 @@ class MainWindow(QMainWindow):
         self.file_export(True)
         #need to change for multi-game
         #this is fine and can be used, just make an if/then with the cs:go version
-        try:
-            tf2BinLoc = open(self.gameDirVar+'startupcache/vbsp.su','r+')
-            tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/') #wtf even is this!?!? why do you need it?!?!
-            tf2BinLoc.close() 
-
-        except Exception as e:
+        
+        tf2BinLoc = open(self.gameDirVar+'startupcache/vbsp.su','r+')
+        tf2BinLocFile = tf2BinLoc.readlines()[0].replace('\\','/') #wtf even is this!?!? why do you need it?!?!
+        tf2BinLoc.close() 
+        if not os.path.isfile(tf2BinLocFile):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
@@ -1227,57 +1181,33 @@ class MainWindow(QMainWindow):
                 self.btn_id_count += 1
                 self.grid_list.append(grid_btn)
 
-##                self.progress += 100/(self.grid_x*self.grid_y) MOVED TO BUTTONS' __INIT__
-##                self.progressBar.setValue(self.progress)
+
         self.button_grid_layout.setRowStretch(self.grid_y + 1, 1)
         self.button_grid_layout.setColumnStretch(self.grid_x + 1, 1)
         self.entity_list.append("lighting slot")  
         self.count_btns = self.grid_x*self.grid_y
         self.status.removeWidget(self.progressBar)
 
-        #self.scrollArea.deleteLater()
-        #self.scrollArea = QScrollArea()
-        #self.scrollArea.setBackgroundRole(QPalette.Light)
-        #self.scrollArea.setStyleSheet("background-color: rgb(50, 50, 50, 100);")
 
-
-##        self.grid_widget = QWidget()
-##        self.grid_widget.setLayout(self.button_grid_layout)
-##        self.scrollArea.setWidget(self.grid_widget)
-##        self.scrollArea.ensureWidgetVisible(self.grid_widget)
-##        self.scrollArea.setWidgetResizable(True)
-
-#        for i in range(self.levels):
-#            with open(self.gameDirVar+"leveltemp/level" + str(i)+".tmp", "wb") as f:
-#                pickle.dump(self.iconlist[i], f)
-        
-        #self.gridLayout.addWidget(self.scrollArea)
-        #self.button_grid_all.addLayout(self.gridLayout)
         self.setWindowTitle("Easy "+self.gameVar+" Mapper ")
 
     def change_light(self):
         
-        r_input = QInputDialog.getText(self, ("Red light level 0-255"),
+        r_input = QInputDialog.getInt(self, ("Red light level 0-255"),
                                        ("Put in the red light ambiance level, 0-255:"))
-        g_input = QInputDialog.getText(self, ("Green light level 0-255"),
+        g_input = QInputDialog.getInt(self, ("Green light level 0-255"),
                                        ("Put in the green light ambiance level, 0-255:"))
-        b_input = QInputDialog.getText(self, ("Blue light level 0-255"),
+        b_input = QInputDialog.getInt(self, ("Blue light level 0-255"),
                                        ("Put in the blue light ambiance level, 0-255:"))
-        light_input = QInputDialog.getText(self, ("Brightness level"),
+        light_input = QInputDialog.getInt(self, ("Brightness level"),
                                        ("Put in the brightness level desired:"))
-        try:
-            
-            r_input = int(r_input[0])
-            g_input = int(g_input[0])
-            b_input = int(b_input[0])
-            light_input = int(light_input[0])
-            if r_input > 255 or g_input > 255 or b_input > 255:
-                print("Error. Put in a number below 256 for each color input")
-            else:
-                pass
-        except ValueError:
-            QMessageBox.critical(self, "Error", "Please enter a number.")
-            self.change_light()
+                    
+        r_input = int(r_input[0])
+        g_input = int(g_input[0])
+        b_input = int(b_input[0])
+        light_input = int(light_input[0])
+        if r_input > 255 or g_input > 255 or b_input > 255:
+            print("Error. Put in a number below 256 for each color input")
 
         self.currentlight = light_create.replacevalues(r_input,g_input,b_input,light_input,world_id_num)
 
@@ -1320,8 +1250,6 @@ class MainWindow(QMainWindow):
                         os.remove(folder+f)
                     
                 sys.exit()
-            else:
-                pass
         if restart:
             choice = QMessageBox.question(self, "Restart",
                                           "Are you sure you want to restart?",
@@ -1334,17 +1262,12 @@ class MainWindow(QMainWindow):
                         print("removing", f)
                         os.remove(folder+f)
                 #again the exe references need to be changed    
-                try:
-                    subprocess.call('sudo wine EasyTF2Mapper.exe')
-                    
-                except:
-                    try:
-                        subprocess.Popen('EasyTF2Mapper.exe')
-                    except:
-                        subprocess.Popen('python main.py')
+
+                if os.path.isfile('./EasyEasyTF2Mapper.exe'):
+                    subprocess.Popen('EasyTF2Mapper.exe')
+                else:
+                    subprocess.Popen('python main.py')
                 sys.exit()
-            else:
-                pass
 
     def create_prefab(self):
         
@@ -1443,17 +1366,12 @@ class MainWindow(QMainWindow):
             choice.setDefaultButton(later_btn)
             #exe name change
             if choice.exec_() == 0:
-                try:
-                    subprocess.call('sudo wine EasyTF2Mapper.exe')
-                    
-                except:
-                    try:
-                        subprocess.Popen('EasyTF2Mapper.exe')
-                    except:
-                        subprocess.Popen('python main.py')
+
+                if os.path.isfile('./EasyEasyTF2Mapper.exe'):
+                    subprocess.Popen('EasyTF2Mapper.exe')
+                else:
+                    subprocess.Popen('python main.py')
                 sys.exit()
-            else:
-                pass  
         else:
             for index,box in enumerate(form_list):         
                 if box == '':          
@@ -1495,16 +1413,12 @@ class MainWindow(QMainWindow):
         choice.setDefaultButton(later_btn)
         #rename exe
         if choice.exec_() == 0:
-            try:
-                subprocess.call('sudo wine EasyTF2Mapper.exe')
-            except:
-                try:
-                    subprocess.Popen('EasyTF2Mapper.exe')
-                except:
-                    subprocess.Popen('python main.py')
+            if os.path.isfile('./EasyEasyTF2Mapper.exe'):
+                subprocess.Popen('EasyTF2Mapper.exe')
+            else:
+                subprocess.Popen('python main.py')
             sys.exit()
-        else:
-            pass  
+
         
 
     def open_console(self):
@@ -1631,7 +1545,7 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
             else:
                 #self.level.setText("Level: " + str(h_level+1))
                 self.levellist.setCurrentRow(h_level)
-                self.change_level(False, False, True)
+                #self.change_level(False, False, True)
 
             self.redo_history.append(self.history.pop(-1)) if undo else self.history.append(self.redo_history.pop(-1))
         else:
@@ -1645,7 +1559,6 @@ print <variable>, setlevel <int>, help, restart, exit, func <function>, wiki, py
 
     def heavy(self):
         self.gif("icons/heavy.gif", (350,262,150,99), "DANCE HEAVY DANCE!")
-        print("LOL")
 
     def gif(self, file, geo, title, icon="icons\icon.ico"):
         self.gif = QLabel()
