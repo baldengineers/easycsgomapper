@@ -423,8 +423,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             key = line_sep[0] if line_sep else None
             if not key == "angles":
                 if p_val in self.vmf_data[index]:
-                    self.vmf_data[index] = self.vmf_data[index].replace(p_val, "x%d y%d z%d" % (self.var_num, self.var_num, self.var_num))
-
+                    self.vmf_data[index] = self.vmf_data[index].replace("("+p_val+")", "(x%d y%d z%d)" % (self.var_num, self.var_num, self.var_num)) #replaces the plane values
+                    self.vmf_data[index] = self.vmf_data[index].replace("\""+p_val+"\"", "\"x%d y%d z%d\"" % (self.var_num, self.var_num, self.var_num)) #replaces the entity values
+                    
         self.c_dict.update({"x%d" % (self.var_num) : nums[X], "y%d" % (self.var_num) : nums[Y], "z%d" % (self.var_num) : nums[Z]})
         
         self.var_num += 1
@@ -449,8 +450,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
-    xd = Create(False)
-    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
-    #app = QApplication(sys.argv)
-    #main = Create()
+    #xd = Create(False)
+    #xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    app = QApplication(sys.argv)
+    main = Create()
     
