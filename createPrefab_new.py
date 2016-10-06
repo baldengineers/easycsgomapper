@@ -351,11 +351,11 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         """
                         for i, p_val in enumerate(p_vals): 
                             if not "x" in p_val:
-                                p_vals[i] = [int(i) for i in p_val.split()]
-                                self.assign_var(p_val, index)
+                                p_vals[i] = [int(p) for p in p_val.split()]
+                                self.assign_var(p_vals[i], index)
                             else:
                                 var_num = int(p_val.split()[0][1:])
-                                p_vals[i] = [int(self.c_dict["%s%d" % (var, var_num)]) for var in ["x", "y", "z"]]
+                                p_vals[i] = [self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]]
                         X,Y = 0,1
                         a,b,c = p_vals[0], p_vals[1], p_vals[2]
                         if a[X]*(b[Y] - c[Y]) + b[X]*(c[Y] - a[Y]) + c[X]*(a[Y] - b[Y]) != 0: #if triangle's area is not 0 (meaning it's not a straight line)
@@ -409,24 +409,23 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
     def assign_var(self, p_val, index):
         #assigns values for the variables (x1,y1,z1,x2,etc...) and writes them to self.var_list
         #p_val is the coord values for the point
-        
-        nums = p_val.split()
-        X,Y,Z = 0,1,2 #Constants to make managing the indices of nums[] easier
+
+        X,Y,Z = 0,1,2 #Constants to make managing the indices of p_val[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale%s, posy*-1*scale%s), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, "+" + nums[X], "+" + nums[Y]))
+        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+%d, posy*-1*scale+%d), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, p_val[X], p_val[Y]))
         for var in ["x","y"]:
             self.var_list.append("%s%d = xy%d[%s]" % (var, self.var_num, self.var_num, 0 if var == "x" else 1))
-        self.var_list.append("z%d = %s" % (self.var_num, nums[Z]))
+        self.var_list.append("z%d = %d" % (self.var_num, p_val[Z]))
 
         for index in range(index,len(self.vmf_data)):
             line_sep = self.separate("Q",self.vmf_data[index])
             key = line_sep[0] if line_sep else None
-            if not key == "angles":
+            if key and not key == "angles":
                 if p_val in self.vmf_data[index]:
                     self.vmf_data[index] = self.vmf_data[index].replace("("+p_val+")", "(x%d y%d z%d)" % (self.var_num, self.var_num, self.var_num)) #replaces the plane values
                     self.vmf_data[index] = self.vmf_data[index].replace("\""+p_val+"\"", "\"x%d y%d z%d\"" % (self.var_num, self.var_num, self.var_num)) #replaces the entity values
                     
-        self.c_dict.update({"x%d" % (self.var_num) : nums[X], "y%d" % (self.var_num) : nums[Y], "z%d" % (self.var_num) : nums[Z]})
+        self.c_dict.update({"x%d" % (self.var_num) : p_val[X], "y%d" % (self.var_num) : p_val[Y], "z%d" % (self.var_num) : p_val[Z]})
         
         self.var_num += 1
         
