@@ -968,7 +968,7 @@ class MainWindow(QMainWindow):
                 stored_info_list_temp.append([])
                 for info in lvl:
                     #print(info)
-                    if info != '':
+                    if info:
                         temp = load_dict[info[0]]
                         info[0] = temp
                         stored_info_list_temp[index].append(info)
