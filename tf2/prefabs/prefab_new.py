@@ -152,6 +152,9 @@ entity
     for i in range(vmf_template.count("id_num")):
         vmf_template.replace("id_num", id_num, 1)
         id_num += 1
+	#
+	#move id_num calculations into export.py!!!!!! and out of prefab files
+	#
     axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
     negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
     for normal_num in range(0,var_count,3):
