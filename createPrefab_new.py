@@ -311,12 +311,11 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
                     if block_type == "solid":
                         X,Y,Z = 0,1,2
-                        for p_vals in cur_p_vals:
-                            a,b,c = p_vals[0], p_vals[1], p_vals[2]
-                            if a[X]*(b[Y] - c[Y]) + b[X]*(c[Y] - a[Y]) + c[X]*(a[Y] - b[Y]) == 0: #if triangle's area is not 0 (meaning it's not a straight line)
-                                self.cur_p_vals.remove(p_vals)
-                        z = [p_vals[0][Z] for p_vals in cur_p_vals]
-                        self.draw_list.append(cur_p_vals[z.index(max(z))]) #append the plane with the greatest z value/height
+                        ##instead of this,find the intersection points (3 planes with same coordinates for a point) that have the highest z value
+                        cur_p_vals = list(set(cur_p_vals))
+                        z = [p[Z] for p in cur_p_vals]
+                        self.draw_list.append(cur_p_vals[z.index(max(z))])
+                        
                     continue
                 
                 #structure for the below if statement:
@@ -359,12 +358,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         """
                         for i, p_val in enumerate(p_vals): 
                             if not "x" in p_val:
-                                p_vals[i] = [int(p) for p in p_val.split()]
-                                self.assign_var(p_vals[i], index)
+                                p_val = [int(p) for p in p_val.split()]
+                                self.assign_var(p_val, index)
+                                cur_p_vals.append(p_val)
                             else:
                                 var_num = int(p_val.split()[0][1:])
-                                p_vals[i] = [self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]]
-                        cur_p_vals.append(p_vals)
+                                cur_p_vals.append([self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]])
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
