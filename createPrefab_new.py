@@ -310,11 +310,14 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     block_title = line.strip() #isolates the title of code blocks such as "solid" or "side"
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
                     if block_type == "solid":
-                        X,Y,Z = 0,1,2
-                        ##instead of this,find the intersection points (3 planes with same coordinates for a point) that have the highest z value
-                        cur_p_vals = list(set(cur_p_vals))
-                        z = [p[Z] for p in cur_p_vals]
-                        self.draw_list.append(cur_p_vals[z.index(max(z))])
+                        if cur_p_vals:
+                            X,Y,Z = 0,1,2
+                            ##instead of this,find the intersection points (3 planes with same coordinates for a point) that have the highest z value
+                            #print('cur:',cur_p_vals)
+                            cur_p_vals = list(set(cur_p_vals))
+                            z = [p[Z] for p in cur_p_vals]
+                            #print(z)
+                            self.draw_list.append(cur_p_vals[z.index(max(z))])
                         
                     continue
                 
@@ -338,7 +341,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         header = False
                         for i in range(index):
                             self.vmf_data[i] = ""
-                    curr_p_vals = [] #resets the list used for determining the current points in the current solid
+                    cur_p_vals = [] #resets the list used for determining the current points in the current solid
                     block_type = "solid"
                 elif block_title == "side":
                     block_type = "side"
@@ -373,7 +376,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         self.vmf_data[index] = self.vmf_data[index].replace(value,"#ROTATION_%s_%s_%s" % (anglevallist[0],anglevallist[1],anglevallist[2]))  
                     elif key == "origin":
                         if "x" not in value:
-                            self.assign_var(value, index)
+                            self.assign_var([int(v) for v in value.split()], index)
                     elif key == "targetname":
                         #some way for it to add the targetname to a list of targetnames that is added to a list
                         #here, and when the .py is run, it replaces all instances of the targetname with tgname_<id_num>
@@ -425,9 +428,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             line_sep = self.separate("Q",self.vmf_data[index])
             key = line_sep[0] if line_sep else None
             if key and not key == "angles":
-                if p_val in self.vmf_data[index]:
-                    self.vmf_data[index] = self.vmf_data[index].replace("("+p_val+")", "(x%d y%d z%d)" % (self.var_num, self.var_num, self.var_num)) #replaces the plane values
-                    self.vmf_data[index] = self.vmf_data[index].replace("\""+p_val+"\"", "\"x%d y%d z%d\"" % (self.var_num, self.var_num, self.var_num)) #replaces the entity values
+                if ' '.join([str(p) for p in p_val]) in self.vmf_data[index]:
+                    self.vmf_data[index] = self.vmf_data[index].replace("(%d %d %d)" % (p_val[X], p_val[Y], p_val[Z]), "(x%d y%d z%d)" % (self.var_num, self.var_num, self.var_num)) #replaces the plane values
+                    self.vmf_data[index] = self.vmf_data[index].replace("\"%d %d %d\"" % (p_val[X], p_val[Y], p_val[Z]), "\"x%d y%d z%d\"" % (self.var_num, self.var_num, self.var_num)) #replaces the entity values
                     
         self.c_dict.update({"x%d" % (self.var_num) : p_val[X], "y%d" % (self.var_num) : p_val[Y], "z%d" % (self.var_num) : p_val[Z]})
         
@@ -453,8 +456,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
-    #xd = Create(False)
-    #xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
-    app = QApplication(sys.argv)
-    main = Create()
+    xd = Create(False)
+    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    #app = QApplication(sys.argv)
+    #main = Create()
     
