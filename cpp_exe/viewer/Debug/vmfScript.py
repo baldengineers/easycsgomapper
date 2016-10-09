@@ -26,7 +26,7 @@ def coplanar(planePts, point):
 	
 	normal = crossProduct(ab, ac)
 	
-	print("\n normal:"+str(normal)+"\n")
+	#print("\n normal:"+str(normal)+"\n")
 	
 	dval = (-normal[0]*planePts[1][0]) + (-normal[1]*planePts[1][1]) + (-normal[2]*planePts[1][2])
 	
@@ -83,7 +83,7 @@ def loadVMF(filename):
 			inNormal = crossProduct((b[0]-a[0], b[1]-a[1],b[2]-a[2]),
 									(c[0]-a[0], c[1]-a[1], c[2]-a[2]))
 			numplane = [a,b,c]
-			newlist = [a]
+			numplanecopy = [a,b,c]
 			for verti in vertlist:
 				for vert in verti:
 					vert_num = toVert(vert)
@@ -94,14 +94,17 @@ def loadVMF(filename):
 								numplane.append(vert_num)
 			
 			center = findCenter(numplane)
-			for vertex in range(1,len(numplane)):
-				if dotProduct(inNormal,crossProduct((numplane[vertex-1][0]-center[0],numplane[vertex-1][1]-center[1],numplane[vertex-1][2]-center[2]),(numplane[vertex][0]-center[0],numplane[vertex][1]-center[1],numplane[vertex][2]-center[2]))) < 0:
-					newlist.append(numplane[vertex])
-					print("neg")
-				else:
-					print("pos")
-					newlist.insert(vertex-1,numplane[vertex])
-			planelist[ind][index] = newlist
+			#sort verts
+			for i in range(len(numplane)):
+				for vertex in range(1,len(numplane)):
+					if dotProduct(inNormal,crossProduct((numplane[vertex-1][0]-center[0],numplane[vertex-1][1]-center[1],numplane[vertex-1][2]-center[2]),(numplane[vertex][0]-center[0],numplane[vertex][1]-center[1],numplane[vertex][2]-center[2]))) < 0:
+						#numplanecopy.append(numplane[vertex])
+						pass
+					else:
+						#print("pos")
+						numplane.insert(vertex-1,numplane[vertex])
+						del numplane[vertex+1]
+			planelist[ind][index] = numplane
 	
 	with open('vertfile.vf','w') as file:
 		for i in planelist:

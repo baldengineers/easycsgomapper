@@ -47,8 +47,9 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/ENTRY:"mainCRTStartup" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\Release\Win32" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib-vc2013" /VERBOSE %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions> /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\Release\Win32" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib-vc2013" /VERBOSE %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -189,14 +189,22 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void processNormalKeys(unsigned char key, int x, int y) {
 
+	if (key == 27)
+		exit(0);
+}
 
-int main(int argc, char **argv){
-	glutInit(&argc, argv);
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int       nCmdShow){
+	char *myargv[1];
+	int myargc = 1;
+	myargv[0] = _strdup("Myappname");
+	glutInit(&myargc, myargv);
+	//FreeConsole();
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(500, 500);
-	glutCreateWindow("pfb render");
+	glutCreateWindow("pfb render (esc to close)");
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -226,9 +234,10 @@ int main(int argc, char **argv){
 	loadEntPoints("origfile.vf");
 	glTranslatef(10.0, 5.0, -10.0);
 	glRotatef(135, 1, 0, 0.1);
+
+	glutKeyboardFunc(processNormalKeys);
 	glutDisplayFunc(renderPoints);
 	glutReshapeFunc(changeSize);
-
 	glutIdleFunc(renderPoints);
 	
 
