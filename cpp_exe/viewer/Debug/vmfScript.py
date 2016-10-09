@@ -1,6 +1,7 @@
 from math import *
 def toVert(string_vert):
 	return (int(string_vert.split(" ")[0]),int(string_vert.split(" ")[1]),int(string_vert.split(" ")[2]))
+
 	
 def crossProduct(vecta, vectb):	
 	#similar to det
@@ -75,6 +76,12 @@ def loadVMF(filename):
 			string = line.split('\" \"')[1].replace('"','').replace("\n","")
 			ent_list.append(string)
 	#print(vertlist)
+	allverts =[]
+	for sec in vertlist:
+		for i in sec:
+			allverts.append(toVert(i))
+	totalCenter = findCenter(allverts)
+	print(totalCenter)
 	for ind, planelist_in in enumerate(planelist):	
 		for index,plane in enumerate(planelist_in):
 			a = toVert(plane[0])
@@ -118,12 +125,5 @@ def loadVMF(filename):
 		for orig in ent_list:
 			fileinfo += orig+"\n"
 		file.write(fileinfo)
-
-
-
-side_list = loadVMF("vmfs/ent.vmf")
-#print(str(coplanar(((64, -64, 384),(64, -64, 64),(64, -192, 384)),(64, -192, 64))))
-
-#64 -64 384
-#64 -64 64
-#64 -192 384
+	with open('infofile.vf','w') as file:
+		file.write(str(totalCenter).replace("(","").replace(",","").replace(")",""))

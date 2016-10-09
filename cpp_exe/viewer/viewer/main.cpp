@@ -24,6 +24,8 @@ vector<bool>   trueSet;
 vector<string> lines;
 vector<Point>  entSet;
 
+Point center;
+
 float ypos = 5.0;
 float t;
 
@@ -60,6 +62,20 @@ void drawCube(Point center){
 		glVertex3f(center.getPointX() + i*0.1, center.getPointY() + i*0.1, center.getPointZ() - i*0.1);
 		glEnd();
 	}
+}
+
+void loadInfo(const char *filename){
+	ifstream input(filename);
+	string current_line;
+	while (getline(input, current_line)){
+		int firstSpace = current_line.find_first_of(" ");
+		int lastSpace = current_line.find_last_of(" ");
+		//	printf(current_line.c_str());
+		center = Point(stod(current_line.substr(0, firstSpace)) / 64, stod(current_line.substr(lastSpace, current_line.length())) / 64, stod(current_line.substr(firstSpace, lastSpace)) / 64);
+	}
+	cout << center.getPointX() << endl;
+	cout << center.getPointY() << endl;
+	cout << center.getPointZ() << endl;
 }
 
 void loadEntPoints(const char *filename){
@@ -125,9 +141,9 @@ void renderPoints(void){
 	glLightfv(GL_LIGHT0, GL_AMBIENT, qaLowAmbient);
 	glLoadIdentity();
 	
-	glShadeModel(GL_FLAT);
-	gluLookAt(6 * cos(t) + 4, ypos, -6 * sin(t) - 4,
-		4.0f, 0.0f, -4.0f,
+	glShadeModel(GL_SMOOTH);
+	gluLookAt((center.getPointX()+4) * cos(t) + center.getPointX(), center.getPointY()*2, (center.getPointZ()-4) * sin(t) + center.getPointZ(),
+		center.getPointX(), center.getPointY(), center.getPointZ(),
 		0.0f, 1.0f, 0.0f);
 
 	//render solids
@@ -155,6 +171,8 @@ void renderPoints(void){
 	glLightfv(GL_LIGHT0, GL_AMBIENT, qaFullAmbient);
 	glTranslatef(0.0, ypos, 0);
 	glutSwapBuffers();
+
+	glutSetWindow(1);
 	glutPostRedisplay();
 
 
@@ -195,11 +213,8 @@ void processNormalKeys(unsigned char key, int x, int y) {
 		exit(0);
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int       nCmdShow){
-	char *myargv[1];
-	int myargc = 1;
-	myargv[0] = _strdup("Myappname");
-	glutInit(&myargc, myargv);
+int main(int argc, char **argv){
+	glutInit(&argc, argv);
 	//FreeConsole();
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
@@ -218,21 +233,29 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpC
 	GLfloat qaAmbientLight[] = { 0.05, 0.05, 0.05, 1.0 };
 	GLfloat qaDiffuseLight[] = { 0.8, 0.8, 0.8, 1.0 };
 	GLfloat qaSpecularLight[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat qaLightPosition[] = { 4.0, 12.0, -4.0, 1.0 };
+	
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
-	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
+	
 
 	
 
 	glMatrixMode(GL_MODELVIEW);
 	
-	parseVMF();
+	//parseVMF();
+	//the vmf is parsed within the .py file
+
+	loadInfo("infofile.vf");
+
+
+	GLfloat qaLightPosition[] = { center.getPointX()-1, center.getPointY()*3, center.getPointZ()+1, 1.0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
+
 	loadPoints("vertfile.vf");
 	loadEntPoints("origfile.vf");
-	glTranslatef(10.0, 5.0, -10.0);
+	glTranslatef(center.getPointX()*2, -center.getPointY()*2, center.getPointZ()*2);
 	glRotatef(135, 1, 0, 0.1);
 
 	glutKeyboardFunc(processNormalKeys);

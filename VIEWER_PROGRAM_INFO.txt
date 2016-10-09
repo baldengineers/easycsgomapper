@@ -1,0 +1,6 @@
+how to use the prefab viewer right now (from main or cpfb or whatever):
+1. import vmfscript from cpp_exe/
+2. call vmfscript.loadVMF("file path of vmf (whole, including drive)")
+3. run viewer.exe. i don't know if you can somehow incorporate the glut window into a user interface,
+   but you can just make a button that runs the program or something.
+   
