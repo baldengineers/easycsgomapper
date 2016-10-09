@@ -9,6 +9,9 @@ import re
 import sys
 import itertools
 import math
+import numpy as np
+import geo
+from GridWidget import CreatePrefabGridWidget
 from PySide.QtCore import *
 from PySide.QtGui import *
 
@@ -22,6 +25,7 @@ class Create():
             self.nameLineEdit = QLineEdit()
             
             self.vmfLineEdit = QLineEdit()
+            self.vmfLineEdit.textChanged.connect(lambda: self.create_prefab(self.vmfLineEdit.text()))
             self.vmfBrowse = QPushButton("Browse",self.dialog)
             self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
             self.vmfLayout = QHBoxLayout()
@@ -53,6 +57,9 @@ class Create():
             self.group.setExclusive(True)
             self.radioLayout.addWidget(self.radioTF2)
             self.radioLayout.addWidget(self.radioCSGO)
+
+            icon_grid = CreatePrefabGridWidget(parent=self)
+            icon_grid.show()
             
             self.okay_btn = QPushButton("Create Prefab", self.dialog)
             self.okay_btn.clicked.connect(self.dialog.accept)
@@ -74,6 +81,7 @@ class Create():
             self.form.addRow("Export prefab?", self.expCheckBox)
             self.form.addRow("Which section?",self.sectionSelect)
             self.form.addRow("Which game?", self.radioLayout)
+            #self.form.addRow(self.icon_grid)
 ##            for i in range(5):
 ##                self.form.addRow(self.blankstring)
             self.form.addRow(self.btn_layout)
@@ -87,7 +95,7 @@ class Create():
             self.dialog.setLayout(self.form)
             self.dialog.exec_()
 
-    def create_prefab(self, vmf_file, prefab_name, prefab_text, prefab_icon, workshop_export, is_tf2):
+    def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
@@ -316,15 +324,16 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         end = block_dict[line.count("\t")] #detects which block is "ending"
                         if end == "solid":
                             X,Y,Z = 0,1,2
-                            for i, p_val in enumerate(cur_p_vals):
-                                cur_p_vals[i] = [abs(p) for p in p_val] #find abs val of all point values
-                            cur_p_vals = list(k for k,_ in itertools.groupby(sorted(cur_p_vals))) #removes duplicate points
-                            self.draw_list.append([])
-                            z = [p[Z] for p in cur_p_vals]
-                            for i in range(4):
-                                self.draw_list[-1].append(cur_p_vals.pop(z.index(max(z)))) 
-                                z.remove(max(z))
-                            self.draw_list[-1].sort(key=lambda p:math.atan2(p[0],p[1])) 
+                            cur_p_vals = np.absolute(cur_p_vals).tolist()
+                            points = list(k for k,_ in itertools.groupby(sorted([item for sublist in cur_p_vals for item in sublist]))) #removes duplicate points
+                            for p in points:
+                                for i, pl in enumerate(cur_p_vals):
+                                    if geo.coplanar(pl,p):
+                                        #print("cop")
+                                        cur_p_vals[i] += [p]
+                            a = [geo.area(pl) for pl in cur_p_vals]
+                            self.draw_list.append(cur_p_vals[a.index(max(a))])
+                            self.draw_list[-1].sort(key=lambda p:math.atan2(p[1],p[0]))
                     continue
                 
                 #structure for the below if statement:
@@ -357,12 +366,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         """
                         for i, p_val in enumerate(p_vals): 
                             if not "x" in p_val:
-                                p_val = [int(p) for p in p_val.split()]
-                                self.assign_var(p_val, index)
-                                cur_p_vals.append(p_val)
+                                p_vals[i] = [int(float(p)) for p in p_val.split()]
+                                self.assign_var(p_vals[i], index)
                             else:
                                 var_num = int(p_val.split()[0][1:])
-                                cur_p_vals.append([self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]])
+                                p_vals[i] = [self.c_dict["%s%d" % (var, var_num)] for var in ["x", "y", "z"]]
+                        cur_p_vals.append(p_vals)
                     elif key == "uaxis" or key == "vaxis":
                         replace = self.separate("B", value, "\[", "\]")[0]
                         self.vmf_data[index] = self.vmf_data[index].replace(replace, "AXIS_REPLACE_%s" %("U" if key == "uaxis" else "V"))
@@ -455,7 +464,7 @@ if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
     xd = Create(False)
-    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/ent.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/gridtest.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
     #app = QApplication(sys.argv)
     #main = Create()
     
