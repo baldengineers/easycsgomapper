@@ -7,6 +7,8 @@ Every prefab file should include
 
 import re
 import sys
+import itertools
+import math
 from PySide.QtCore import *
 from PySide.QtGui import *
 
@@ -288,8 +290,8 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         entity_num += 1
 """]
-        block_title = ""
         block_type = "" #block_type contains the current block of code the program is currently looking at. A block of code is determined by the two brackets {}/()/[] surrounding it.
+        block_dict = {}
         key = ""
         value = ""
         
@@ -300,31 +302,34 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
             for index, line in enumerate(self.vmf_data):
                 key = ""
                 value = ""
-                block_title = "" #note: don't reset block_type because that lasts until the bracket
                 if "\"" in line:
                     line_sep = self.separate("Q",line) #line separated by the quotes as a tuple
                     key = line_sep[0]
                     value = line_sep[1]
                     #for example, in "lightmapscale" "16", lightmapscale is the key, 16 is the value
                 elif "{" not in line and "}" not in line:
-                    block_title = line.strip() #isolates the title of code blocks such as "solid" or "side"
+                    block_type = line.strip() #isolates the title of code blocks such as "solid" or "side"
                 else: #need to use key and block_title vars because a model/texture name might have the words in them. e.g. a texture called "farside", it has "side" in it
-                    if block_type == "solid":
-                        if cur_p_vals:
+                    if "{" in line:
+                        block_dict[line.count("\t")] = block_type
+                    elif "}" in line:
+                        end = block_dict[line.count("\t")] #detects which block is "ending"
+                        if end == "solid":
                             X,Y,Z = 0,1,2
-                            ##instead of this,find the intersection points (3 planes with same coordinates for a point) that have the highest z value
-                            #print('cur:',cur_p_vals)
-                            cur_p_vals = list(set(cur_p_vals))
+                            for i, p_val in enumerate(cur_p_vals):
+                                cur_p_vals[i] = [abs(p) for p in p_val] #find abs val of all point values
+                            cur_p_vals = list(k for k,_ in itertools.groupby(sorted(cur_p_vals))) #removes duplicate points
+                            self.draw_list.append([])
                             z = [p[Z] for p in cur_p_vals]
-                            #print(z)
-                            self.draw_list.append(cur_p_vals[z.index(max(z))])
-                        
+                            for i in range(4):
+                                self.draw_list[-1].append(cur_p_vals.pop(z.index(max(z)))) 
+                                z.remove(max(z))
+                            self.draw_list[-1].sort(key=lambda p:math.atan2(p[0],p[1])) 
                     continue
                 
                 #structure for the below if statement:
                 #1: if key == ...
-                #2: elif block_title == ...
-                #3: elif block_type == ...
+                #2: elif block_type == ...
 
                 if key == "id":
                     if block_type == "solid" or block_type == "entity":
@@ -336,21 +341,12 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                     self.vmf_data[index] = self.vmf_data[index].replace(value, id_var)
                     
                     
-                elif block_title == "solid":
+                elif block_type == "solid":
                     if header:
                         header = False
                         for i in range(index):
                             self.vmf_data[i] = ""
                     cur_p_vals = [] #resets the list used for determining the current points in the current solid
-                    block_type = "solid"
-                elif block_title == "side":
-                    block_type = "side"
-                elif block_title == "entity":
-                    block_type = "entity"
-                elif block_title == "cameras":
-                    del self.vmf_data[index:]
-                    
-                    
                 elif block_type == "side":
                     if key == "plane":
                         p_vals = list(self.separate("P",value)) #contains all 3 point values of the plane
@@ -387,14 +383,16 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                         self.ent_name_list.append(value)
                         
                         pass
+                elif block_type == "cameras":
+                    del self.vmf_data[index:]
                     
                 
                     
 
-        print("vmf_data: ")
-        for i in self.vmf_data:
-            print(i)
-        print("var_list: ",self.var_list)
+##        print("vmf_data: ")
+##        for i in self.vmf_data:
+##            print(i)
+##        print("var_list: ",self.var_list)
         print("draw_list: ",self.draw_list)
 
 ##        with open('tf2/prefabs/prefab_new.py', 'a') as f:

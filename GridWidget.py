@@ -175,13 +175,12 @@ class CreatePrefabGridWidget(GridWidget):
         qp.setPen(pen)
 
         X,Y,Z = 0,1,2
-        rects = []
-        for poly in [[[0, -448, 64], [512, -448, 64], [512, -512, 64]], [[0, -512, 0], [512, -512, 0], [512, -448, 0]], [[0, 0, 64], [64, 0, 64], [64, -448, 64]], [[0, -448, 0], [64, -448, 0], [64, 0, 0]], [[448, 0, 64], [512, 0, 64], [512, -448, 64]], [[448, -448, 0], [512, -448, 0], [512, 0, 0]], [[512, 0, 64], [960, 0, 64], [960, -64, 64]], [[512, -64, 0], [960, -64, 0], [960, 0, 0]], [[512, -448, 64], [960, -448, 64], [960, -512, 64]], [[512, -512, 0], [960, -512, 0], [960, -448, 0]], [[896, -512, 64], [960, -512, 64], [960, -960, 64]], [[896, -960, 0], [960, -960, 0], [960, -512, 0]], [[0, -896, 64], [448, -896, 64], [448, -960, 64]], [[0, -960, 0], [448, -960, 0], [448, -896, 0]], [[448, -512, 64], [512, -512, 64], [512, -960, 64]], [[448, -960, 0], [512, -960, 0], [512, -512, 0]]]:#self.parent.draw_list:
+        polys = []
+        for poly in [[[0, 0, 64], [0, 512, 64], [512, 512, 64], [512, 0, 64]]]:
             points = []
             for p in poly:
                 points.append([c/self.scale_list[0]*self.spacing for c in p])
-            
-            rects.append(QRect(QPoint(points[0][X], abs(points[0][Y])), QPoint(points[2][X], abs(points[2][Y]))))
+            polys.append(QPolygon([QPoint(points[i][X], points[i][Y]) for i in range(len(points))]))
 
         #might want to rewrite the following code:
 ##        for r1 in rects:
@@ -193,8 +192,8 @@ class CreatePrefabGridWidget(GridWidget):
 ##                            points.pop(rects.index(r2))
 ##                            rects.remove(r2)
 
-        for r in rects:
-            qp.drawRect(r) #in future, try to make this drawPolygon() and have a way to detect how many points the face has 
+        for p in polys:
+            qp.drawPolygon(p)
 
     def rect_contains(r1, r2):
         #checks if rectangle r2 is in rectangle r1
