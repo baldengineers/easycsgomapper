@@ -1,14 +1,1175 @@
-﻿Build started 10/8/2016 6:43:07 PM.
+﻿Build started 10/9/2016 1:23:34 AM.
      1>Project "C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\viewer\viewer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
          main.cpp
-     1>c:\users\anson\documents\github\easycsgomapper\cpp_exe\viewer\viewer\main.cpp(60): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\anson\documents\github\easycsgomapper\cpp_exe\viewer\viewer\main.cpp(136): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\anson\documents\github\easycsgomapper\cpp_exe\viewer\viewer\main.cpp(152): warning C4018: '<' : signed/unsigned mismatch
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.lib" /MACHINE:X86 /ENTRY:"mainCRTStartup" Debug\main.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.exe" /INCREMENTAL /NOLOGO glut32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.lib" /MACHINE:X86 /ENTRY:"mainCRTStartup" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\Release\Win32" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib-vc2013" /VERBOSE Debug\main.obj
+         
+         Starting pass 1
+         Processed /DEFAULTLIB:msvcprtd
+         Processed /DEFAULTLIB:uuid.lib
+         Processed /DEFAULTLIB:winmm.lib
+         Processed /DEFAULTLIB:opengl32.lib
+         Processed /DEFAULTLIB:glu32.lib
+         Processed /DEFAULTLIB:glut32.lib
+         Processed /DEFAULTLIB:MSVCRTD
+         Processed /DEFAULTLIB:OLDNAMES
+         
+         Searching libraries
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\glut32.lib:
+               Found _glutInit@8
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutInitDisplayMode@4
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutInitWindowPosition@8
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutInitWindowSize@8
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutMainLoop@0
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutCreateWindow@4
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutPostRedisplay@0
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutSwapBuffers@0
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutDisplayFunc@4
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutReshapeFunc@4
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found _glutIdleFunc@4
+                 Referenced in main.obj
+                 Loaded glut32.lib(glut32.dll)
+               Found __IMPORT_DESCRIPTOR_glut32
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Referenced in glut32.lib(glut32.dll)
+                 Loaded glut32.lib(glut32.dll)
+               Found __NULL_IMPORT_DESCRIPTOR
+                 Referenced in glut32.lib(glut32.dll)
+                 Loaded glut32.lib(glut32.dll)
+               Found glut32_NULL_THUNK_DATA
+                 Referenced in glut32.lib(glut32.dll)
+                 Loaded glut32.lib(glut32.dll)
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\kernel32.lib:
+               Found __imp__Sleep@4
+                 Referenced in main.obj
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __IMPORT_DESCRIPTOR_KERNEL32
+                 Referenced in kernel32.lib(KERNEL32.dll)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found KERNEL32_NULL_THUNK_DATA
+                 Referenced in kernel32.lib(KERNEL32.dll)
+                 Loaded kernel32.lib(KERNEL32.dll)
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\user32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\gdi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winspool.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\comdlg32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\advapi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\shell32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\ole32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\oleaut32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\uuid.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbc32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbccp32.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\msvcprtd.lib:
+               Found "__declspec(dllimport) public: __thiscall std::_Lockit::_Lockit(int)" (__imp_??0_Lockit@std@@QAE@H@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::_Lockit::~_Lockit(void)" (__imp_??1_Lockit@std@@QAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl std::_Debug_message(wchar_t const *,wchar_t const *,unsigned int)" (__imp_?_Debug_message@std@@YAXPB_W0I@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::_Container_base12::_Container_base12(void)" (__imp_??0_Container_base12@std@@QAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::_Container_base12::~_Container_base12(void)" (__imp_??1_Container_base12@std@@QAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: struct std::_Iterator_base12 * * __thiscall std::_Container_base12::_Getpfirst(void)const " (__imp_?_Getpfirst@_Container_base12@std@@QBEPAPAU_Iterator_base12@2@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: void __thiscall std::_Container_base12::_Orphan_all(void)" (__imp_?_Orphan_all@_Container_base12@std@@QAEXXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl std::_Xbad_alloc(void)" (__imp_?_Xbad_alloc@std@@YAXXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl std::_Xinvalid_argument(char const *)" (__imp_?_Xinvalid_argument@std@@YAXPBD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl std::_Xlength_error(char const *)" (__imp_?_Xlength_error@std@@YAXPBD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl std::_Xout_of_range(char const *)" (__imp_?_Xout_of_range@std@@YAXPBD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "void __cdecl std::_Facet_Register(class std::_Facet_base *)" (?_Facet_Register@std@@YAXPAV_Facet_base@1@@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(locale0_implib.obj)
+               Found "__declspec(dllimport) public: __thiscall std::locale::id::id(unsigned int)" (__imp_??0id@locale@std@@QAE@I@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::locale::id::operator unsigned int(void)" (__imp_??Bid@locale@std@@QAEIXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) private: static class std::locale::_Locimp * __cdecl std::locale::_Getgloballocale(void)" (__imp_?_Getgloballocale@locale@std@@CAPAV_Locimp@12@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: bool __thiscall std::codecvt_base::always_noconv(void)const " (__imp_?always_noconv@codecvt_base@std@@QBE_NXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,int>::in(int &,char const *,char const *,char const * &,char *,char *,char * &)const " (__imp_?in@?$codecvt@DDH@std@@QBEHAAHPBD1AAPBDPAD3AAPAD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,int>::out(int &,char const *,char const *,char const * &,char *,char *,char * &)const " (__imp_?out@?$codecvt@DDH@std@@QBEHAAHPBD1AAPBDPAD3AAPAD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,int>::unshift(int &,char *,char *,char * &)const " (__imp_?unshift@?$codecvt@DDH@std@@QBEHAAHPAD1AAPAD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: static unsigned int __cdecl std::codecvt<char,char,int>::_Getcat(class std::locale::facet const * *,class std::locale const *)" (__imp_?_Getcat@?$codecvt@DDH@std@@SAIPAPBVfacet@locale@2@PBV42@@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) char const * __cdecl std::_Syserror_map(int)" (__imp_?_Syserror_map@std@@YAPBDH@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) char const * __cdecl std::_Winerror_map(int)" (__imp_?_Winerror_map@std@@YAPBDH@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::ios_base::operator bool(void)const " (__imp_??Bios_base@std@@QBE_NXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::basic_streambuf<char,struct std::char_traits<char> >(void)" (__imp_??0?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: virtual __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::~basic_streambuf<char,struct std::char_traits<char> >(void)" (__imp_??1?$basic_streambuf@DU?$char_traits@D@std@@@std@@UAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: class std::locale __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::getloc(void)const " (__imp_?getloc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QBE?AVlocale@2@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::sbumpc(void)" (__imp_?sbumpc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QAEHXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::sgetc(void)" (__imp_?sgetc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QAEHXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: int __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::snextc(void)" (__imp_?snextc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@QAEHXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::eback(void)const " (__imp_?eback@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IBEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::gptr(void)const " (__imp_?gptr@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IBEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::pptr(void)const " (__imp_?pptr@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IBEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::egptr(void)const " (__imp_?egptr@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IBEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: void __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::setg(char *,char *,char *)" (__imp_?setg@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEXPAD00@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::epptr(void)const " (__imp_?epptr@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IBEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::_Gndec(void)" (__imp_?_Gndec@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::_Gninc(void)" (__imp_?_Gninc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: char * __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::_Pninc(void)" (__imp_?_Pninc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEPADXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: void __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::_Init(void)" (__imp_?_Init@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEXXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: void __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::_Init(char * *,char * *,int *,char * *,char * *,int *)" (__imp_?_Init@?$basic_streambuf@DU?$char_traits@D@std@@@std@@IAEXPAPAD0PAH001@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: virtual __thiscall std::basic_ios<char,struct std::char_traits<char> >::~basic_ios<char,struct std::char_traits<char> >(void)" (__imp_??1?$basic_ios@DU?$char_traits@D@std@@@std@@UAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: void __thiscall std::basic_ios<char,struct std::char_traits<char> >::setstate(int,bool)" (__imp_?setstate@?$basic_ios@DU?$char_traits@D@std@@@std@@QAEXH_N@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: class std::basic_streambuf<char,struct std::char_traits<char> > * __thiscall std::basic_ios<char,struct std::char_traits<char> >::rdbuf(void)const " (__imp_?rdbuf@?$basic_ios@DU?$char_traits@D@std@@@std@@QBEPAV?$basic_streambuf@DU?$char_traits@D@std@@@2@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: char __thiscall std::basic_ios<char,struct std::char_traits<char> >::widen(char)const " (__imp_?widen@?$basic_ios@DU?$char_traits@D@std@@@std@@QBEDD@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) protected: __thiscall std::basic_ios<char,struct std::char_traits<char> >::basic_ios<char,struct std::char_traits<char> >(void)" (__imp_??0?$basic_ios@DU?$char_traits@D@std@@@std@@IAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::basic_istream<char,struct std::char_traits<char> >::basic_istream<char,struct std::char_traits<char> >(class std::basic_streambuf<char,struct std::char_traits<char> > *,bool)" (__imp_??0?$basic_istream@DU?$char_traits@D@std@@@std@@QAE@PAV?$basic_streambuf@DU?$char_traits@D@std@@@1@_N@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: virtual __thiscall std::basic_istream<char,struct std::char_traits<char> >::~basic_istream<char,struct std::char_traits<char> >(void)" (__imp_??1?$basic_istream@DU?$char_traits@D@std@@@std@@UAE@XZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: bool __thiscall std::basic_istream<char,struct std::char_traits<char> >::_Ipfx(bool)" (__imp_?_Ipfx@?$basic_istream@DU?$char_traits@D@std@@@std@@QAE_N_N@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) struct _iobuf * __cdecl std::_Fiopen(char const *,int,int)" (__imp_?_Fiopen@std@@YAPAU_iobuf@@PBDHH@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "protected: virtual __int64 __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::showmanyc(void)" (?showmanyc@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MAE_JXZ)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "protected: virtual __int64 __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::xsgetn(char *,__int64)" (?xsgetn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MAE_JPAD_J@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "protected: virtual __int64 __thiscall std::basic_streambuf<char,struct std::char_traits<char> >::xsputn(char const *,__int64)" (?xsputn@?$basic_streambuf@DU?$char_traits@D@std@@@std@@MAE_JPBD_J@Z)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) __int64 const std::_BADOFF" (__imp_?_BADOFF@std@@3_JB)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) public: static class std::locale::id std::codecvt<char,char,int>::id" (__imp_?id@?$codecvt@DDH@std@@2V0locale@2@A)
+                 Referenced in main.obj
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found __IMPORT_DESCRIPTOR_MSVCP120D
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void * __cdecl operator new(unsigned int,struct std::_DebugHeapTag_t const &,char *,int)" (__imp_??2@YAPAXIABU_DebugHeapTag_t@std@@PADH@Z)
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) void __cdecl operator delete(void *,struct std::_DebugHeapTag_t const &,char *,int)" (__imp_??3@YAXPAXABU_DebugHeapTag_t@std@@PADH@Z)
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found "__declspec(dllimport) struct std::_DebugHeapTag_t const & __cdecl std::_DebugHeapTag_func(void)" (__imp_?_DebugHeapTag_func@std@@YAABU_DebugHeapTag_t@1@XZ)
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+               Found MSVCP120D_NULL_THUNK_DATA
+                 Referenced in msvcprtd.lib(MSVCP120D.dll)
+                 Loaded msvcprtd.lib(MSVCP120D.dll)
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winmm.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\opengl32.lib:
+               Found __imp__glBegin@4
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glClear@4
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glClearColor@16
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glEnable@4
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glEnd@0
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glLightModeli@8
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glLightfv@12
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glLoadIdentity@0
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glMaterialf@12
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glMaterialfv@12
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glMatrixMode@4
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glRotatef@16
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glShadeModel@4
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glTranslatef@12
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glVertex3f@12
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __imp__glViewport@16
+                 Referenced in main.obj
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found __IMPORT_DESCRIPTOR_OPENGL32
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Loaded opengl32.lib(OPENGL32.dll)
+               Found OPENGL32_NULL_THUNK_DATA
+                 Referenced in opengl32.lib(OPENGL32.dll)
+                 Loaded opengl32.lib(OPENGL32.dll)
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\glu32.lib:
+               Found _gluPerspective@32
+                 Referenced in main.obj
+                 Loaded glu32.lib(GLU32.dll)
+               Found _gluLookAt@72
+                 Referenced in main.obj
+                 Loaded glu32.lib(GLU32.dll)
+               Found __IMPORT_DESCRIPTOR_GLU32
+                 Referenced in glu32.lib(GLU32.dll)
+                 Referenced in glu32.lib(GLU32.dll)
+                 Loaded glu32.lib(GLU32.dll)
+               Found GLU32_NULL_THUNK_DATA
+                 Referenced in glu32.lib(GLU32.dll)
+                 Loaded glu32.lib(GLU32.dll)
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\MSVCRTD.lib:
+               Found _mainCRTStartup
+                 Loaded MSVCRTD.lib(crtexe.obj)
+               Found __purecall
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "void * __cdecl operator new(unsigned int)" (??2@YAPAXI@Z)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "void __cdecl operator delete(void *)" (??3@YAXPAX@Z)
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _atexit
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(atonexit.obj)
+               Found __imp___invalid_parameter
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___errno
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__strtod
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__system
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__free
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fclose
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fflush
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fgetc
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fgetpos
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fputc
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fsetpos
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___fseeki64
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__fwrite
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__setvbuf
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__ungetc
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___lock_file
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___unlock_file
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _cos
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _sin
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___hypot
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__memchr
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _memcmp
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _memcpy
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__memcpy_s
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _memset
+                 Referenced in main.obj
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _strlen
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp__memmove
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___CrtDbgReportW
+                 Referenced in main.obj
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "__declspec(dllimport) public: __thiscall std::bad_cast::bad_cast(char const *)" (__imp_??0bad_cast@std@@QAE@PBD@Z)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "public: __thiscall std::bad_cast::bad_cast(class std::bad_cast const &)" (??0bad_cast@std@@QAE@ABV01@@Z)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "public: __thiscall std::exception::exception(class std::exception const &)" (??0exception@std@@QAE@ABV01@@Z)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "public: virtual __thiscall std::bad_cast::~bad_cast(void)" (??1bad_cast@std@@UAE@XZ)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found @_RTC_CheckStackVars@8
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(stack.obj)
+               Found @__security_check_cookie@4
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(secchk.obj)
+               Found __CxxThrowException@8
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __RTC_InitBase
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(init.obj)
+               Found ___CxxFrameHandler3
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "const type_info::`vftable'" (??_7type_info@@6B@)
+                 Referenced in main.obj
+                 Loaded MSVCRTD.lib(ti_inst.obj)
+               Found ___security_cookie
+                 Referenced in MSVCRTD.lib(secchk.obj)
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(gs_cookie.obj)
+               Found __fltused
+                 Referenced in main.obj
+                 Referenced in msvcprtd.lib(locale0_implib.obj)
+                 Loaded MSVCRTD.lib(dllsupp.obj)
+               Found ___CxxSetUnhandledExceptionFilter
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(unhandld.obj)
+               Found __XcptFilter
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __amsg_exit
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __setargv
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(dllargv.obj)
+               Found __imp____getmainargs
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp____set_app_type
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___CrtSetCheckCount
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __IsNonwritableInCurrentImage
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(pesect.obj)
+               Found __imp__exit
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___exit
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___cexit
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___security_init_cookie
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(gs_support.obj)
+               Found __matherr
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(merr.obj)
+               Found __RTC_Initialize
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(initsect.obj)
+               Found __imp___configthreadlocale
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __setdefaultprecision
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(fp8.obj)
+               Found __imp____setusermatherr
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __initterm_e
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __initterm
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __except_handler4
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Referenced in MSVCRTD.lib(pesect.obj)
+                 Loaded MSVCRTD.lib(chandler4gs.obj)
+               Found ___globallocalestatus
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(xthdloc.obj)
+               Found __commode
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(xncommod.obj)
+               Found __dowildcard
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(wildcard.obj)
+               Found __newmode
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(_newmode.obj)
+               Found __imp____initenv
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___native_startup_state
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(natstart.obj)
+               Found __fmode
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(xtxtmode.obj)
+               Found __imp___fmode
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___commode
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___xi_a
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Loaded MSVCRTD.lib(cinitexe.obj)
+         Processed /DEFAULTLIB:kernel32.lib
+          Processed /DISALLOWLIB:libcmt.lib
+          Processed /DISALLOWLIB:libcmtd.lib
+          Processed /DISALLOWLIB:msvcrt.lib
+               Found __IMPORT_DESCRIPTOR_MSVCR120D
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __lock
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __unlock
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___calloc_dbg
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___dllonexit
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __imp___onexit
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "void __cdecl _RTC_Failure(void *,int)" (?_RTC_Failure@@YAXPAXH@Z)
+                 Referenced in MSVCRTD.lib(stack.obj)
+                 Loaded MSVCRTD.lib(error.obj)
+               Found ___report_gsfailure
+                 Referenced in MSVCRTD.lib(secchk.obj)
+                 Loaded MSVCRTD.lib(gs_report.obj)
+               Found __RTC_SetErrorFuncW
+                 Referenced in MSVCRTD.lib(init.obj)
+                 Loaded MSVCRTD.lib(userapi.obj)
+               Found __CRT_RTC_INITW
+                 Referenced in MSVCRTD.lib(init.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "void __stdcall `eh vector destructor iterator'(void *,unsigned int,int,void (__thiscall*)(void *))" (??_M@YGXPAXIHP6EX0@Z@Z)
+                 Referenced in MSVCRTD.lib(ti_inst.obj)
+                 Loaded MSVCRTD.lib(ehvecdtr.obj)
+               Found "public: virtual __thiscall type_info::~type_info(void)" (??1type_info@@UAE@XZ)
+                 Referenced in MSVCRTD.lib(ti_inst.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "void __cdecl terminate(void)" (?terminate@@YAXXZ)
+                 Referenced in MSVCRTD.lib(unhandld.obj)
+                 Referenced in MSVCRTD.lib(ehvecdtr.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___crtSetUnhandledExceptionFilter
+                 Referenced in MSVCRTD.lib(unhandld.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __invoke_watson
+                 Referenced in MSVCRTD.lib(fp8.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __controlfp_s
+                 Referenced in MSVCRTD.lib(fp8.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __except_handler4_common
+                 Referenced in MSVCRTD.lib(chandler4gs.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found MSVCR120D_NULL_THUNK_DATA
+                 Referenced in MSVCRTD.lib(MSVCR120D.dll)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found "int __cdecl _RTC_GetSrcLine(unsigned char *,wchar_t *,unsigned long,int *,wchar_t *,unsigned long)" (?_RTC_GetSrcLine@@YAHPAEPA_WKPAH1K@Z)
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Loaded MSVCRTD.lib(pdblkup.obj)
+               Found __crt_debugger_hook
+                 Referenced in MSVCRTD.lib(gs_report.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___crtUnhandledException
+                 Referenced in MSVCRTD.lib(gs_report.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found ___crtTerminateProcess
+                 Referenced in MSVCRTD.lib(gs_report.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found _wcscpy_s
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __wmakepath_s
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+               Found __wsplitpath_s
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded MSVCRTD.lib(MSVCR120D.dll)
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\OLDNAMES.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\glut32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\kernel32.lib:
+               Found __imp__EncodePointer@4
+                 Referenced in MSVCRTD.lib(crtexe.obj)
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__DecodePointer@4
+                 Referenced in MSVCRTD.lib(atonexit.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__QueryPerformanceCounter@4
+                 Referenced in MSVCRTD.lib(gs_support.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetCurrentProcessId@0
+                 Referenced in MSVCRTD.lib(gs_support.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetCurrentThreadId@0
+                 Referenced in MSVCRTD.lib(gs_support.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetSystemTimeAsFileTime@4
+                 Referenced in MSVCRTD.lib(gs_support.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__IsDebuggerPresent@0
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Referenced in MSVCRTD.lib(gs_report.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__RaiseException@16
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetLastError@0
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetProcAddress@8
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__LoadLibraryExW@12
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__MultiByteToWideChar@24
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__WideCharToMultiByte@32
+                 Referenced in MSVCRTD.lib(error.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found _IsProcessorFeaturePresent@4
+                 Referenced in MSVCRTD.lib(gs_report.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__HeapAlloc@12
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__HeapFree@12
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetProcessHeap@0
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__VirtualQuery@12
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__FreeLibrary@4
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetModuleFileNameW@12
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+               Found __imp__GetModuleHandleW@4
+                 Referenced in MSVCRTD.lib(pdblkup.obj)
+                 Loaded kernel32.lib(KERNEL32.dll)
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\user32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\gdi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winspool.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\comdlg32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\advapi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\shell32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\ole32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\oleaut32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\uuid.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbc32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbccp32.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\msvcprtd.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winmm.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\opengl32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\glu32.lib:
+         
+         Finished searching libraries
+         
+         Finished pass 1
+         
+         Generating non-SAFESEH image.
+         
+         Searching libraries
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\glut32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\kernel32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\user32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\gdi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winspool.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\comdlg32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\advapi32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\shell32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\ole32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\oleaut32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\uuid.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbc32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbccp32.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\msvcprtd.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winmm.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\opengl32.lib:
+             Searching C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\glu32.lib:
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\MSVCRTD.lib:
+               Found __load_config_used
+                 Loaded MSVCRTD.lib(loadcfg.obj)
+             Searching C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\OLDNAMES.lib:
+         
+         Finished searching libraries
+         
+         Invoking rc.exe:
+          /v
+          /x
+          /fo
+          "C:\Users\Anson\AppData\Local\Temp\lnk{0B1BD377-B53F-4054-8BD9-D02D2C1110DF}.tmp"
+          "C:\Users\Anson\AppData\Local\Temp\lnk{6E263F3C-E5E3-4ADC-9549-14B3624B1885}.tmp"
+         Microsoft (R) Windows (R) Resource Compiler Version 6.3.9600.17336
+         
+         Copyright (C) Microsoft Corporation.  All rights reserved.
+         
+         
+         Creating C:\Users\Anson\AppData\Local\Temp\lnk{0B1BD377-B53F-4054-8BD9-D02D2C1110DF}.tmp
+         
+         Using codepage 1252 as default
+         
+         C:\Users\Anson\AppData\Local\Temp\lnk{6E263F3C-E5E3-4ADC-9549-14B3624B1885}.tmp.
+         Writing 24:1,	lang:0x409,	size 381
+         
+         Invoking cvtres.exe:
+          /machine:x86
+          /verbose
+          /out:"C:\Users\Anson\AppData\Local\Temp\lnk{7292448B-D55D-4E5B-B654-5B33FC0D030E}.tmp"
+          /readonly
+          "C:\Users\Anson\AppData\Local\Temp\lnk{0B1BD377-B53F-4054-8BD9-D02D2C1110DF}.tmp"
+         Microsoft (R) Windows Resource To Object Converter Version 12.00.21005.1
+         Copyright (C) Microsoft Corporation.  All rights reserved.
+         
+         adding resource. type:MANIFEST, name:1, language:0x0409, flags:0x30, size:381
+         
+         Unused libraries:
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\user32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\gdi32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winspool.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\comdlg32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\advapi32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\shell32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\ole32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\oleaut32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\uuid.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbc32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\odbccp32.lib
+           C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86\winmm.lib
+           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\OLDNAMES.lib
+         
+         Starting pass 2
+              * linker generated manifest res *
+              main.obj
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              glut32.lib(glut32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              kernel32.lib(KERNEL32.dll)
+              msvcprtd.lib(locale0_implib.obj)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              msvcprtd.lib(MSVCP120D.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              opengl32.lib(OPENGL32.dll)
+              glu32.lib(GLU32.dll)
+              glu32.lib(GLU32.dll)
+              glu32.lib(GLU32.dll)
+              glu32.lib(GLU32.dll)
+              MSVCRTD.lib(ehvecdtr.obj)
+              MSVCRTD.lib(unhandld.obj)
+              MSVCRTD.lib(atonexit.obj)
+              MSVCRTD.lib(cinitexe.obj)
+              MSVCRTD.lib(crtexe.obj)
+              MSVCRTD.lib(dllargv.obj)
+              MSVCRTD.lib(gs_cookie.obj)
+              MSVCRTD.lib(gs_report.obj)
+              MSVCRTD.lib(gs_support.obj)
+              MSVCRTD.lib(merr.obj)
+              MSVCRTD.lib(natstart.obj)
+              MSVCRTD.lib(pesect.obj)
+              MSVCRTD.lib(ti_inst.obj)
+              MSVCRTD.lib(wildcard.obj)
+              MSVCRTD.lib(dllsupp.obj)
+              MSVCRTD.lib(chandler4gs.obj)
+              MSVCRTD.lib(fp8.obj)
+              MSVCRTD.lib(loadcfg.obj)
+              MSVCRTD.lib(secchk.obj)
+              MSVCRTD.lib(_newmode.obj)
+              MSVCRTD.lib(xncommod.obj)
+              MSVCRTD.lib(xtxtmode.obj)
+              MSVCRTD.lib(xthdloc.obj)
+              MSVCRTD.lib(userapi.obj)
+              MSVCRTD.lib(stack.obj)
+              MSVCRTD.lib(pdblkup.obj)
+              MSVCRTD.lib(initsect.obj)
+              MSVCRTD.lib(init.obj)
+              MSVCRTD.lib(error.obj)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+              MSVCRTD.lib(MSVCR120D.dll)
+         Finished pass 2
          viewer.vcxproj -> C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\Debug\viewer.exe
      1>Done Building Project "C:\Users\Anson\Documents\GitHub\easycsgomapper\cpp_exe\viewer\viewer\viewer.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.92
+Time Elapsed 00:00:00.94
