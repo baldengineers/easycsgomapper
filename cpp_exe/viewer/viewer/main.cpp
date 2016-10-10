@@ -247,14 +247,14 @@ int main(int argc, char **argv){
 	//parseVMF();
 	//the vmf is parsed within the .py file
 
-	loadInfo("infofile.vf");
+	loadInfo("cpp_exe/infofile.vf");
 
 
 	GLfloat qaLightPosition[] = { center.getPointX()-1, center.getPointY()*3, center.getPointZ()+1, 1.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 
-	loadPoints("vertfile.vf");
-	loadEntPoints("origfile.vf");
+	loadPoints("cpp_exe/vertfile.vf");
+	loadEntPoints("cpp_exe/origfile.vf");
 	glTranslatef(center.getPointX()*2, -center.getPointY()*2, center.getPointZ()*2);
 	glRotatef(135, 1, 0, 0.1);
 

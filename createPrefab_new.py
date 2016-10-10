@@ -102,16 +102,21 @@ class Create():
 
     def preview(self):
         loadVMF(self.vmfLineEdit.text())
-        process = subprocess.Popen('cpp_exe/viewer.exe')
-##        window = QWidget()
-##        window.fromWinId(process.pid)
-##        window.setFlags(Qt.FramelessWindowHint)
-##        container = QWidget.createWindowContainer(window)
-##        layout = QVBoxLayout()
-##        layout.addWidget(container)
-##        self.form.addRow(layout)
+        self.process = subprocess.Popen('cpp_exe/viewer.exe')
+#        window = QWidget()
+#        window.fromWinId(process.pid)
+#        window.setFlags(Qt.FramelessWindowHint)
+#        container = QWidget.createWindowContainer(window)
+#        layout = QVBoxLayout()
+#        layout.addWidget(container)
+#        self.form.addRow(layout)
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
+		try:
+			os.kill(self.process.pid, signal.SIGKILL)
+		except:
+			pass
+			#i know try/excepts arent good but you gotta do it here
         #begin creating prefab
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
