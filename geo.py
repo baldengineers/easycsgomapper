@@ -3,6 +3,10 @@ def crossProduct(vecta, vectb):
 	#similar to det
 	#ref: wikipedia cross product
 	return ( vecta[1]*vectb[2] - vecta[2]*vectb[1],  -1*(vecta[0]*vectb[2] - vecta[2]*vectb[0]),vecta[0]*vectb[1] - vecta[1]*vectb[0] )
+
+def dotProduct(vecta, vectb):
+	return vecta[0]*vectb[0] + vecta[1]*vectb[1] + vecta[2]*vectb[2] 
+	#x*v.getVectX() + y*v.getVectY() + z*v.getVectZ()
 	
 def coplanar(planePts, point):
 	#eqn of plane.
