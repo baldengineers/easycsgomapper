@@ -158,9 +158,11 @@ class MainGridWidget(GridWidget):
             self.rubberBand.hide()
 
 class CreatePrefabGridWidget(GridWidget):
-    def __init__(self, spacing=25, parent=None):
+    def __init__(self, spacing=25):
         super(CreatePrefabGridWidget, self).__init__(spacing)
-        self.parent = parent
+        self.draw_list = []
+        w = 350; h = 350
+        self.sizeHint = lambda: QSize(w, h)
 
     def paintEvent(self, e):
         qp = QPainter()
@@ -169,6 +171,10 @@ class CreatePrefabGridWidget(GridWidget):
         self.update_icon(qp)
         qp.end()
 
+    def update_draw_list(self, draw_list):
+        self.draw_list = draw_list
+        self.repaint()
+
     def update_icon(self, qp):
         #creates the polygons in poly list on the grid so user can color their prefab icon
         pen = QPen(Qt.gray, 5)
@@ -176,7 +182,7 @@ class CreatePrefabGridWidget(GridWidget):
 
         X,Y,Z = 0,1,2
         polys = []
-        for poly in [[[64, 0, 64], [256, 0, 64], [256, 64, 64], [64, 64, 64]], [[0, 0, 64], [48, 48, 64], [32, 96, 64], [0, 64, 64]], [[256, 128, 64], [320, 192, 64], [256, 256, 64], [64, 128, 64], [64, 256, 64]], [[576, 0, 0], [320, 0, 0], [576, 192, 0], [320, 192, 0]], [[640, 256, 128], [384, 256, 128], [640, 448, 128], [384, 448, 128]]]:
+        for poly in self.draw_list:
             points = []
             for p in poly:
                 points.append([c/self.scale_list[0]*self.spacing for c in p])

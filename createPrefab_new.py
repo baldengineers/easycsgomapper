@@ -10,8 +10,10 @@ import sys
 import itertools
 import math
 import numpy as np
+import subprocess
 import geo
 from GridWidget import CreatePrefabGridWidget
+from cpp_exe.vmfScript import *
 from PySide.QtCore import *
 from PySide.QtGui import *
 
@@ -25,7 +27,7 @@ class Create():
             self.nameLineEdit = QLineEdit()
             
             self.vmfLineEdit = QLineEdit()
-            self.vmfLineEdit.textChanged.connect(lambda: self.create_prefab(self.vmfLineEdit.text()))
+            self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.update_draw_list(self.create_prefab(self.vmfLineEdit.text())))
             self.vmfBrowse = QPushButton("Browse",self.dialog)
             self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
             self.vmfLayout = QHBoxLayout()
@@ -58,17 +60,20 @@ class Create():
             self.radioLayout.addWidget(self.radioTF2)
             self.radioLayout.addWidget(self.radioCSGO)
 
-            icon_grid = CreatePrefabGridWidget(parent=self)
-            icon_grid.show()
-            
+            self.icon_grid = CreatePrefabGridWidget()
+
             self.okay_btn = QPushButton("Create Prefab", self.dialog)
             self.okay_btn.clicked.connect(self.dialog.accept)
+            self.preview_btn = QPushButton("Preview", self.dialog)
+            self.preview_btn.clicked.connect(self.preview)
             self.cancel_btn = QPushButton("Cancel", self.dialog)
             self.cancel_btn.clicked.connect(self.dialog.reject)
             self.btn_layout = QHBoxLayout()
             self.btn_layout.addStretch(1)
             self.btn_layout.addWidget(self.okay_btn)
+            self.btn_layout.addWidget(self.preview_btn)
             self.btn_layout.addWidget(self.cancel_btn)
+            
 
             #self.blankstring = QWidget()
             
@@ -81,7 +86,7 @@ class Create():
             self.form.addRow("Export prefab?", self.expCheckBox)
             self.form.addRow("Which section?",self.sectionSelect)
             self.form.addRow("Which game?", self.radioLayout)
-            #self.form.addRow(self.icon_grid)
+            self.form.addRow("icon", self.icon_grid)
 ##            for i in range(5):
 ##                self.form.addRow(self.blankstring)
             self.form.addRow(self.btn_layout)
@@ -94,6 +99,17 @@ class Create():
 
             self.dialog.setLayout(self.form)
             self.dialog.exec_()
+
+    def preview(self):
+        loadVMF(self.vmfLineEdit.text())
+        process = subprocess.Popen('cpp_exe/viewer.exe')
+##        window = QWidget()
+##        window.fromWinId(process.pid)
+##        window.setFlags(Qt.FramelessWindowHint)
+##        container = QWidget.createWindowContainer(window)
+##        layout = QVBoxLayout()
+##        layout.addWidget(container)
+##        self.form.addRow(layout)
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
@@ -333,7 +349,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
                                         cur_p_vals[i] += [p]
                             a = [geo.area(pl) for pl in cur_p_vals]
                             self.draw_list.append(cur_p_vals[a.index(max(a))])
-                            self.draw_list[-1].sort(key=lambda p:math.atan2(p[1],p[0]))
+                            self.draw_list[-1] = geo.sortPtsClockwise(self.draw_list[-1])
                     continue
                 
                 #structure for the below if statement:
@@ -403,6 +419,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 ##            print(i)
 ##        print("var_list: ",self.var_list)
         print("draw_list: ",self.draw_list)
+        return self.draw_list
 
 ##        with open('tf2/prefabs/prefab_new.py', 'a') as f:
 ##            for item in self.vmf_data:
@@ -460,11 +477,13 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
  
         return re.search(ex,s).groups() if re.search(ex,s) else None #check if NoneType
 
+    
+
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
 
-    xd = Create(False)
-    xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/gridtest.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
-    #app = QApplication(sys.argv)
-    #main = Create()
+    #xd = Create(False)
+    #xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/gridtest.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
+    app = QApplication(sys.argv)
+    main = Create()
     
