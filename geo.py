@@ -23,6 +23,39 @@ def coplanar(planePts, point):
 	else:
 		return False
 
+def findCenter(pointList):
+	xtotal,ytotal,ztotal = 0,0,0
+	for point in pointList:
+		xtotal += point[0]
+		ytotal += point[1]
+		ztotal += point[2]
+	return (xtotal/len(pointList), ytotal/len(pointList), ztotal/len(pointList))		
+		
+def sortPtsClockwise(pointList):
+	#if these points are coplanar, this will work (i use this in the vmf parsing script)
+	
+	a = pointList[0]
+	b = pointList[1]
+	c = pointList[2]
+	
+	center = findCenter(pointList)
+	
+	inNormal = crossProduct((b[0]-a[0], b[1]-a[1],b[2]-a[2]),
+									(c[0]-a[0], c[1]-a[1], c[2]-a[2]))
+	
+	for i in range(len(pointList)):
+		for vertex in range(1,len(pointList)):
+			if dotProduct(inNormal,crossProduct((pointList[vertex-1][0]-center[0],pointList[vertex-1][1]-center[1],pointList[vertex-1][2]-center[2]),(pointList[vertex][0]-center[0],pointList[vertex][1]-center[1],pointList[vertex][2]-center[2]))) < 0:
+				#numplanecopy.append(pointList[vertex])
+				pass
+			else:
+				#print("pos")
+				pointList.insert(vertex-1,pointList[vertex])
+				del pointList[vertex+1]
+				
+	#returns sorted list
+	return pointList
+
 def area(pts):
 	#pts is a list of points with x,y values
 	#area() is basically shoelace method 
