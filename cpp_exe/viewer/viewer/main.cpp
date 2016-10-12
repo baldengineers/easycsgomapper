@@ -142,7 +142,7 @@ void renderPoints(void){
 	glLoadIdentity();
 	
 	glShadeModel(GL_SMOOTH);
-	gluLookAt((center.getPointX()+4) * cos(t) + center.getPointX(), center.getPointY()*2, (center.getPointZ()-4) * sin(t) + center.getPointZ(),
+	gluLookAt((center.getPointX()+4) * cos(t) + center.getPointX(), center.getPointY()*2+3, (center.getPointZ()-4) * sin(t) + center.getPointZ(),
 		center.getPointX(), center.getPointY(), center.getPointZ(),
 		0.0f, 1.0f, 0.0f);
 
@@ -255,7 +255,7 @@ int main(int argc, char **argv){
 
 	loadPoints("cpp_exe/vertfile.vf");
 	loadEntPoints("cpp_exe/origfile.vf");
-	glTranslatef(center.getPointX()*2, -center.getPointY()*2, center.getPointZ()*2);
+	//glTranslatef(center.getPointX()*2, center.getPointY()*2, center.getPointZ()*2);
 	glRotatef(135, 1, 0, 0.1);
 
 	glutKeyboardFunc(processNormalKeys);
