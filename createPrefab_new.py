@@ -61,7 +61,9 @@ class Create():
             self.radioLayout.addWidget(self.radioTF2)
             self.radioLayout.addWidget(self.radioCSGO)
 
-            self.icon_grid = CreatePrefabGridWidget()
+            self.icon_grid = CreatePrefabGridWidget(self.dialog)
+            self.icon_grid.setFocusPolicy(Qt.StrongFocus)
+            self.icon_grid.setFocus()
 
             self.okay_btn = QPushButton("Create Prefab", self.dialog)
             self.okay_btn.clicked.connect(self.dialog.accept)

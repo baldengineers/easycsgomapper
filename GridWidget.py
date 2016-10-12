@@ -4,35 +4,39 @@ from PySide.QtGui import *
 import main
 
 class GridWidget(QWidget):
-    def __init__(self, spacing=25):
-        super(GridWidget, self).__init__()
+    def __init__(self, parent=None, spacing=25):
+        super(GridWidget, self).__init__(parent)
         self.spacing = spacing
         self.scale_list = [32,64,128,256,512]
         self.scale = self.scale_list[1]
         self.pList = []
         self.setCursor(Qt.CrossCursor)
 
-    def wheelEvent(self, e):
-        if self.spacing <= 50 and self.spacing >= 16:
-            e.accept()
-            self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
-        else:
-            e.ignore()
-
-        if self.spacing > 50:
-            self.spacing = 50
-        elif self.spacing < 16:
-            self.spacing = 16
-
-        self.repaint()
+##    def wheelEvent(self, e):
+##        if self.spacing <= 50 and self.spacing >= 16:
+##            e.accept()
+##            self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
+##        else:
+##            e.ignore()
+##
+##        if self.spacing > 50:
+##            self.spacing = 50
+##        elif self.spacing < 16:
+##            self.spacing = 16
+##
+##        self.repaint()
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_BracketLeft:
+            e.accept()
             self.changeScale(-1)
             self.repaint()
         elif e.key() == Qt.Key_BracketRight:
+            e.accept()
             self.changeScale(1)
             self.repaint()
+        else:
+            e.ignore()
         
     def paintEvent(self, e):
         qp = QPainter()
@@ -50,23 +54,25 @@ class GridWidget(QWidget):
         pen = QPen(Qt.lightGray, 1)
         qp.setPen(pen)
 
-        scale_ind = 2 ** (self.scale_list.index(self.scale))
+        scale_ind = self.scaleSpacing()
         
         coors = []
         for x in range(int(w/self.spacing)+1):
-            pen.setColor(Qt.darkGray if (x/scale_ind).is_integer() else Qt.lightGray)
-            qp.setPen(pen)
+##            pen.setColor(Qt.darkGray if (x/scale_ind).is_integer() else Qt.lightGray)
+##            qp.setPen(pen)
             x *= self.spacing
-            line = QLineF(x,0.0,x,h)
-            qp.drawLine(line)
+            if (x/scale_ind).is_integer():
+                line = QLineF(x,0.0,x,h)
+                qp.drawLine(line)
             
             for y in range(int(h/self.spacing)+1):
-                pen.setColor(Qt.darkGray if (y/scale_ind).is_integer() else Qt.lightGray)
-                qp.setPen(pen)
+##                pen.setColor(Qt.darkGray if (y/scale_ind).is_integer() else Qt.lightGray)
+##                qp.setPen(pen)
                 y *= self.spacing
-                line = QLineF(x,y,x+self.spacing,y)
-                qp.drawLine(line)
-                coors.append([x,y])
+                if (y/scale_ind).is_integer():
+                    line = QLineF(x,y,x+self.spacing,y)
+                    qp.drawLine(line)
+                    coors.append([x,y])
 
         self.pList = []
         for c in coors:
@@ -86,6 +92,12 @@ class GridWidget(QWidget):
         cur_ind = self.scale_list.index(self.scale)
         self.scale = self.scale_list[cur_ind+change] if self.scale_list[0] != self.scale and change < 0 or self.scale_list[-1] != self.scale and change > 0 else self.scale
 
+    def scaleSpacing(self):
+        return 2 ** (self.scale_list.index(self.scale))
+
+    def iconScaleSpacing(self):
+        return self.spacing #add more
+
     def closestP(self, e):
         #finds the closest point to the mouse cursor(e)
         dist = []
@@ -96,9 +108,9 @@ class GridWidget(QWidget):
 
 class MainGridWidget(GridWidget):
     #This is the grid for the main program, where you place the prefabs
-    def __init__(self, spacing=25, parent=None):
+    def __init__(self, parent=None, spacing=25):
         #spacing controls how spaced out the lines are
-        super(MainGridWidget, self).__init__(spacing)
+        super(MainGridWidget, self).__init__(parent, spacing)
         self.parent = parent
         self.pList = []#list of points where gridlines intersect
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
@@ -158,8 +170,8 @@ class MainGridWidget(GridWidget):
             self.rubberBand.hide()
 
 class CreatePrefabGridWidget(GridWidget):
-    def __init__(self, spacing=25):
-        super(CreatePrefabGridWidget, self).__init__(spacing)
+    def __init__(self, parent=None, spacing=25):
+        super(CreatePrefabGridWidget, self).__init__(parent, spacing)
         self.draw_list = []
         w = 350; h = 350
         self.sizeHint = lambda: QSize(w, h)
@@ -177,7 +189,7 @@ class CreatePrefabGridWidget(GridWidget):
 
     def update_icon(self, qp):
         #creates the polygons in poly list on the grid so user can color their prefab icon
-        pen = QPen(Qt.gray, 5)
+        pen = QPen(Qt.black, 3)
         qp.setPen(pen)
 
         X,Y,Z = 0,1,2
