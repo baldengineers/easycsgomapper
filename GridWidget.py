@@ -9,22 +9,28 @@ class GridWidget(QWidget):
         self.spacing = spacing
         self.scale_list = [32,64,128,256,512]
         self.scale = self.scale_list[1]
-        self.pList = []
+        self.pList = [] #intersection points of graph lines
+		self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
+		
         self.setCursor(Qt.CrossCursor)
 
-##    def wheelEvent(self, e):
-##        if self.spacing <= 50 and self.spacing >= 16:
-##            e.accept()
-##            self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
-##        else:
-##            e.ignore()
-##
-##        if self.spacing > 50:
-##            self.spacing = 50
-##        elif self.spacing < 16:
-##            self.spacing = 16
-##
-##        self.repaint()
+    def wheelEvent(self, e):
+        if self.spacing <= 50 and self.spacing >= 16:
+            e.accept()
+            self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
+        else:
+            e.ignore()
+
+        #if self.spacing > 50:
+        #    self.spacing = 50
+        #elif self.spacing < 16:
+        #    self.spacing = 16
+        if self.spacing < 16:
+			self.no_draw = int(round(16/self.spacing)) + 1
+		else:
+			self.no_draw = 1
+
+        self.repaint()
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_BracketLeft:
@@ -61,7 +67,7 @@ class GridWidget(QWidget):
 ##            pen.setColor(Qt.darkGray if (x/scale_ind).is_integer() else Qt.lightGray)
 ##            qp.setPen(pen)
             x *= self.spacing
-            if (x/scale_ind).is_integer():
+            if (x/self.no_draw).is_integer():
                 line = QLineF(x,0.0,x,h)
                 qp.drawLine(line)
             
@@ -69,7 +75,7 @@ class GridWidget(QWidget):
 ##                pen.setColor(Qt.darkGray if (y/scale_ind).is_integer() else Qt.lightGray)
 ##                qp.setPen(pen)
                 y *= self.spacing
-                if (y/scale_ind).is_integer():
+                if (y/no_draw).is_integer():
                     line = QLineF(x,y,x+self.spacing,y)
                     qp.drawLine(line)
                     coors.append([x,y])
