@@ -10,25 +10,20 @@ class GridWidget(QWidget):
         self.scale_list = [32,64,128,256,512]
         self.scale = self.scale_list[1]
         self.pList = [] #intersection points of graph lines
-		self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
-		
+        self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
         self.setCursor(Qt.CrossCursor)
 
     def wheelEvent(self, e):
-        if self.spacing <= 50 and self.spacing >= 16:
-            e.accept()
-            self.changeSpacing(e.delta()/20) #replace with scrollspeed constant
-        else:
-            e.ignore()
+        e.accept()
+        self.changeSpacing(e.delta()/40) #replace with scrollspeed constant
 
-        #if self.spacing > 50:
-        #    self.spacing = 50
-        #elif self.spacing < 16:
-        #    self.spacing = 16
         if self.spacing < 16:
-			self.no_draw = int(round(16/self.spacing)) + 1
-		else:
-			self.no_draw = 1
+            self.no_draw = int(round(16/self.spacing)) + 1
+        else:
+            self.no_draw = 1
+
+        print('spacing', self.spacing)
+        print("no_draw ",self.no_draw)
 
         self.repaint()
 
@@ -75,7 +70,7 @@ class GridWidget(QWidget):
 ##                pen.setColor(Qt.darkGray if (y/scale_ind).is_integer() else Qt.lightGray)
 ##                qp.setPen(pen)
                 y *= self.spacing
-                if (y/no_draw).is_integer():
+                if (y/self.no_draw).is_integer():
                     line = QLineF(x,y,x+self.spacing,y)
                     qp.drawLine(line)
                     coors.append([x,y])
@@ -89,7 +84,7 @@ class GridWidget(QWidget):
         self.spacing = spacing
 
     def changeSpacing(self, spacing):
-        self.spacing += spacing
+        self.spacing += spacing if self.spacing + spacing > 0 else 0
 
     def setScale(self, scale):
         self.scale = scale if scale in scale_list else self.scale #to make sure scale is not changed to anything other than those in scale_list
