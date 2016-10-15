@@ -176,9 +176,9 @@ void renderPoints(void){
 	glutPostRedisplay();
 
 
-	t += 0.05;
+	t += 0.01;
 	//ypos += 0.1f;
-	Sleep(100);
+	Sleep(16.7777);
 	
 }
 
