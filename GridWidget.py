@@ -58,10 +58,12 @@ class GridWidget(QWidget):
         X,Y = 0,1
         coors = [[],[]]
 
+        for x in range(0, w, int(self.spacing*self.no_draw)):
             line = QLineF(x,0.0,x,h)
             qp.drawLine(line)
             coors[X].append(x)
 
+        for y in range(0, h, int(self.spacing*self.no_draw)):
             line = QLineF(0.0,y,w,y)
             qp.drawLine(line)
             coors[Y].append(y)
