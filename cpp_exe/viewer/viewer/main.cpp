@@ -11,10 +11,11 @@
 #include <iostream>
 #include <math.h>
 
-
-#include <gl/glut.h>
-
 #include "Point.h"
+#include <gl/freeglut.h>
+//#include <GL/glut.h>
+
+
 
 using namespace std;
 
@@ -129,6 +130,11 @@ void parseVMF(void){
 
 
 void renderPoints(void){
+
+	if (!glutGetWindow()){
+		exit(0);
+	}
+	cout << glutGetWindow() << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -213,13 +219,20 @@ void processNormalKeys(unsigned char key, int x, int y) {
 		exit(0);
 }
 
+void leaveProcess(void){
+	exit(0);
+}
+
 int main(int argc, char **argv){
 	glutInit(&argc, argv);
 	//FreeConsole();
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(500, 500);
 	glutCreateWindow("pfb render (esc to close)");
+	//glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
+		//GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+	glutSetWindow(1);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -229,6 +242,7 @@ int main(int argc, char **argv){
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glEnable(GLUT_MULTISAMPLE);
 
 	GLfloat qaAmbientLight[] = { 0.05, 0.05, 0.05, 1.0 };
 	GLfloat qaDiffuseLight[] = { 0.8, 0.8, 0.8, 1.0 };
@@ -259,6 +273,7 @@ int main(int argc, char **argv){
 	glRotatef(135, 1, 0, 0.1);
 
 	glutKeyboardFunc(processNormalKeys);
+	glutCloseFunc(leaveProcess);
 	glutDisplayFunc(renderPoints);
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(renderPoints);
