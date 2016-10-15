@@ -3,38 +3,30 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 import main
 
+#CURRENTLY, each grid line represents 32 hammer units
+
 class GridWidget(QWidget):
     def __init__(self, parent=None, spacing=25):
         super(GridWidget, self).__init__(parent)
         self.spacing = spacing
-        self.scale_list = [32,64,128,256,512]
-        self.scale = self.scale_list[1]
         self.pList = [] #intersection points of graph lines
         self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
+        self.no_draw_max = 16 #point at which no_draw starts to take effect
+        self.scrollspeed = 2
+        self.scale = 32
         self.setCursor(Qt.CrossCursor)
 
     def wheelEvent(self, e):
         e.accept()
-        self.changeSpacing(e.delta()/40) #replace with scrollspeed constant
-
-        if self.spacing < 16:
-            self.no_draw = int(round(16/self.spacing)) + 1
-        else:
-            self.no_draw = 1
-
-        print('spacing', self.spacing)
-        print("no_draw ",self.no_draw)
-
+        self.changeSpacing(e.delta()/(20*self.scrollspeed)) #replace with scrollspeed constant
         self.repaint()
 
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_BracketLeft:
-            e.accept()
-            self.changeScale(-1)
+        if e.key() == Qt.Key_Equal:
+            self.changeSpacing(self.scrollspeed)
             self.repaint()
-        elif e.key() == Qt.Key_BracketRight:
-            e.accept()
-            self.changeScale(1)
+        elif e.key() == Qt.Key_Minus:
+            self.changeSpacing(-self.scrollspeed)
             self.repaint()
         else:
             e.ignore()
@@ -55,49 +47,32 @@ class GridWidget(QWidget):
         pen = QPen(Qt.lightGray, 1)
         qp.setPen(pen)
 
-        scale_ind = self.scaleSpacing()
-        
-        coors = []
-        for x in range(int(w/self.spacing)+1):
-##            pen.setColor(Qt.darkGray if (x/scale_ind).is_integer() else Qt.lightGray)
-##            qp.setPen(pen)
-            x *= self.spacing
-            if (x/self.no_draw).is_integer():
-                line = QLineF(x,0.0,x,h)
-                qp.drawLine(line)
-            
-            for y in range(int(h/self.spacing)+1):
-##                pen.setColor(Qt.darkGray if (y/scale_ind).is_integer() else Qt.lightGray)
-##                qp.setPen(pen)
-                y *= self.spacing
-                if (y/self.no_draw).is_integer():
-                    line = QLineF(x,y,x+self.spacing,y)
-                    qp.drawLine(line)
-                    coors.append([x,y])
+        if self.spacing < self.no_draw_max:
+            self.no_draw = int(round(self.no_draw_max/self.spacing)) + 1
+        else:
+            self.no_draw = 1
+
+##        print('spacing',self.spacing)
+##        print(self.no_draw)
+
+        X,Y = 0,1
+        coors = [[],[]]
+
+            line = QLineF(x,0.0,x,h)
+            qp.drawLine(line)
+            coors[X].append(x)
+
+            line = QLineF(0.0,y,w,y)
+            qp.drawLine(line)
+            coors[Y].append(y)
 
         self.pList = []
-        for c in coors:
-            p = QPoint(c[0],c[1])
-            self.pList.append(p)
-
-    def setSpacing(self, spacing):
-        self.spacing = spacing
+        for x in coors[X]:
+            for y in coors[Y]:
+                self.pList.append(QPoint(x,y))
 
     def changeSpacing(self, spacing):
-        self.spacing += spacing if self.spacing + spacing > 0 else 0
-
-    def setScale(self, scale):
-        self.scale = scale if scale in scale_list else self.scale #to make sure scale is not changed to anything other than those in scale_list
-
-    def changeScale(self, change):
-        cur_ind = self.scale_list.index(self.scale)
-        self.scale = self.scale_list[cur_ind+change] if self.scale_list[0] != self.scale and change < 0 or self.scale_list[-1] != self.scale and change > 0 else self.scale
-
-    def scaleSpacing(self):
-        return 2 ** (self.scale_list.index(self.scale))
-
-    def iconScaleSpacing(self):
-        return self.spacing #add more
+        self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
 
     def closestP(self, e):
         #finds the closest point to the mouse cursor(e)
@@ -113,7 +88,6 @@ class MainGridWidget(GridWidget):
         #spacing controls how spaced out the lines are
         super(MainGridWidget, self).__init__(parent, spacing)
         self.parent = parent
-        self.pList = []#list of points where gridlines intersect
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
         self.setCursor(Qt.CrossCursor)
         self.setAcceptDrops(True)
@@ -198,7 +172,7 @@ class CreatePrefabGridWidget(GridWidget):
         for poly in self.draw_list:
             points = []
             for p in poly:
-                points.append([c/self.scale_list[0]*self.spacing for c in p])
+                points.append([c/self.scale*self.spacing for c in p])
             polys.append(QPolygon([QPoint(points[i][X], points[i][Y]) for i in range(len(points))]))
 
         #might want to rewrite the following code:
@@ -220,7 +194,7 @@ class CreatePrefabGridWidget(GridWidget):
 
 def main():
     app = QApplication(sys.argv)
-    grid = CreatePrefabGridWidget()
+    grid = MainGridWidget()
     grid.show()
     sys.exit(app.exec_())
 
