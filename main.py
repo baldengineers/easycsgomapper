@@ -1160,9 +1160,9 @@ class MainWindow(QMainWindow):
         self.status.addWidget(self.progressBar)
 
         
-        self.totalblocks.append([])
-        self.entity_list.append([])
-        self.iconlist.append([])
+        #self.totalblocks.append([])
+        #self.entity_list.append([])
+        #self.iconlist.append([])
         self.stored_info_list.append([])
         self.btn_id_count=0
         self.count_btns=0
@@ -1170,10 +1170,10 @@ class MainWindow(QMainWindow):
         for x in range(self.grid_x):
             
             for y in range(self.grid_y):
-                self.totalblocks[z].append("") #This is so that there are no problems with replacing list values
-                self.entity_list[z].append("")
-                self.iconlist[z].append(('',''))
-                self.stored_info_list[z].append('')
+                self.totalblocks.append("") #This is so that there are no problems with replacing list values
+                self.entity_list.append("")
+                self.iconlist.append(('',''))
+                self.stored_info_list.append('')
         for x in range(self.grid_x):
             for y in range(self.grid_y):
                 grid_btn = GridBtn(self, x, y, self.btn_id_count)
