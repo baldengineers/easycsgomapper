@@ -8,13 +8,15 @@ import main
 class GridWidget(QWidget):
     def __init__(self, parent=None, spacing=25):
         super(GridWidget, self).__init__(parent)
-        self.spacing = spacing
-        self.pList = [] #intersection points of graph lines
         self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
         self.no_draw_max = 16 #point at which no_draw starts to take effect
-        self.scrollspeed = 2
+        self.pList = [] #intersection points of graph lines
         self.scale = 32
+        self.scrollspeed = 2
         self.setCursor(Qt.CrossCursor)
+        self.spacing = spacing
+        self.transform = [0,0]
+        self.transformspeed = self.scrollspeed * 10
 
     def wheelEvent(self, e):
         e.accept()
@@ -22,14 +24,21 @@ class GridWidget(QWidget):
         self.repaint()
 
     def keyPressEvent(self, e):
+        X,Y = 0,1
         if e.key() == Qt.Key_Equal:
             self.changeSpacing(self.scrollspeed)
-            self.repaint()
         elif e.key() == Qt.Key_Minus:
             self.changeSpacing(-self.scrollspeed)
-            self.repaint()
-        else:
-            e.ignore()
+        elif e.key() == Qt.Key_Down:
+            self.transform[Y] += self.transformspeed
+        elif e.key() == Qt.Key_Up:
+            self.transform[Y] -= self.transformspeed
+        elif e.key() == Qt.Key_Right:
+            self.transform[X] += self.transformspeed
+        elif e.key() == Qt.Key_Left:
+            self.transform[X] -= self.transformspeed
+
+        self.repaint()
         
     def paintEvent(self, e):
         qp = QPainter()
@@ -57,13 +66,14 @@ class GridWidget(QWidget):
 
         X,Y = 0,1
         coors = [[],[]]
-
-        for x in range(0, w, int(self.spacing*self.no_draw)):
+        start = [int(t % self.spacing) for t in self.transform]
+        
+        for x in range(start[X], w, int(self.spacing*self.no_draw)):
             line = QLineF(x,0.0,x,h)
             qp.drawLine(line)
             coors[X].append(x)
 
-        for y in range(0, h, int(self.spacing*self.no_draw)):
+        for y in range(start[Y], h, int(self.spacing*self.no_draw)):
             line = QLineF(0.0,y,w,y)
             qp.drawLine(line)
             coors[Y].append(y)
@@ -175,7 +185,7 @@ class CreatePrefabGridWidget(GridWidget):
             points = []
             for p in poly:
                 points.append([c/self.scale*self.spacing for c in p])
-            polys.append(QPolygon([QPoint(points[i][X], points[i][Y]) for i in range(len(points))]))
+            polys.append(QPolygon([QPoint(points[i][X]+self.transform[X], points[i][Y]+self.transform[Y]) for i in range(len(points))]))
 
         #might want to rewrite the following code:
 ##        for r1 in rects:
