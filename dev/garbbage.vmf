@@ -1,0 +1,267 @@
+versioninfo
+{
+	"editorversion" "400"
+	"editorbuild" "7293"
+	"mapversion" "2"
+	"formatversion" "100"
+	"prefab" "0"
+}
+visgroups
+{
+}
+viewsettings
+{
+	"bSnapToGrid" "1"
+	"bShowGrid" "1"
+	"bShowLogicalGrid" "0"
+	"nGridSpacing" "64"
+	"bShow3DGrid" "0"
+}
+world
+{
+	"id" "1"
+	"mapversion" "2"
+	"classname" "worldspawn"
+	"skyname" "sky_tf2_04"
+	"maxpropscreenwidth" "-1"
+	"detailvbsp" "detail_2fort.vbsp"
+	"detailmaterial" "detail/detailsprites_2fort"
+	solid
+	{
+		"id" "2"
+		side
+		{
+			"id" "1"
+			"plane" "(448 -64 256) (448 -448 256) (64 -448 256)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2"
+			"plane" "(512 -512 0) (512 0 0) (0 0 0)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "3"
+			"plane" "(64 -448 256) (0 -512 0) (0 0 0)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "4"
+			"plane" "(512 -512 0) (448 -448 256) (448 -64 256)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "5"
+			"plane" "(64 -64 256) (0 0 0) (512 0 0)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "6"
+			"plane" "(0 -512 0) (64 -448 256) (448 -448 256)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 142 235"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+	solid
+	{
+		"id" "7"
+		side
+		{
+			"id" "18"
+			"plane" "(896 512 128) (896 128 128) (512 128 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 -1 0 256] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "17"
+			"plane" "(960 64 -128) (960 576 -128) (448 576 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 -1 0 256] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "16"
+			"plane" "(512 128 128) (448 64 -128) (448 576 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "15"
+			"plane" "(960 64 -128) (896 128 128) (896 512 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "14"
+			"plane" "(512 512 128) (448 576 -128) (960 576 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "13"
+			"plane" "(448 64 -128) (512 128 128) (896 128 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 142 235"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+	solid
+	{
+		"id" "9"
+		side
+		{
+			"id" "30"
+			"plane" "(1024 -64 128) (1024 -448 128) (640 -448 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "29"
+			"plane" "(1088 -512 -128) (1088 0 -128) (576 0 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "28"
+			"plane" "(640 -448 128) (576 -512 -128) (576 0 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "27"
+			"plane" "(1088 -512 -128) (1024 -448 128) (1024 -64 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "26"
+			"plane" "(640 -64 128) (576 0 -128) (1088 0 -128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "25"
+			"plane" "(576 -512 -128) (640 -448 128) (1024 -448 128)"
+			"material" "ADVANCEDWEAPONISER/SICKLE_SNIPER/SCYTHE"
+			"uaxis" "[1 0 0 -256] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 142 235"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+}
+cameras
+{
+	"activecamera" "-1"
+}
+cordon
+{
+	"mins" "(-1024 -1024 -1024)"
+	"maxs" "(1024 1024 1024)"
+	"active" "0"
+}
