@@ -6,20 +6,26 @@ import main
 #CURRENTLY, each grid line represents 32 hammer units
 
 class GridWidget(QWidget):
-    def __init__(self, parent=None, spacing=25):
+    def __init__(self, parent=None, spacing=25, rband=True):
         super(GridWidget, self).__init__(parent)
+        self.draw_list = []
+        self.mouse_pos = None
         self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
         self.no_draw_max = 16 #point at which no_draw starts to take effect
         self.pList = [] #intersection points of graph lines
         self.scale = 32
         self.scrollspeed = 2
         self.setCursor(Qt.CrossCursor)
+        self.setMouseTracking(True)
         self.spacing = spacing
         self.transform = [0,0]
         self.transformspeed = self.scrollspeed * 10
+        #vars for rubber band
+        self.rband = rband #if rubberband is enabled
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        self.origin = QPoint()
 
     def wheelEvent(self, e):
-        e.accept()
         self.changeSpacing(e.delta()/(20*self.scrollspeed)) #replace with scrollspeed constant
         self.repaint()
 
@@ -29,16 +35,43 @@ class GridWidget(QWidget):
             self.changeSpacing(self.scrollspeed)
         elif e.key() == Qt.Key_Minus:
             self.changeSpacing(-self.scrollspeed)
+        elif e.key() == Qt.Key_Space:
+            self.transform = [0,0]
         elif e.key() == Qt.Key_Down:
-            self.transform[Y] += self.transformspeed
-        elif e.key() == Qt.Key_Up:
             self.transform[Y] -= self.transformspeed
+        elif e.key() == Qt.Key_Up:
+            self.transform[Y] += self.transformspeed
         elif e.key() == Qt.Key_Right:
-            self.transform[X] += self.transformspeed
-        elif e.key() == Qt.Key_Left:
             self.transform[X] -= self.transformspeed
+        elif e.key() == Qt.Key_Left:
+            self.transform[X] += self.transformspeed
 
         self.repaint()
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.RightButton:
+            if self.rband:
+                self.origin = self.closestP(e.pos())
+                self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+                self.rubberBand.show()
+        elif e.button() == Qt.LeftButton:
+            #self.parent.cur_icon
+            pass
+    
+    def mouseMoveEvent(self, e):
+        self.mouse_pos = e.pos()
+        if self.rband:
+            if not self.origin.isNull():
+                self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e.pos())).normalized())
+    
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            pass   
+        #rubber band
+        elif e.button() == Qt.RightButton:
+            if self.rband:
+                print(QRect(self.origin, self.closestP(e.pos())))
+                self.rubberBand.hide()
         
     def paintEvent(self, e):
         qp = QPainter()
@@ -66,7 +99,7 @@ class GridWidget(QWidget):
 
         X,Y = 0,1
         coors = [[],[]]
-        start = [int(t % self.spacing) for t in self.transform]
+        start = [int(t % (self.spacing*self.no_draw)) for t in self.transform]
         
         for x in range(start[X], w, int(self.spacing*self.no_draw)):
             line = QLineF(x,0.0,x,h)
@@ -84,28 +117,26 @@ class GridWidget(QWidget):
                 self.pList.append(QPoint(x,y))
 
     def changeSpacing(self, spacing):
+        X,Y = 0,1
         self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
 
-    def closestP(self, e):
-        #finds the closest point to the mouse cursor(e)
+    def closestP(self, pos):
+        #finds the closest point to the mouse cursor/QPoint(pos)
         dist = []
         for p in self.pList:
-            dist.append([abs(e.pos().x() - p.x()),abs(e.pos().y() - p.y())])
+            dist.append([abs(pos.x() - p.x()),abs(pos.y() - p.y())])
         xy = min(d for d in dist)
         return self.pList[dist.index(xy)]
 
 class MainGridWidget(GridWidget):
     #This is the grid for the main program, where you place the prefabs
-    def __init__(self, parent=None, spacing=25):
+    def __init__(self, parent=None, spacing=25, rband=True):
         #spacing controls how spaced out the lines are
-        super(MainGridWidget, self).__init__(parent, spacing)
+        super(MainGridWidget, self).__init__(parent, spacing, rband)
         self.parent = parent
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
         self.setCursor(Qt.CrossCursor)
         self.setAcceptDrops(True)
-        #vars for rubber band
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
-        self.origin = QPoint()
         
     def dragEnterEvent(self, e):
         #http://www.pythonstudio.us/pyqt-programming/drag-and-drop.html
@@ -131,36 +162,12 @@ class MainGridWidget(GridWidget):
 ##        print(e.mimeData().imageData())
         pass
 
-    def mousePressEvent(self, e):
-
-        if e.button() == Qt.RightButton:
-            self.origin = self.closestP(e)
-            self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-            self.rubberBand.show()
-        elif e.button() == Qt.LeftButton:
-            #self.parent.cur_icon
-            pass
-    
-    def mouseMoveEvent(self, e):
-
-        #rubber band
-        if not self.origin.isNull():
-            self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e)).normalized())
-    
-    def mouseReleaseEvent(self, e):
-
-        if e.button() == Qt.LeftButton:
-            pass   
-        #rubber band
-        elif e.button() == Qt.RightButton:
-            print(QRect(self.origin, self.closestP(e)))
-            self.rubberBand.hide()
-
 class CreatePrefabGridWidget(GridWidget):
-    def __init__(self, parent=None, spacing=25):
-        super(CreatePrefabGridWidget, self).__init__(parent, spacing)
+    def __init__(self, parent=None, spacing=25, rband=False):
+        super(CreatePrefabGridWidget, self).__init__(parent, spacing, rband)
         self.draw_list = []
-        w = 350; h = 350
+        w = 500
+        h = 350
         self.sizeHint = lambda: QSize(w, h)
 
     def paintEvent(self, e):
@@ -196,7 +203,6 @@ class CreatePrefabGridWidget(GridWidget):
 ##                        if points[rects.index(r1)][Z] > points[rects.index(r2)][Z]: #if r1 is higher on z axis than r2
 ##                            points.pop(rects.index(r2))
 ##                            rects.remove(r2)
-
         for p in polys:
             qp.drawPolygon(p)
 

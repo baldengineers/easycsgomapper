@@ -115,13 +115,6 @@ class Create():
 #        self.form.addRow(layout)
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
-        try:
-            os.kill(self.process.pid, 9)
-        except Exception as e:
-            pass
-            #print(str(e))
-
-			#i know try/excepts arent good but you gotta do it here
         #begin creating prefab
         #vmf_file | string | contains the filepath of the vmf file of the prefab
         #prefab_name | string | is the filename of the prefab file being created
