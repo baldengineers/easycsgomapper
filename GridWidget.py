@@ -19,6 +19,7 @@ class GridWidget(QWidget):
         self.setMouseTracking(True)
         self.spacing = spacing
         self.transform = [0,0]
+        self.transform_origin = QPoint()
         self.transformspeed = self.scrollspeed * 10
         #vars for rubber band
         self.rband = rband #if rubberband is enabled
@@ -57,12 +58,25 @@ class GridWidget(QWidget):
         elif e.button() == Qt.LeftButton:
             #self.parent.cur_icon
             pass
+        elif e.button() == Qt.MidButton:
+            self.transform_origin = e.pos()
     
     def mouseMoveEvent(self, e):
+        X,Y = 0,1
         self.mouse_pos = e.pos()
         if self.rband:
             if not self.origin.isNull():
                 self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e.pos())).normalized())
+        if not self.transform_origin.isNull():
+            self.transform[X] -= self.transform_origin.x() - e.pos().x()
+            self.transform[Y] -= self.transform_origin.y() - e.pos().y()
+            self.transform_origin = e.pos()
+            self.repaint()
+        self.mouseMoveCustom(e)
+
+    def mouseMoveCuston(self, e):
+        #custom reimplementation without disrupting original function
+        pass
     
     def mouseReleaseEvent(self, e):
         if e.button() == Qt.LeftButton:
@@ -72,6 +86,8 @@ class GridWidget(QWidget):
             if self.rband:
                 print(QRect(self.origin, self.closestP(e.pos())))
                 self.rubberBand.hide()
+        elif e.button() == Qt.MidButton:
+            self.transform_origin = QPoint()
         
     def paintEvent(self, e):
         qp = QPainter()
@@ -169,6 +185,18 @@ class CreatePrefabGridWidget(GridWidget):
         w = 500
         h = 350
         self.sizeHint = lambda: QSize(w, h)
+        self.polys = []
+        self.cur_poly = QPolygon() #the current polygon mouse is hovering over
+
+    def mouseMoveCustom(self, e):
+        for poly in reversed(self.polys):
+            if e.pos() in poly:
+                self.cur_poly = poly
+                self.setCursor(Qt.PointingHandCursor)
+                print('hand')
+                break
+            else:
+                self.setCursor(Qt.CrossCursor)
 
     def paintEvent(self, e):
         qp = QPainter()
@@ -187,12 +215,12 @@ class CreatePrefabGridWidget(GridWidget):
         qp.setPen(pen)
 
         X,Y,Z = 0,1,2
-        polys = []
+        self.polys = []
         for poly in self.draw_list:
             points = []
             for p in poly:
                 points.append([c/self.scale*self.spacing for c in p])
-            polys.append(QPolygon([QPoint(points[i][X]+self.transform[X], points[i][Y]+self.transform[Y]) for i in range(len(points))]))
+            self.polys.append(QPolygon([QPoint(points[i][X]+self.transform[X], points[i][Y]+self.transform[Y]) for i in range(len(points))]))
 
         #might want to rewrite the following code:
 ##        for r1 in rects:
@@ -203,7 +231,7 @@ class CreatePrefabGridWidget(GridWidget):
 ##                        if points[rects.index(r1)][Z] > points[rects.index(r2)][Z]: #if r1 is higher on z axis than r2
 ##                            points.pop(rects.index(r2))
 ##                            rects.remove(r2)
-        for p in polys:
+        for p in self.polys:
             qp.drawPolygon(p)
 
     def rect_contains(r1, r2):
@@ -212,7 +240,7 @@ class CreatePrefabGridWidget(GridWidget):
 
 def main():
     app = QApplication(sys.argv)
-    grid = MainGridWidget()
+    grid = CreatePrefabGridWidget()
     grid.show()
     sys.exit(app.exec_())
 

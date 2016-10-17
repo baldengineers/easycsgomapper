@@ -61,9 +61,24 @@ class Create():
             self.radioLayout.addWidget(self.radioTF2)
             self.radioLayout.addWidget(self.radioCSGO)
 
+            self.color_btn = QPushButton(self.dialog)
+            self.color_btn.sizeHint = lambda:  QSize(32,32)
+            self.color_btn.setStyleSheet("background-color: white")
+            self.color_btn.clicked.connect(self.change_color)
+            self.color_dialog = QColorDialog(self.dialog)
+            
             self.icon_grid = CreatePrefabGridWidget(self.dialog)
             self.icon_grid.setFocusPolicy(Qt.StrongFocus)
             self.icon_grid.setFocus()
+
+            self.tool_layout = QVBoxLayout()
+            self.tool_layout.addWidget(self.color_btn)
+            self.tool_layout.addStretch(1)
+            self.icon_grid_layout = QHBoxLayout(self.dialog)
+            self.icon_grid_layout.addLayout(self.tool_layout)
+            self.icon_grid_layout.addWidget(self.icon_grid)
+            self.icon_grid_widget = QWidget(self.dialog)
+            self.icon_grid_widget.setLayout(self.icon_grid_layout)
 
             self.okay_btn = QPushButton("Create Prefab", self.dialog)
             self.okay_btn.clicked.connect(self.dialog.accept)
@@ -89,7 +104,7 @@ class Create():
             self.form.addRow("Export prefab?", self.expCheckBox)
             self.form.addRow("Which section?",self.sectionSelect)
             self.form.addRow("Which game?", self.radioLayout)
-            self.form.addRow("icon", self.icon_grid)
+            self.form.addRow("icon", self.icon_grid_widget)
 ##            for i in range(5):
 ##                self.form.addRow(self.blankstring)
             self.form.addRow(self.btn_layout)
@@ -113,6 +128,9 @@ class Create():
 #        layout = QVBoxLayout()
 #        layout.addWidget(container)
 #        self.form.addRow(layout)
+    def change_color(self):
+        color = self.color_dialog.getColor()
+        self.color_btn.setStyleSheet("background-color: %s" % color.name())
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
@@ -421,6 +439,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 ##        for i in self.vmf_data:
 ##            print(i)
 ##        print("var_list: ",self.var_list)
+        self.draw_list = sorted(self.draw_list, key=lambda p: p[0][2]) #p[0][2] is the z_val
         print("draw_list: ",self.draw_list)
         return self.draw_list
 
