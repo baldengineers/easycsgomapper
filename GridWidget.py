@@ -181,6 +181,7 @@ class MainGridWidget(GridWidget):
 class CreatePrefabGridWidget(GridWidget):
     def __init__(self, parent=None, spacing=25, rband=False):
         super(CreatePrefabGridWidget, self).__init__(parent, spacing, rband)
+        #self.draw_list = [[[512, 512, 64], [512, 448, 64], [0, 448, 64], [0, 512, 64]], [[64, 448, 64], [64, 0, 64], [0, 0, 64], [0, 448, 64]], [[512, 448, 64], [512, 0, 64], [448, 0, 64], [448, 448, 64]], [[960, 64, 64], [960, 0, 64], [512, 0, 64], [512, 64, 64]], [[960, 512, 64], [960, 448, 64], [512, 448, 64], [512, 512, 64]], [[960, 960, 64], [960, 512, 64], [896, 512, 64], [896, 960, 64]], [[448, 960, 64], [448, 896, 64], [0, 896, 64], [0, 960, 64]], [[512, 960, 64], [512, 512, 64], [448, 512, 64], [448, 960, 64]]]
         self.draw_list = []
         w = 500
         h = 350
@@ -190,13 +191,11 @@ class CreatePrefabGridWidget(GridWidget):
 
     def mouseMoveCustom(self, e):
         for poly in reversed(self.polys):
-            if e.pos() in poly:
+            if poly.containsPoint(e.pos(), Qt.OddEvenFill):
                 self.cur_poly = poly
                 self.setCursor(Qt.PointingHandCursor)
-                print('hand')
-                break
-            else:
-                self.setCursor(Qt.CrossCursor)
+                return
+        self.setCursor(Qt.CrossCursor)
 
     def paintEvent(self, e):
         qp = QPainter()
