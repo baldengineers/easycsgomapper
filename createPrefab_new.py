@@ -131,6 +131,7 @@ class Create():
     def change_color(self):
         color = self.color_dialog.getColor()
         self.color_btn.setStyleSheet("background-color: %s" % color.name())
+        self.icon_grid.cur_color = color
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
