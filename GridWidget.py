@@ -60,6 +60,11 @@ class GridWidget(QWidget):
             pass
         elif e.button() == Qt.MidButton:
             self.transform_origin = e.pos()
+        
+        self.mousePressCustom(e)
+    
+    def mousePressCustom(self, e):
+        pass
     
     def mouseMoveEvent(self, e):
         X,Y = 0,1
@@ -72,6 +77,7 @@ class GridWidget(QWidget):
             self.transform[Y] -= self.transform_origin.y() - e.pos().y()
             self.transform_origin = e.pos()
             self.repaint()
+        
         self.mouseMoveCustom(e)
 
     def mouseMoveCuston(self, e):
@@ -100,7 +106,7 @@ class GridWidget(QWidget):
         w = size.width()
         h = size.height()
 
-        #draw the grid
+        #draw the gride.button() == Qt.LeftButton:
         x, y = 0, 0
         pen = QPen(Qt.lightGray, 1)
         qp.setPen(pen)
@@ -187,14 +193,26 @@ class CreatePrefabGridWidget(GridWidget):
         h = 350
         self.sizeHint = lambda: QSize(w, h)
         self.polys = []
-        self.cur_poly = QPolygon() #the current polygon mouse is hovering over
-
+        self.polys_color = []
+        self.cur_poly = [QPolygon(), None] #the current polygon mouse is hovering over, with its index in self.polys
+        self.cur_color = None
+        
+    def mousePressCustom(self, e):
+        if not self.cur_poly[0].isNull():
+            if self.cur_poly[0].containsPoint(e.pos(), Qt.OddEvenFill):
+                if e.button() == Qt.LeftButton:
+                    self.polys_color[self.cur_poly[1]] = self.cur_color
+                elif e.button() == Qt.RightButton:
+                    self.polys_color[self.cur_poly[1]] = None
+                self.repaint()
+                
     def mouseMoveCustom(self, e):
-        for poly in reversed(self.polys):
+        for i, poly in enumerate(reversed(self.polys)):
             if poly.containsPoint(e.pos(), Qt.OddEvenFill):
-                self.cur_poly = poly
+                self.cur_poly = [poly, len(self.polys - 1) - i]
                 self.setCursor(Qt.PointingHandCursor)
                 return
+        self.cur_poly = QPolygon()
         self.setCursor(Qt.CrossCursor)
 
     def paintEvent(self, e):
@@ -206,6 +224,7 @@ class CreatePrefabGridWidget(GridWidget):
 
     def update_draw_list(self, draw_list):
         self.draw_list = draw_list
+        self.polys_color = [None for i in self.draw_list]
         self.repaint()
 
     def update_icon(self, qp):
@@ -214,12 +233,14 @@ class CreatePrefabGridWidget(GridWidget):
         qp.setPen(pen)
 
         X,Y,Z = 0,1,2
+        i = 0 #current index of self.polys, used to find the current color the poly should be 
         self.polys = []
         for poly in self.draw_list:
             points = []
             for p in poly:
                 points.append([c/self.scale*self.spacing for c in p])
-            self.polys.append(QPolygon([QPoint(points[i][X]+self.transform[X], points[i][Y]+self.transform[Y]) for i in range(len(points))]))
+            self.polys.append([QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]), self.polys_color[i]])
+            i += 1
 
         #might want to rewrite the following code:
 ##        for r1 in rects:
@@ -231,7 +252,8 @@ class CreatePrefabGridWidget(GridWidget):
 ##                            points.pop(rects.index(r2))
 ##                            rects.remove(r2)
         for p in self.polys:
-            qp.drawPolygon(p)
+            qp.setBrush(QBrush(p[1]))
+            qp.drawPolygon(p[0])
 
     def rect_contains(r1, r2):
         #checks if rectangle r2 is in rectangle r1
