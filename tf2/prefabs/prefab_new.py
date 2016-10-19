@@ -41,7 +41,6 @@ def create(posx, posy, id_num, world_id_num, scale, rotation):
     z8 = 73
 
     var_list = [[x0,y0,z0],[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4],[x5,y5,z5],[x6,y6,z6],[x7,y7,z7],[x8,y8,z8]]
-    var_count = 9
 
     vmf_template = """
 	solid
@@ -144,17 +143,17 @@ entity
 }
 """
     X,Y,Z = 0,1,2
-    for i in range(var_count):
+    for i in range(len(var_list)):
         vmf_template.replace("x%d y%d z%d" % (i, i, i), "%d %d %d" % (var_list[i][X], var_list[i][Y], var_list[i][Z]))
-    for i in range(vmf_template.count("world_id_num")):
-        vmf_template.replace("world_id_num", world_id_num, 1)
-        world_id_num += 1
-    for i in range(vmf_template.count("id_num")):
-        vmf_template.replace("id_num", id_num, 1)
-        id_num += 1
+##    for i in range(vmf_template.count("world_id_num")):
+##        vmf_template.replace("world_id_num", world_id_num, 1)
+##        world_id_num += 1
+##    for i in range(vmf_template.count("id_num")):
+##        vmf_template.replace("id_num", id_num, 1)
+##        id_num += 1
 	#
 	#move id_num calculations into export.py!!!!!! and out of prefab files
-	#
+	#ALRIGHTY!!!
     axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
     negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
     for normal_num in range(0,var_count,3):

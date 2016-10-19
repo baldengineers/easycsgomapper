@@ -68,7 +68,7 @@ class Create():
             self.color_dialog = QColorDialog(self.dialog)
             
             self.icon_grid = CreatePrefabGridWidget(self.dialog)
-            #self.icon_grid.cur_color =
+            self.icon_grid.cur_color = QColor(Qt.white)
             self.icon_grid.setFocusPolicy(Qt.StrongFocus)
             self.icon_grid.setFocus()
 
@@ -133,7 +133,6 @@ class Create():
         color = self.color_dialog.getColor()
         self.color_btn.setStyleSheet("background-color: %s" % color.name())
         self.icon_grid.cur_color = color
-        print(color)
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
@@ -442,8 +441,9 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 ##        for i in self.vmf_data:
 ##            print(i)
 ##        print("var_list: ",self.var_list)
-        self.draw_list = sorted(self.draw_list, key=lambda p: p[0][2]) #p[0][2] is the z_val
+        self.draw_list = sorted(self.draw_list, key=lambda p: max(p[i][2] for i in range(len(p)))) #p[0][2] is the z_val
         print("draw_list: ",self.draw_list)
+
         return self.draw_list
 
 ##        with open('tf2/prefabs/prefab_new.py', 'a') as f:
