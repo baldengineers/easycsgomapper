@@ -120,22 +120,22 @@ class GridWidget(QWidget):
 ##        print(self.no_draw)
 
         X,Y = 0,1
-        coors = [[],[]]
+        coords = [[],[]]
         start = [int(t % (self.spacing*self.no_draw)) for t in self.transform]
         
         for x in range(start[X], w, int(self.spacing*self.no_draw)):
             line = QLineF(x,0.0,x,h)
             qp.drawLine(line)
-            coors[X].append(x)
+            coords[X].append(x)
 
         for y in range(start[Y], h, int(self.spacing*self.no_draw)):
             line = QLineF(0.0,y,w,y)
             qp.drawLine(line)
-            coors[Y].append(y)
+            coords[Y].append(y)
 
         self.pList = []
-        for x in coors[X]:
-            for y in coors[Y]:
+        for x in coords[X]:
+            for y in coords[Y]:
                 self.pList.append(QPoint(x,y))
 
     def changeSpacing(self, spacing):
