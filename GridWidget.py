@@ -194,13 +194,14 @@ class CreatePrefabGridWidget(GridWidget):
         self.sizeHint = lambda: QSize(w, h)
         self.polys = []
         self.polys_color = []
-        self.cur_poly = [QPolygon(), None] #the current polygon mouse is hovering over, with its index in self.polys
+        self.cur_poly = [None, None] #the current polygon mouse is hovering over, with its index in self.polys
         self.cur_color = None
         
     def mousePressCustom(self, e):
-        if not self.cur_poly[0].isNull():
+        if self.cur_poly[0]:
             if self.cur_poly[0].containsPoint(e.pos(), Qt.OddEvenFill):
                 if e.button() == Qt.LeftButton:
+                    print(self.cur_color)
                     self.polys_color[self.cur_poly[1]] = self.cur_color
                 elif e.button() == Qt.RightButton:
                     self.polys_color[self.cur_poly[1]] = None
@@ -209,10 +210,10 @@ class CreatePrefabGridWidget(GridWidget):
     def mouseMoveCustom(self, e):
         for i, poly in enumerate(reversed(self.polys)):
             if poly.containsPoint(e.pos(), Qt.OddEvenFill):
-                self.cur_poly = [poly, len(self.polys - 1) - i]
+                self.cur_poly = [poly, len(self.polys) - 1 - i]
                 self.setCursor(Qt.PointingHandCursor)
                 return
-        self.cur_poly = QPolygon()
+        self.cur_poly = [None, None]
         self.setCursor(Qt.CrossCursor)
 
     def paintEvent(self, e):
@@ -232,15 +233,13 @@ class CreatePrefabGridWidget(GridWidget):
         pen = QPen(Qt.black, 3)
         qp.setPen(pen)
 
-        X,Y,Z = 0,1,2
-        i = 0 #current index of self.polys, used to find the current color the poly should be 
+        X,Y,Z = 0,1,2    
         self.polys = []
         for poly in self.draw_list:
             points = []
             for p in poly:
                 points.append([c/self.scale*self.spacing for c in p])
-            self.polys.append([QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]), self.polys_color[i]])
-            i += 1
+            self.polys.append(QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]))
 
         #might want to rewrite the following code:
 ##        for r1 in rects:
@@ -251,9 +250,9 @@ class CreatePrefabGridWidget(GridWidget):
 ##                        if points[rects.index(r1)][Z] > points[rects.index(r2)][Z]: #if r1 is higher on z axis than r2
 ##                            points.pop(rects.index(r2))
 ##                            rects.remove(r2)
-        for p in self.polys:
-            qp.setBrush(QBrush(p[1]))
-            qp.drawPolygon(p[0])
+        for i, p in enumerate(self.polys):
+            qp.setBrush(QBrush(self.polys_color[i]))
+            qp.drawPolygon(p)
 
     def rect_contains(r1, r2):
         #checks if rectangle r2 is in rectangle r1

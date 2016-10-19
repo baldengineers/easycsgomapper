@@ -68,6 +68,7 @@ class Create():
             self.color_dialog = QColorDialog(self.dialog)
             
             self.icon_grid = CreatePrefabGridWidget(self.dialog)
+            #self.icon_grid.cur_color =
             self.icon_grid.setFocusPolicy(Qt.StrongFocus)
             self.icon_grid.setFocus()
 
@@ -132,6 +133,7 @@ class Create():
         color = self.color_dialog.getColor()
         self.color_btn.setStyleSheet("background-color: %s" % color.name())
         self.icon_grid.cur_color = color
+        print(color)
 
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
