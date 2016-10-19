@@ -27,6 +27,10 @@ cordon
     #end of file template that ends each vmf
     #print(totalblocks)
     compiledblocks = "".join(totalblocks) #totalblocks will be a list of each "block" from each chunk in the map, put into 1 string here.
+    for i in range(compiledblocks.count("world_id_num")):
+        compiledblocks = compiledblocks.replace("world_id_num",str(i),1)    
+    for i in range(compiledblocks.count("id_num")):
+        compiledblocks = compiledblocks.replace("id_num",str(i),1)
     totalentities = "".join(entity_list)
     compiledblocks = compiledblocks.replace('EMPTY_SLOT','')
     #totalentities = "".join(entity_list)
