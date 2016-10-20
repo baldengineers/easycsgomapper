@@ -2,6 +2,7 @@ import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 import main
+X,Y,Z = 0,1,2
 
 #CURRENTLY, each grid line represents 32 hammer units
 
@@ -31,7 +32,6 @@ class GridWidget(QWidget):
         self.repaint()
 
     def keyPressEvent(self, e):
-        X,Y = 0,1
         if e.key() == Qt.Key_Equal:
             self.changeSpacing(self.scrollspeed)
         elif e.key() == Qt.Key_Minus:
@@ -67,7 +67,6 @@ class GridWidget(QWidget):
         pass
     
     def mouseMoveEvent(self, e):
-        X,Y = 0,1
         self.mouse_pos = e.pos()
         if self.rband:
             if not self.origin.isNull():
@@ -107,7 +106,6 @@ class GridWidget(QWidget):
         h = size.height()
 
         #draw the gride.button() == Qt.LeftButton:
-        x, y = 0, 0
         pen = QPen(Qt.lightGray, 1)
         qp.setPen(pen)
 
@@ -119,7 +117,6 @@ class GridWidget(QWidget):
 ##        print('spacing',self.spacing)
 ##        print(self.no_draw)
 
-        X,Y = 0,1
         coords = [[],[]]
         start = [int(t % (self.spacing*self.no_draw)) for t in self.transform]
         
@@ -139,11 +136,10 @@ class GridWidget(QWidget):
                 self.pList.append(QPoint(x,y))
 
     def changeSpacing(self, spacing):
-        X,Y = 0,1
         self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
 
     def closestP(self, pos):
-        #finds the closest point to the mouse cursor/QPoint(pos)
+        #finds the closest point to the mouse cursor/QPoint (pos)
         dist = []
         for p in self.pList:
             dist.append([abs(pos.x() - p.x()),abs(pos.y() - p.y())])
@@ -155,9 +151,8 @@ class MainGridWidget(GridWidget):
     def __init__(self, parent=None, spacing=25, rband=True):
         #spacing controls how spaced out the lines are
         super(MainGridWidget, self).__init__(parent, spacing, rband)
-        self.parent = parent
+        self.cur_icon = None
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
-        self.setCursor(Qt.CrossCursor)
         self.setAcceptDrops(True)
         
     def dragEnterEvent(self, e):
@@ -177,18 +172,24 @@ class MainGridWidget(GridWidget):
         #multiply the image size by 32/self.spacing
 ##        for p in self.pList:
 ##            if e.pos().x() < p.x() and e.pos().y() < p.y():
-##                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))
+##                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))                                                                                                                                                                                                                                                                                                                                                       
 ##                break
 
 ##        self.prefabs.append([e.mimeData().imageData(), coor])
 ##        print(e.mimeData().imageData())
         pass
 
+    def mousePressCustom(self, e):
+        pos = self.closestP(e.pos())
+        for poly in self.cur_icon:
+            transform = [t/self.spacing*self.scale for t in self.transform]
+            self.draw_list.append([p[X] + transform[X], p[Y] for p in poly]
+        
+
 class CreatePrefabGridWidget(GridWidget):
     def __init__(self, parent=None, spacing=25, rband=False):
         super(CreatePrefabGridWidget, self).__init__(parent, spacing, rband)
         #self.draw_list = [[[512, 512, 64], [512, 448, 64], [0, 448, 64], [0, 512, 64]], [[64, 448, 64], [64, 0, 64], [0, 0, 64], [0, 448, 64]], [[512, 448, 64], [512, 0, 64], [448, 0, 64], [448, 448, 64]], [[960, 64, 64], [960, 0, 64], [512, 0, 64], [512, 64, 64]], [[960, 512, 64], [960, 448, 64], [512, 448, 64], [512, 512, 64]], [[960, 960, 64], [960, 512, 64], [896, 512, 64], [896, 960, 64]], [[448, 960, 64], [448, 896, 64], [0, 896, 64], [0, 960, 64]], [[512, 960, 64], [512, 512, 64], [448, 512, 64], [448, 960, 64]]]
-        self.draw_list = []
         w = 500
         h = 350
         self.sizeHint = lambda: QSize(w, h)
@@ -232,8 +233,7 @@ class CreatePrefabGridWidget(GridWidget):
         #creates the polygons in poly list on the grid so user can color their prefab icon
         pen = QPen(Qt.black, 3)
         qp.setPen(pen)
-
-        X,Y,Z = 0,1,2    
+  
         self.polys = []
         for poly in self.draw_list:
             points = []
