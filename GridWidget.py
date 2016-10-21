@@ -16,7 +16,7 @@ class GridWidget(QWidget):
         self.pList = [] #intersection points of graph lines
         self.polys = []
         self.polys_color = []
-        self.scale = 32
+        self.scale = 64
         self.scrollspeed = 2
         self.setCursor(Qt.CrossCursor)
         self.setMouseTracking(True)
