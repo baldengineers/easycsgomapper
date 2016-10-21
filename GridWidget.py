@@ -14,6 +14,8 @@ class GridWidget(QWidget):
         self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
         self.no_draw_max = 16 #point at which no_draw starts to take effect
         self.pList = [] #intersection points of graph lines
+        self.polys = []
+        self.polys_color = []
         self.scale = 32
         self.scrollspeed = 2
         self.setCursor(Qt.CrossCursor)
@@ -79,7 +81,7 @@ class GridWidget(QWidget):
         
         self.mouseMoveCustom(e)
 
-    def mouseMoveCuston(self, e):
+    def mouseMoveCustom(self, e):
         #custom reimplementation without disrupting original function
         pass
     
@@ -98,6 +100,7 @@ class GridWidget(QWidget):
         qp = QPainter()
         qp.begin(self)
         self.draw(qp)
+        self.update_icon(qp)
         qp.end()
 
     def draw(self, qp):
@@ -135,6 +138,22 @@ class GridWidget(QWidget):
             for y in coords[Y]:
                 self.pList.append(QPoint(x,y))
 
+    def update_icon(self, qp):
+        #creates the polygons in poly list on the grid so user can color their prefab icon
+        pen = QPen(Qt.black, 3)
+        qp.setPen(pen)
+  
+        self.polys = []
+        for poly in self.draw_list:
+            points = []
+            for p in poly:
+                points.append([c/self.scale*self.spacing for c in p])
+            self.polys.append(QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]))
+
+        for i, p in enumerate(self.polys):
+            qp.setBrush(QBrush(self.polys_color[i]))
+            qp.drawPolygon(p)
+
     def changeSpacing(self, spacing):
         self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
 
@@ -151,7 +170,11 @@ class MainGridWidget(GridWidget):
     def __init__(self, parent=None, spacing=25, rband=True):
         #spacing controls how spaced out the lines are
         super(MainGridWidget, self).__init__(parent, spacing, rband)
-        self.cur_icon = None
+        #testing purposes
+        self.cur_icon = [[[512, 512, 64], [512, 448, 64], [0, 448, 64], [0, 512, 64]], [[64, 448, 64], [64, 0, 64], [0, 0, 64], [0, 448, 64]], [[512, 448, 64], [512, 0, 64], [448, 0, 64], [448, 448, 64]], [[960, 64, 64], [960, 0, 64], [512, 0, 64], [512, 64, 64]], [[960, 512, 64], [960, 448, 64], [512, 448, 64], [512, 512, 64]], [[960, 960, 64], [960, 512, 64], [896, 512, 64], [896, 960, 64]], [[448, 960, 64], [448, 896, 64], [0, 896, 64], [0, 960, 64]], [[512, 960, 64], [512, 512, 64], [448, 512, 64], [448, 960, 64]]]
+        self.cur_icon_color = [None for i in self.cur_icon]
+        #self.cur_icon = None
+        #self.cur_icon_color = None
         self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
         self.setAcceptDrops(True)
         
@@ -180,10 +203,17 @@ class MainGridWidget(GridWidget):
         pass
 
     def mousePressCustom(self, e):
-        pos = self.closestP(e.pos())
-        for poly in self.cur_icon:
-            transform = [t/self.spacing*self.scale for t in self.transform]
-            self.draw_list.append([p[X] + transform[X], p[Y] for p in poly]
+        if e.button() == Qt.LeftButton:
+            pos = self.closestP(e.pos()) / self.spacing * self.scale
+            for poly in self.cur_icon:
+                print(self.transform)
+                transform = [int(t/self.spacing*self.scale) for t in self.transform]
+                self.draw_list.append([])
+                for p in poly:
+                    self.draw_list[-1].append([p[X] + transform[X] + pos.x(), p[Y] + transform[Y] + pos.y(), p[Z]])
+            for c in self.cur_icon_color:
+                self.polys_color.append(c)
+            self.repaint()
         
 
 class CreatePrefabGridWidget(GridWidget):
@@ -193,8 +223,6 @@ class CreatePrefabGridWidget(GridWidget):
         w = 500
         h = 350
         self.sizeHint = lambda: QSize(w, h)
-        self.polys = []
-        self.polys_color = []
         self.cur_poly = [None, None] #the current polygon mouse is hovering over, with its index in self.polys
         self.cur_color = None
         
@@ -217,50 +245,14 @@ class CreatePrefabGridWidget(GridWidget):
         self.cur_poly = [None, None]
         self.setCursor(Qt.CrossCursor)
 
-    def paintEvent(self, e):
-        qp = QPainter()
-        qp.begin(self)
-        self.draw(qp)
-        self.update_icon(qp)
-        qp.end()
-
     def update_draw_list(self, draw_list):
         self.draw_list = draw_list
         self.polys_color = [None for i in self.draw_list]
         self.repaint()
 
-    def update_icon(self, qp):
-        #creates the polygons in poly list on the grid so user can color their prefab icon
-        pen = QPen(Qt.black, 3)
-        qp.setPen(pen)
-  
-        self.polys = []
-        for poly in self.draw_list:
-            points = []
-            for p in poly:
-                points.append([c/self.scale*self.spacing for c in p])
-            self.polys.append(QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]))
-
-        #might want to rewrite the following code:
-##        for r1 in rects:
-##            for r2 in rects:
-##                draw = False
-##                if r1 != r2:
-##                    if r1.contains(r2):
-##                        if points[rects.index(r1)][Z] > points[rects.index(r2)][Z]: #if r1 is higher on z axis than r2
-##                            points.pop(rects.index(r2))
-##                            rects.remove(r2)
-        for i, p in enumerate(self.polys):
-            qp.setBrush(QBrush(self.polys_color[i]))
-            qp.drawPolygon(p)
-
-    def rect_contains(r1, r2):
-        #checks if rectangle r2 is in rectangle r1
-        pass
-
 def main():
     app = QApplication(sys.argv)
-    grid = CreatePrefabGridWidget()
+    grid = MainGridWidget()
     grid.show()
     sys.exit(app.exec_())
 
