@@ -156,7 +156,13 @@ class GridWidget(QWidget):
 
     def changeSpacing(self, spacing):
         self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
-
+        w = self.size().width()
+        h = self.size().height()
+        midpoint = QPoint(w/2,h/2)
+        transform = midpoint - self.mouse_pos
+        self.transform[X] += transform.x()
+        self.transform[Y] += transform.y()
+        
     def closestP(self, pos):
         #finds the closest point to the mouse cursor/QPoint (pos)
         dist = []
