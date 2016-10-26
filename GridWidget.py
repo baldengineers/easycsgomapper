@@ -16,14 +16,15 @@ class GridWidget(QWidget):
         self.pList = [] #intersection points of graph lines
         self.polys = []
         self.polys_color = []
-        self.scale = 64
+        self.scale_list = [64,128,256,512,1024]
+        self.scale = self.scale_list[0]
         self.scrollspeed = 2
         self.setCursor(Qt.CrossCursor)
         self.setMouseTracking(True)
         self.spacing = spacing
-        self.transform = [0,0]
-        self.transform_origin = QPoint()
-        self.transformspeed = self.scrollspeed * 10
+        self.translate = [0,0]
+        self.translate_origin = QPoint()
+        #self.translatespeed = self.scrollspeed * 10
         #vars for rubber band
         self.rband = rband #if rubberband is enabled
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
@@ -35,19 +36,21 @@ class GridWidget(QWidget):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Equal:
-            self.changeSpacing(self.scrollspeed)
+            #self.changeSpacing(self.scrollspeed)
+            self.changeScale(1)
         elif e.key() == Qt.Key_Minus:
-            self.changeSpacing(-self.scrollspeed)
+            #self.changeSpacing(-self.scrollspeed)
+            self.changeScale(-1)
         elif e.key() == Qt.Key_Space:
-            self.transform = [0,0]
+            self.translate = [0,0]
         elif e.key() == Qt.Key_Down:
-            self.transform[Y] -= self.transformspeed
+            self.translate[Y] -= 1
         elif e.key() == Qt.Key_Up:
-            self.transform[Y] += self.transformspeed
+            self.translate[Y] += 1
         elif e.key() == Qt.Key_Right:
-            self.transform[X] -= self.transformspeed
+            self.translate[X] -= 1
         elif e.key() == Qt.Key_Left:
-            self.transform[X] += self.transformspeed
+            self.translate[X] += 1
 
         self.repaint()
 
@@ -61,7 +64,7 @@ class GridWidget(QWidget):
             #self.parent.cur_icon
             pass
         elif e.button() == Qt.MidButton:
-            self.transform_origin = e.pos()
+            self.translate_origin = self.closestP(e.pos()) / self.spacing
         
         self.mousePressCustom(e)
     
@@ -73,10 +76,11 @@ class GridWidget(QWidget):
         if self.rband:
             if not self.origin.isNull():
                 self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e.pos())).normalized())
-        if not self.transform_origin.isNull():
-            self.transform[X] -= self.transform_origin.x() - e.pos().x()
-            self.transform[Y] -= self.transform_origin.y() - e.pos().y()
-            self.transform_origin = e.pos()
+        if not self.translate_origin.isNull():
+            pos = self.closestP(e.pos()) / self.spacing
+            self.translate[X] -= self.translate_origin.x() - pos.x()
+            self.translate[Y] -= self.translate_origin.y() - pos.y()
+            self.translate_origin = self.closestP(e.pos()) / self.spacing
             self.repaint()
         
         self.mouseMoveCustom(e)
@@ -94,7 +98,7 @@ class GridWidget(QWidget):
                 print(QRect(self.origin, self.closestP(e.pos())))
                 self.rubberBand.hide()
         elif e.button() == Qt.MidButton:
-            self.transform_origin = QPoint()
+            self.translate_origin = QPoint()
         
     def paintEvent(self, e):
         qp = QPainter()
@@ -108,7 +112,7 @@ class GridWidget(QWidget):
         w = size.width()
         h = size.height()
 
-        #draw the gride.button() == Qt.LeftButton:
+        #draw the grid
         pen = QPen(Qt.lightGray, 1)
         qp.setPen(pen)
 
@@ -121,9 +125,10 @@ class GridWidget(QWidget):
 ##        print(self.no_draw)
 
         coords = [[],[]]
-        start = [int(t % (self.spacing*self.no_draw)) for t in self.transform]
+        #might not need self.no_draw below
+        start = [t*self.spacing*self.no_draw for t in self.translate]
         
-        for x in range(start[X], w, int(self.spacing*self.no_draw)):
+        for x in range(start[X], w, self.scale):
             line = QLineF(x,0.0,x,h)
             qp.drawLine(line)
             coords[X].append(x)
@@ -148,20 +153,29 @@ class GridWidget(QWidget):
             points = []
             for p in poly:
                 points.append([c/self.scale*self.spacing for c in p])
-            self.polys.append(QPolygon([QPoint(points[p][X]+self.transform[X], points[p][Y]+self.transform[Y]) for p in range(len(points))]))
+            self.polys.append(QPolygon([QPoint(points[p][X]+self.translate[X]*self.spacing, points[p][Y]+self.translate[Y]*self.spacing) for p in range(len(points))]))
 
         for i, p in enumerate(self.polys):
             qp.setBrush(QBrush(self.polys_color[i]))
             qp.drawPolygon(p)
+            
+    def changeScale(self, change):
+        if self.scale != self.scale_list[0] and self.scale != self.scale_list[-1]:
+            index = self.scale_list.index(self.scale)
+            self.scale = self.scale_list[index + change]
+            self.repaint()
 
     def changeSpacing(self, spacing):
-        self.spacing += spacing if self.spacing + spacing > 0 else -(self.spacing-1) #set to 0 if adding spacing makes it less than 0
+        if self.spacing + spacing > 0:
+            self.spacing += spacing
+        else:
+            self.spacing = 1        
         w = self.size().width()
         h = self.size().height()
         midpoint = QPoint(w/2,h/2)
-        transform = midpoint - self.mouse_pos
-        self.transform[X] += transform.x()
-        self.transform[Y] += transform.y()
+        translate = midpoint - self.mouse_pos
+        self.translate[X] += translate.x()
+        self.translate[Y] += translate.y()
         
     def closestP(self, pos):
         #finds the closest point to the mouse cursor/QPoint (pos)
@@ -212,11 +226,11 @@ class MainGridWidget(GridWidget):
         if e.button() == Qt.LeftButton:
             pos = self.closestP(e.pos()) / self.spacing * self.scale
             for poly in self.cur_icon:
-                print(self.transform)
-                transform = [int(t/self.spacing*self.scale) for t in self.transform]
+                print(self.translate)
+                translate = [int(t/self.spacing*self.scale) for t in self.translate]
                 self.draw_list.append([])
                 for p in poly:
-                    self.draw_list[-1].append([p[X] + transform[X] + pos.x(), p[Y] + transform[Y] + pos.y(), p[Z]])
+                    self.draw_list[-1].append([p[X] + translate[X] + pos.x(), p[Y] + translate[Y] + pos.y(), p[Z]])
             for c in self.cur_icon_color:
                 self.polys_color.append(c)
             self.repaint()
