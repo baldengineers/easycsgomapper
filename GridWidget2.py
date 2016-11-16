@@ -8,8 +8,9 @@ class GridWidget(QWidget):
         super(GridWidget, self).__init__()
         self.x = x
         self.y = y
-        self.startX = 0
-        self.startY = 0
+        self.draw_list = []
+        #self.startX = 0
+        #self.startY = 0
         #self.setMouseTracking(True)
         self.spacing = 2
         self.grid_width = 16
@@ -48,6 +49,10 @@ class GridWidget(QWidget):
         w = self.x*self.spacing + self.x*self.grid_width
         h = self.y*self.spacing + self.y*self.grid_width
         self.setFixedSize(QSize(w, h))
+        
+    def updatePrefabs(self, prefab, x, y):
+        for i, poly in enumerate(prefab):
+            prefab[i] = poly
 
     def changeSize(self, c, d):
         #c is change (whether adding or subtracting a row)
