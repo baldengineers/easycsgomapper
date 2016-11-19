@@ -3,6 +3,8 @@ import math
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+X,Y = 0,1
+
 class GridWidget(QWidget):
     def __init__(self, x, y, rband=True):
         super(GridWidget, self).__init__()
@@ -43,16 +45,21 @@ class GridWidget(QWidget):
             x += self.spacing*x/self.grid_width
             for y in range(0, self.y*self.grid_width, self.grid_width):
                 y += self.spacing*y/self.grid_width
-                self.grid_list.append(QRect(x, y, self.grid_width, self.grid_width))
+                self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
                 qp.drawRect(self.grid_list[-1])
 
         w = self.x*self.spacing + self.x*self.grid_width
         h = self.y*self.spacing + self.y*self.grid_width
         self.setFixedSize(QSize(w, h))
         
-    def updatePrefabs(self, prefab, x, y):
-        for i, poly in enumerate(prefab):
-            prefab[i] = poly
+        ##Draw the Prefabs
+        
+        for prefab in draw_list:
+            QPolygon([QPoint(prefab[X]*(self.spacing+self.grid_width) + prefab[2][p][X], prefab[Y]*(self.spacing+self.grid_width) + prefab[2][p][X])])
+            
+    def updatePrefabs(self, x, y, prefab):
+        #prefab is a list of the points in its icon
+        self.draw_list.append([x, y, prefab])
 
     def changeSize(self, c, d):
         #c is change (whether adding or subtracting a row)
@@ -94,6 +101,12 @@ class GridWidget(QWidget):
             if self.rband:
                 print(QRect(self.origin, e.pos()))
                 self.rubberBand.hide()
+                
+class GridSquare(QRect):
+    def __init__(self, x, y, w, h):
+        super(GridSquare, self).__init__(x, y, w, h)
+        self.x = x
+        self.y = y
         
 class GridWidgetContainer(QWidget):
     def __init__(self, grid_widget):
