@@ -12,35 +12,34 @@ import math
 import numpy as np
 import subprocess
 import geo
+import pf
 from GridWidget import CreatePrefabGridWidget
 from cpp_exe.vmfScript import *
 from PySide.QtCore import *
 from PySide.QtGui import *
 import os
+import pickle
 
 class Create():
     def __init__(self, show=True):
         if show:
             self.dialog = QDialog()
+            self.dialog.accepted.connect(self.accept)
 
             self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
             self.textLineEdit = QLineEdit()
+            self.textLineEdit.textChanged.connect(self.check_accept)
             self.nameLineEdit = QLineEdit()
+            self.nameLineEdit.textChanged.connect(self.check_accept)
             
             self.vmfLineEdit = QLineEdit()
-            self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.update_draw_list(self.create_prefab(self.vmfLineEdit.text())))
+            self.vmfLineEdit.textChanged.connect(self.check_accept)
+            self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.updateDrawList(self.create_prefab(self.vmfLineEdit.text())))
             self.vmfBrowse = QPushButton("Browse",self.dialog)
             self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
             self.vmfLayout = QHBoxLayout()
             self.vmfLayout.addWidget(self.vmfLineEdit)
             self.vmfLayout.addWidget(self.vmfBrowse)
-            
-            self.iconLineEdit = QLineEdit()
-            self.iconBrowse = QPushButton("Browse",self.dialog)
-            self.iconBrowse.clicked.connect(lambda: self.iconLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .jpg File", "/","*.jpg")[0]))
-            self.iconLayout = QHBoxLayout()
-            self.iconLayout.addWidget(self.iconLineEdit)
-            self.iconLayout.addWidget(self.iconBrowse)
 
             self.expCheckBox = QCheckBox(self.dialog)
             self.sectionSelect = QComboBox()
@@ -67,7 +66,8 @@ class Create():
             self.color_btn.clicked.connect(self.change_color)
             self.color_dialog = QColorDialog(self.dialog)
             
-            self.icon_grid = CreatePrefabGridWidget(self.dialog)
+            self.icon_grid = CreatePrefabGridWidget(20, 20)
+            #self.icon_grid = CreatePrefabGridWidget(self.dialog)
             self.icon_grid.cur_color = QColor(Qt.white)
             self.icon_grid.setFocusPolicy(Qt.StrongFocus)
             self.icon_grid.setFocus()
@@ -83,8 +83,10 @@ class Create():
 
             self.okay_btn = QPushButton("Create Prefab", self.dialog)
             self.okay_btn.clicked.connect(self.dialog.accept)
+            self.okay_btn.setEnabled(False)
             self.preview_btn = QPushButton("Preview", self.dialog)
             self.preview_btn.clicked.connect(self.preview)
+            self.preview_btn.setEnabled(False)
             self.cancel_btn = QPushButton("Cancel", self.dialog)
             self.cancel_btn.clicked.connect(self.dialog.reject)
             self.btn_layout = QHBoxLayout()
@@ -101,7 +103,6 @@ class Create():
             self.form.addRow("Prefab Text:", self.textLineEdit)
             self.form.addRow("Prefab Name:", self.nameLineEdit)
             self.form.addRow("VMF file (.vmf):", self.vmfLayout)
-            self.form.addRow("Icon (.jpg):", self.iconLayout)
             self.form.addRow("Export prefab?", self.expCheckBox)
             self.form.addRow("Which section?",self.sectionSelect)
             self.form.addRow("Which game?", self.radioLayout)
@@ -110,7 +111,7 @@ class Create():
 ##                self.form.addRow(self.blankstring)
             self.form.addRow(self.btn_layout)
 
-            self.dialog.accepted.connect(lambda: self.create_prefab(self.vmfLineEdit.text(), self.nameLineEdit.text(), self.textLineEdit.text(), self.iconLineEdit.text(), self.expCheckBox.isChecked(), self.radioTF2.isChecked()))
+            #self.dialog.accepted.connect(lambda: self.create_prefab(self.vmfLineEdit.text(), self.nameLineEdit.text(), self.textLineEdit.text(), self.iconLineEdit.text(), self.expCheckBox.isChecked(), self.radioTF2.isChecked()))
             
             #self.dialog.setGeometry(150,150,400,300)
             self.dialog.setWindowTitle("Create Prefab")
@@ -134,6 +135,108 @@ class Create():
         self.color_btn.setStyleSheet("background-color: %s" % color.name())
         self.icon_grid.cur_color = color
 
+    def check_accept(self):
+        #checks if the dialog should be accepted
+        if self.vmfLineEdit.displayText() !=  '' and self.textLineEdit.displayText() != '' and self.nameLineEdit.displayText() != '':
+            self.okay_btn.setEnabled(True)
+        else:
+            self.okay_btn.setEnabled(False)
+
+        #check if you can preview prefab
+        if self.vmfLineEdit.displayText() !=  '':
+            self.preview_btn.setEnabled(True)
+        else:
+            self.preview_btn.setEnabled(False)
+
+    def accept(self):
+##        var_string = ""
+##        var_list = []
+##        vmf_string = ""
+##        for i in self.var_list:
+##            var_string += "\t"+i+"\n"
+##        for n in range(self.var_num):
+##            var_list.append("[x%d, y%d, z%d]" % (n, n, n))
+##        var_list = "[" + ",".join(var_list) + "]"
+##        for l in self.vmf_data:
+##            vmf_string += l
+##                
+##        #self.template is the outline of the prefab.py file
+##        self.template = """from pf import evaluate, get_normal, rotatePoint
+##def create(posx, posy, scale, rotation):
+##{var_string}
+##    var_list = {var_list}
+##    vmf_template = \"\"\"
+##    {vmf_string}\"\"\"
+##    X,Y,Z = 0,1,2
+##    for i in range(len(var_list)):
+##        vmf_template.replace("x%d y%d z%d" % (i, i, i), "%d %d %d" % (var_list[i][X], var_list[i][Y], var_list[i][Z]))
+##    axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
+##    negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
+##    for normal_num in range(0,var_count,3):
+##        normal_list=[]
+##        for i in range(3):
+##            normal_list.append([])
+##            for var in [X, Y, Z]:
+##                normal_list[i].append(var_list[normal_num+i][var])
+##        response = evalutate(get_normal(normal_list))
+##        if response == "x":
+##            uaxis = axislist[1]
+##        else:
+##            uaxis = axislist[0]
+##        if response == "z":
+##            vaxis = negaxislist[1]
+##        else:
+##            vaxis = negaxislist[2]
+##        vmf_template = vmf_template.replace('AXIS_REPLACE_U',uaxis,1)
+##        vmf_template = vmf_template.replace('AXIS_REPLACE_V',vaxis,1)
+##""".format(var_string=var_string,var_list=var_list,vmf_string=vmf_string)
+##
+##        name = self.nameLineEdit.text().replace(" ", "_")
+##        with open("tf2/prefabs/" + name + ".py", "w") as f:
+##            f.write(self.template)
+##        file = open("tf2/icons/" + name + ".ezm", "wb")
+##        pickle.dump(self.draw_list, open("tf2/icons/" + name + ".ezm", "wb"))
+##        pickle.dump(self.icon_grid.polys_color, open("tf2/icons/" + name + ".ezm", "wb"))
+##
+##        x = pickle.load(open("tf2/icons/" + name + ".ezm", "rb"))
+##        print("draw_list from save file: ", x)
+##        print("load again")
+##        y = pickle.load(open("tf2/icons/" + name + ".ezm", "rb"))
+##        print("color list from save file: ", y)
+
+        prefab = pf.Prefab(self.textLineEdit.text(), self.sectionSelect.currentText(), self.p_vals_list, self.vmf_data, self.draw_list, self.icon_grid.polys_color)
+
+        fname = "tf2/prefabs.dat"
+        if os.path.isfile(fname):
+            with open("tf2/prefabs.dat", "rb") as f:
+                l = pickle.load(f)
+                l[0].__class__ = pf.Prefab
+                print(l[0].lolol)
+        else:
+            l = []
+        l.append(prefab)
+        with open("tf2/prefabs.dat", "wb") as f:
+            pickle.dump(l, f)
+        
+        restart_btn = QPushButton("Restart")
+        later_btn = QPushButton("Later")
+        choice = QMessageBox(self.dialog)
+        choice.setIcon(QMessageBox.Question)
+        choice.setWindowTitle("Prefab Successfully Created")
+        choice.setText("Program must be restarted for changes to take effect.")
+        choice.setInformativeText("Restart? You will lose any unsaved progress.")
+        choice.addButton(restart_btn, QMessageBox.YesRole)
+        choice.addButton(later_btn, QMessageBox.NoRole)
+        choice.setDefaultButton(later_btn)
+        #exe name change
+        if choice.exec_() == 0:
+
+            if os.path.isfile('./EasyEasyTF2Mapper.exe'):
+                subprocess.Popen('EasyTF2Mapper.exe')
+            else:
+                subprocess.Popen('python main.py')
+            sys.exit()
+
     def create_prefab(self, vmf_file, prefab_name='', prefab_text='', prefab_icon='', workshop_export='', is_tf2=''):
         #begin creating prefab
         #vmf_file | string | contains the filepath of the vmf file of the prefab
@@ -142,91 +245,10 @@ class Create():
         #prefab_icon | string | is the filepath of the icon of the prefab as it will appear in the main application window
         #workshop_export | boolean | that determines whether the prefab will be zipped for export to the workshop
         self.ent_name_list = [] #list containing all targetnames
-        self.var_list = [] #self.var_list contains all the variables needed to be written to the prefab.py file
+        self.p_vals_list = [] #self.p_vals_list contains all the point values
         self.draw_list = [] #self.draw_list contains the points of the planes to draw when placing tile on gridWidget
         self.c_dict = {} #self.c_dict (coordinate dict.) is a dictionary of the x, y, and z's so you can reference them later. ex: {x1 : 512, y1 : -512, z1: 192}
         self.var_num = 0 #self.var_num is the number that appears after the variable. ex. (x1 y1 z1) (x2 y2 z2) (x3 y3 z3)
-        self.compile_list = [ #self.compilelist is the outline of the prefab.py file
-        """import os
-import math
-def rotatePoint(centerPoint,point,angle):
-    angle = math.radians(angle)
-    temp_point = point[0]-centerPoint[0] , point[1]-centerPoint[1]
-    temp_point = ( temp_point[0]*math.cos(angle)-temp_point[1]*math.sin(angle) , temp_point[0]*math.sin(angle)+temp_point[1]*math.cos(angle))
-    temp_point = temp_point[0]+centerPoint[0] , temp_point[1]+centerPoint[1]
-    return temp_point
-def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, rotation, level):
-
-    looplist = '1'
-    values=[]#Values are all of the lines of a prefab that have the vertex coords
-""",
-
-  "#INSERT_OPEN_FILE\n",
-
-  """
-    lines = f.readlines() #gathers each line of the prefab and puts numbers them
-""",
-
-  "#INSERT_PY_LIST\n",
-
-  "#INSERT_VAR_COUNT\n",
-
-  """
-    values = "".join(lines)#converting list to string
-    ogvalues = "".join(lines)
-    normal_list,axislist,negaxislist,vaxis,uaxis=[],['1 0 0 1','0 1 0 1','0 0 1 1'],['-1 0 0 1','0 -1 0 1','0 0 -1 1'],0,0
-    def evaluate(coords):
-        dist_x,dist_y,dist_z = abs(coords[0]),abs(coords[1]),abs(coords[2]),
-        if dist_x >= dist_y and dist_x >= dist_z:
-            return axislist[0]
-        if dist_y >= dist_z:
-            return axislist[1]
-        return axislist[2]
-    def get_normal(coord_list):
-        vector_a = (coord_list[1][0]-coord_list[0][0],coord_list[1][1]-coord_list[0][1],coord_list[1][2]-coord_list[0][2])
-        vector_b = (coord_list[2][0]-coord_list[0][0],coord_list[2][1]-coord_list[0][1],coord_list[2][2]-coord_list[0][2])
-
-        normal = (vector_a[1]*vector_b[2]-vector_a[2]*vector_b[1],vector_a[2]*vector_b[0]-vector_a[0]*vector_b[2],vector_a[0]*vector_b[1]-vector_a[1]*vector_b[0])
-        return normal
-
-    for normal_num in range(1,var_count+1,3):
-        normal_list=[]
-        for i in range(3):
-            normal_list.append([])
-            for var in ["x", "y", "z"]:
-                normal_list[i].append(eval(var+str(normal_num+i)))
-        coords = get_normal(normal_list)
-        response = evaluate(coords)
-        if response == axislist[0]:
-            uaxis = axislist[1]
-        else:
-            uaxis = axislist[0]
-        if response == axislist[2]:
-            vaxis = negaxislist[1]
-        else:
-            vaxis = negaxislist[2]
-        values = values.replace('AXIS_REPLACE_U',uaxis,1)
-        values = values.replace('AXIS_REPLACE_V',vaxis,1)
-
-    for i in range(ogvalues.count("world_idnum")):
-        values = values.replace('world_idnum', str(world_id_num), 1)
-        world_id_num += 1
-
-    for var in ["x", "y", "z"]:
-        for count in range(1,var_count+1):
-            string = var + str(count)
-            string_var = str(eval(var + str(count)))
-            if var == "z":
-                values = values.replace(string + ")",string_var + ")") #we need to do this or else it will mess up on 2 digit numbers
-            else:
-                values = values.replace(string + " ",string_var + " ")
-    for i in range(ogvalues.count('id_num')):
-        values = values.replace('id_num', str(id_num), 1)
-        id_num = id_num+1
-        """,
-
-        "#INSERT_ENT_CODE\n",]
-
         #here is entity code, feel free to change. only added to get the new entity rotation code in.        
         ent_code =["#INSERT_ENT_OPEN_FILE\n",
 
@@ -441,6 +463,7 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 ##        for i in self.vmf_data:
 ##            print(i)
 ##        print("var_list: ",self.var_list)
+        #organizes planes based on z value
         self.draw_list = sorted(self.draw_list, key=lambda p: max(p[i][2] for i in range(len(p)))) #p[0][2] is the z_val
         print("draw_list: ",self.draw_list)
 
@@ -468,10 +491,11 @@ def createTile(posx, posy, id_num, world_id_num, entity_num, placeholder_list, r
 
         X,Y,Z = 0,1,2 #Constants to make managing the indices of p_val[] easier
             
-        self.var_list.append("xy%d = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+%d, posy*-1*scale+%d), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, p_val[X], p_val[Y]))
-        for var in ["x","y"]:
-            self.var_list.append("%s%d = xy%d[%s]" % (var, self.var_num, self.var_num, 0 if var == "x" else 1))
-        self.var_list.append("z%d = %d" % (self.var_num, p_val[Z]))
+##        self.var_list.append("xy%d = int(self.rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+%d, posy*-1*scale+%d), (360 if rotation!=0 else 0)-90*rotation))" % (self.var_num, p_val[X], p_val[Y]))
+##        for var in ["x","y"]:
+##            self.var_list.append("%s%d = xy%d[%s]" % (var, self.var_num, self.var_num, 0 if var == "x" else 1))
+##        self.var_list.append("z%d = %d" % (self.var_num, p_val[Z]))
+        self.p_vals_list.append(p_val)
 
         for index in range(index,len(self.vmf_data)):
             line_sep = self.separate("Q",self.vmf_data[index])

@@ -2,7 +2,7 @@
 This contains new algorithms for new and improved prefab system.
 """
 from pf import evaluate, get_normal, rotatePoint
-def create(posx, posy, id_num, world_id_num, scale, rotation):
+def create(posx, posy, scale, rotation):
     xy0 = int(rotatePoint((posx*scale+scale/2,posy*-1*scale-scale/2), (posx*scale+0, posy*-1*scale+0), (360 if rotation!=0 else 0)-90*rotation))
     x0 = xy0[0]
     y0 = xy0[1]
@@ -145,15 +145,6 @@ entity
     X,Y,Z = 0,1,2
     for i in range(len(var_list)):
         vmf_template.replace("x%d y%d z%d" % (i, i, i), "%d %d %d" % (var_list[i][X], var_list[i][Y], var_list[i][Z]))
-##    for i in range(vmf_template.count("world_id_num")):
-##        vmf_template.replace("world_id_num", world_id_num, 1)
-##        world_id_num += 1
-##    for i in range(vmf_template.count("id_num")):
-##        vmf_template.replace("id_num", id_num, 1)
-##        id_num += 1
-	#
-	#move id_num calculations into export.py!!!!!! and out of prefab files
-	#ALRIGHTY!!!
     axislist = ['1 0 0 1','0 1 0 1','0 0 1 1']
     negaxislist = ['-1 0 0 1','0 -1 0 1','0 0 -1 1']
     for normal_num in range(0,var_count,3):
@@ -171,5 +162,5 @@ entity
             vaxis = negaxislist[1]
         else:
             vaxis = negaxislist[2]
-        vmf_template.replace('AXIS_REPLACE_U',uaxis,1)
-        vmf_template.replace('AXIS_REPLACE_V',vaxis,1)
+        vmf_template = vmf_template.replace('AXIS_REPLACE_U',uaxis,1)
+        vmf_template = vmf_template.replace('AXIS_REPLACE_V',vaxis,1)

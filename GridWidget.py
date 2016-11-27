@@ -1,281 +1,275 @@
 import sys
+import math
 from PySide.QtCore import *
 from PySide.QtGui import *
-import main
-X,Y,Z = 0,1,2
 
-#CURRENTLY, each grid line represents 32 hammer units
+X,Y = 0,1
 
 class GridWidget(QWidget):
-    def __init__(self, parent=None, spacing=25, rband=True):
-        super(GridWidget, self).__init__(parent)
+    def __init__(self, x, y, rband=True):
+        super(GridWidget, self).__init__()
+        self.x = x
+        self.y = y
         self.draw_list = []
-        self.mouse_pos = None
-        self.no_draw = 1 #when zoomed out, use no draw to stop drawing unnecessary lines
-        self.no_draw_max = 16 #point at which no_draw starts to take effect
-        self.pList = [] #intersection points of graph lines
         self.polys = []
         self.polys_color = []
-        self.scale_list = [64,128,256,512,1024]
-        self.scale = self.scale_list[0]
-        self.scrollspeed = 2
-        self.setCursor(Qt.CrossCursor)
-        self.setMouseTracking(True)
-        self.spacing = spacing
-        self.translate = [0,0]
-        self.translate_origin = QPoint()
-        #self.translatespeed = self.scrollspeed * 10
+        #self.startX = 0
+        #self.startY = 0
+        #self.setMouseTracking(True)
+        self.scale = 64
+        self.spacing = 2
+        self.grid_width = 16
+        self.grid_list = []
         #vars for rubber band
         self.rband = rband #if rubberband is enabled
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
 
-    def wheelEvent(self, e):
-        self.changeSpacing(e.delta()/(20*self.scrollspeed)) #replace with scrollspeed constant
-        self.repaint()
+##    def sizeHint(self):
+##        w = self.x*self.spacing + self.x*self.grid_width
+##        h = self.y*self.spacing + self.y*self.grid_width
+##        return QSize(w,h)
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Equal:
-            #self.changeSpacing(self.scrollspeed)
-            self.changeScale(1)
-        elif e.key() == Qt.Key_Minus:
-            #self.changeSpacing(-self.scrollspeed)
-            self.changeScale(-1)
-        elif e.key() == Qt.Key_Space:
-            self.translate = [0,0]
-        elif e.key() == Qt.Key_Down:
-            self.translate[Y] -= 1
-        elif e.key() == Qt.Key_Up:
-            self.translate[Y] += 1
-        elif e.key() == Qt.Key_Right:
-            self.translate[X] -= 1
-        elif e.key() == Qt.Key_Left:
-            self.translate[X] += 1
-
-        self.repaint()
-
-    def mousePressEvent(self, e):
-        if e.button() == Qt.RightButton:
-            if self.rband:
-                self.origin = self.closestP(e.pos())
-                self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-                self.rubberBand.show()
-        elif e.button() == Qt.LeftButton:
-            #self.parent.cur_icon
-            pass
-        elif e.button() == Qt.MidButton:
-            self.translate_origin = self.closestP(e.pos()) / self.spacing
-        
-        self.mousePressCustom(e)
-    
-    def mousePressCustom(self, e):
-        pass
-    
-    def mouseMoveEvent(self, e):
-        self.mouse_pos = e.pos()
-        if self.rband:
-            if not self.origin.isNull():
-                self.rubberBand.setGeometry(QRect(self.origin, self.closestP(e.pos())).normalized())
-        if not self.translate_origin.isNull():
-            pos = self.closestP(e.pos()) / self.spacing
-            self.translate[X] -= self.translate_origin.x() - pos.x()
-            self.translate[Y] -= self.translate_origin.y() - pos.y()
-            self.translate_origin = self.closestP(e.pos()) / self.spacing
-            self.repaint()
-        
-        self.mouseMoveCustom(e)
-
-    def mouseMoveCustom(self, e):
-        #custom reimplementation without disrupting original function
-        pass
-    
-    def mouseReleaseEvent(self, e):
-        if e.button() == Qt.LeftButton:
-            pass   
-        #rubber band
-        elif e.button() == Qt.RightButton:
-            if self.rband:
-                print(QRect(self.origin, self.closestP(e.pos())))
-                self.rubberBand.hide()
-        elif e.button() == Qt.MidButton:
-            self.translate_origin = QPoint()
-        
     def paintEvent(self, e):
         qp = QPainter()
         qp.begin(self)
         self.draw(qp)
-        self.update_icon(qp)
         qp.end()
 
     def draw(self, qp):
-        size = self.size()
-        w = size.width()
-        h = size.height()
-
-        #draw the grid
-        pen = QPen(Qt.lightGray, 1)
-        qp.setPen(pen)
-
-        if self.spacing < self.no_draw_max:
-            self.no_draw = int(round(self.no_draw_max/self.spacing)) + 1
-        else:
-            self.no_draw = 1
-
-##        print('spacing',self.spacing)
-##        print(self.no_draw)
-
-        coords = [[],[]]
-        #might not need self.no_draw below
-        start = [t*self.spacing*self.no_draw for t in self.translate]
+##        size = self.size()
+##        w = size.width()
+##        h = size.height()
         
-        for x in range(start[X], w, self.scale):
-            line = QLineF(x,0.0,x,h)
-            qp.drawLine(line)
-            coords[X].append(x)
+        qp.setPen(QColor(0, 0, 0, 0))
+        qp.setBrush(QColor(200, 200, 200, 200))
+        
+        for x in range(self.spacing, self.x*self.grid_width, self.grid_width):
+            x += self.spacing*x/self.grid_width
+            for y in range(self.spacing, self.y*self.grid_width, self.grid_width):
+                y += self.spacing*y/self.grid_width
+                self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
+                qp.drawRect(self.grid_list[-1])
 
-        for y in range(start[Y], h, int(self.spacing*self.no_draw)):
-            line = QLineF(0.0,y,w,y)
-            qp.drawLine(line)
-            coords[Y].append(y)
-
-        self.pList = []
-        for x in coords[X]:
-            for y in coords[Y]:
-                self.pList.append(QPoint(x,y))
-
-    def update_icon(self, qp):
-        #creates the polygons in poly list on the grid so user can color their prefab icon
-        pen = QPen(Qt.black, 3)
-        qp.setPen(pen)
-  
+        w = self.x*self.spacing + self.x*self.grid_width
+        h = self.y*self.spacing + self.y*self.grid_width
+        self.setFixedSize(QSize(w, h))
+        
+        ##Draw the Prefabs
+        qp.setPen(QColor(255, 0, 0, 255))
         self.polys = []
-        for poly in self.draw_list:
-            points = []
-            for p in poly:
-                points.append([c/self.scale*self.spacing for c in p])
-            self.polys.append(QPolygon([QPoint(points[p][X]+self.translate[X]*self.spacing, points[p][Y]+self.translate[Y]*self.spacing) for p in range(len(points))]))
-
+        for prefab in self.draw_list:
+            for poly in prefab[2]:
+                points = []
+                for p in poly:
+                    points.append([c/self.scale*(self.spacing+self.grid_width) for c in p])
+                self.polys.append(QPolygon([QPoint(prefab[X]*(self.spacing+self.grid_width) + points[p][X], prefab[Y]*(self.spacing+self.grid_width) + points[p][Y]) for p in range(len(points))]))
         for i, p in enumerate(self.polys):
             qp.setBrush(QBrush(self.polys_color[i]))
             qp.drawPolygon(p)
             
-    def changeScale(self, change):
-        if self.scale != self.scale_list[0] and self.scale != self.scale_list[-1]:
-            index = self.scale_list.index(self.scale)
-            self.scale = self.scale_list[index + change]
-            self.repaint()
+    def appendPrefabs(self, x, y, prefab):
+        #prefab is a list of the points in its icon
+        self.draw_list.append([x, y, prefab])
 
-    def changeSpacing(self, spacing):
-        if self.spacing + spacing > 0:
-            self.spacing += spacing
-        else:
-            self.spacing = 1        
-        w = self.size().width()
-        h = self.size().height()
-        midpoint = QPoint(w/2,h/2)
-        translate = midpoint - self.mouse_pos
-        self.translate[X] += translate.x()
-        self.translate[Y] += translate.y()
-        
-    def closestP(self, pos):
-        #finds the closest point to the mouse cursor/QPoint (pos)
-        dist = []
-        for p in self.pList:
-            dist.append([abs(pos.x() - p.x()),abs(pos.y() - p.y())])
-        xy = min(d for d in dist)
-        return self.pList[dist.index(xy)]
+##    def updateDrawList(self, draw_list):
+##        self.draw_list = draw_list
+##        self.polys_color = [None for i in draw_list]
+##        self.repaint()
 
-class MainGridWidget(GridWidget):
-    #This is the grid for the main program, where you place the prefabs
-    def __init__(self, parent=None, spacing=25, rband=True):
-        #spacing controls how spaced out the lines are
-        super(MainGridWidget, self).__init__(parent, spacing, rband)
-        #testing purposes
-        self.cur_icon = [[[512, 512, 64], [512, 448, 64], [0, 448, 64], [0, 512, 64]], [[64, 448, 64], [64, 0, 64], [0, 0, 64], [0, 448, 64]], [[512, 448, 64], [512, 0, 64], [448, 0, 64], [448, 448, 64]], [[960, 64, 64], [960, 0, 64], [512, 0, 64], [512, 64, 64]], [[960, 512, 64], [960, 448, 64], [512, 448, 64], [512, 512, 64]], [[960, 960, 64], [960, 512, 64], [896, 512, 64], [896, 960, 64]], [[448, 960, 64], [448, 896, 64], [0, 896, 64], [0, 960, 64]], [[512, 960, 64], [512, 512, 64], [448, 512, 64], [448, 960, 64]]]
-        self.cur_icon_color = [None for i in self.cur_icon]
-        #self.cur_icon = None
-        #self.cur_icon_color = None
-        self.prefabs = [] #contains list of the prefabs in the grid, contains [icon,coordinate index for the point it is at(top left),moduleName(implement in main program)]
-        self.setAcceptDrops(True)
+    def changeSize(self, c, d):
+        #c is change (whether adding or subtracting a row)
+        #d is constant determining the direction of change
+        if d != DOWN and d != UP:
+            self.x += c
+            if d == LEFT or d == UP_LEFT or d == DOWN_LEFT:
+            #TODO: add something here that shifts all prefabs in grid over by 1 to the RIGHT
+                pass
+        if d != LEFT and d != RIGHT:
+            self.y += c
+            if d == DOWN or d == DOWN_RIGHT or d == DOWN_LEFT:
+            #Same TODO as above except shift by 1 DOWN
+                pass
+
+        self.repaint()
         
     def dragEnterEvent(self, e):
-        #http://www.pythonstudio.us/pyqt-programming/drag-and-drop.html
-        
         if e.mimeData().hasImage:
             e.setDropAction(Qt.CopyAction)
             e.accept()
         else:
             e.ignore()
 
-    def dragMoveEvent(self, e):
-        pass
-    
-    def dropEvent(self, e):
-        #e.mimeData().imageData
-        #multiply the image size by 32/self.spacing
-##        for p in self.pList:
-##            if e.pos().x() < p.x() and e.pos().y() < p.y():
-##                coor_ind = self.pList.index(QPoint(p.x() - self.spacing, p.y() - self.spacing))                                                                                                                                                                                                                                                                                                                                                       
-##                break
+    def mousePressEvent(self, e):
+        if e.button() == Qt.RightButton:
+            if self.rband:
+                self.origin = e.pos()
+                self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+                self.rubberBand.show()
 
-##        self.prefabs.append([e.mimeData().imageData(), coor])
-##        print(e.mimeData().imageData())
-        pass
+    def mouseMoveEvent(self, e):
+        if self.rband:
+            if not self.origin.isNull():
+                self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
 
-    def mousePressCustom(self, e):
-        if e.button() == Qt.LeftButton:
-            pos = self.closestP(e.pos()) / self.spacing * self.scale
-            for poly in self.cur_icon:
-                print(self.translate)
-                translate = [int(t/self.spacing*self.scale) for t in self.translate]
-                self.draw_list.append([])
-                for p in poly:
-                    self.draw_list[-1].append([p[X] + translate[X] + pos.x(), p[Y] + translate[Y] + pos.y(), p[Z]])
-            for c in self.cur_icon_color:
-                self.polys_color.append(c)
-            self.repaint()
-        
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.RightButton:
+            if self.rband:
+                print(QRect(self.origin, e.pos()))
+                self.rubberBand.hide()
 
 class CreatePrefabGridWidget(GridWidget):
-    def __init__(self, parent=None, spacing=25, rband=False):
-        super(CreatePrefabGridWidget, self).__init__(parent, spacing, rband)
-        #self.draw_list = [[[512, 512, 64], [512, 448, 64], [0, 448, 64], [0, 512, 64]], [[64, 448, 64], [64, 0, 64], [0, 0, 64], [0, 448, 64]], [[512, 448, 64], [512, 0, 64], [448, 0, 64], [448, 448, 64]], [[960, 64, 64], [960, 0, 64], [512, 0, 64], [512, 64, 64]], [[960, 512, 64], [960, 448, 64], [512, 448, 64], [512, 512, 64]], [[960, 960, 64], [960, 512, 64], [896, 512, 64], [896, 960, 64]], [[448, 960, 64], [448, 896, 64], [0, 896, 64], [0, 960, 64]], [[512, 960, 64], [512, 512, 64], [448, 512, 64], [448, 960, 64]]]
-        w = 500
-        h = 350
-        self.sizeHint = lambda: QSize(w, h)
-        self.cur_poly = [None, None] #the current polygon mouse is hovering over, with its index in self.polys
-        self.cur_color = None
+    #in createPrefab, put a widget at the side to control the size of bounding box
+    def __init__(self, x, y, rband=False):
+        super(CreatePrefabGridWidget, self).__init__(x, y, rband)
+        self.cur_color = None #color as defined by the color picker in CreatePrefab
+        self.cur_poly = None #index of the current polygon mouse is hovering over
+        self.setMouseTracking(True)
         
-    def mousePressCustom(self, e):
-        if self.cur_poly[0]:
-            if self.cur_poly[0].containsPoint(e.pos(), Qt.OddEvenFill):
-                if e.button() == Qt.LeftButton:
-                    print(self.cur_color)
-                    self.polys_color[self.cur_poly[1]] = self.cur_color
-                elif e.button() == Qt.RightButton:
-                    self.polys_color[self.cur_poly[1]] = None
-                self.repaint()
-                
-    def mouseMoveCustom(self, e):
+    def mousePressEvent(self, e):
+        if self.cur_poly != None:
+            if e.button() == Qt.LeftButton:
+                self.polys_color[self.cur_poly] = self.cur_color
+            elif e.button() == Qt.RightButton:
+                self.polys_color[self.cur_poly] = None
+            self.repaint()
+
+    def mouseMoveEvent(self, e):
         for i, poly in enumerate(reversed(self.polys)):
             if poly.containsPoint(e.pos(), Qt.OddEvenFill):
-                self.cur_poly = [poly, len(self.polys) - 1 - i]
+                self.cur_poly = len(self.polys) - 1 - i
                 self.setCursor(Qt.PointingHandCursor)
                 return
-        self.cur_poly = [None, None]
-        self.setCursor(Qt.CrossCursor)
+        self.cur_poly = None
+        self.setCursor(Qt.ArrowCursor)
 
-    def update_draw_list(self, draw_list):
-        self.draw_list = draw_list
-        self.polys_color = [None for i in self.draw_list]
+    def updateDrawList(self, draw_list):
+        self.draw_list = [[0, 0, draw_list]]
+        self.polys_color = [None for i in draw_list]
         self.repaint()
+
+class GridSquare(QRect):
+    def __init__(self, x, y, w, h):
+        super(GridSquare, self).__init__(x, y, w, h)
+        self.x = x
+        self.y = y
+        
+class GridWidgetContainer(QWidget):
+    def __init__(self, grid_widget):
+        super(GridWidgetContainer, self).__init__()
+        #self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        arrow = QPixmap("icons/arrow.png") #initial image is facing up
+        arrows = []
+        self.inner = QGridLayout()
+        self.outer = QGridLayout()
+        locs = [(0,1),
+                (0,2),
+                (1,2),
+                (2,2),
+                (2,1),
+                (2,0),
+                (1,0),
+                (0,0)]
+        for rot in range(len(locs)):
+            transform = QTransform().rotate(45*rot)
+            icon = arrow.transformed(transform, Qt.SmoothTransformation)
+            arrows.append(ExpandButton(icon, rot, grid_widget))
+
+        for i, loc in enumerate(locs):
+            self.inner.addWidget(arrows[i], loc[0], loc[1])
+        self.inner.addWidget(grid_widget, 1, 1)
+
+        self.outer.addLayout(self.inner, 1, 1)
+        self.outer.setColumnStretch(0, 1)
+        self.outer.setColumnStretch(2, 1)
+        self.outer.setRowStretch(0, 1)
+        self.outer.setRowStretch(2, 1)
+
+        self.setLayout(self.outer)
+
+        
+UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT = 0, 1, 2, 3, 4, 5, 6, 7
+class ExpandButton(QPushButton):
+    def __init__(self, icon, num, grid_widget):
+        super(ExpandButton, self).__init__()
+        self.id = num
+        self.setIcon(QIcon(icon))
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.clicked.connect(lambda: grid_widget.changeSize(1, self.id))
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(lambda: grid_widget.changeSize(-1, self.id))
+##
+##    def mouseMoveEvent(self, e):
+##        if self.id == UP or self.id == UP_RIGHT or self.id == UP_LEFT:
+##            self.y = e.y()
+##        elif self.id == DOWN or self.id == DOWN_RIGHT or self.id == DOWN_LEFT:
+##            self.y = e.y()
+##
+##        if self.id == RIGHT or self.id == UP_RIGHT or self.id == DOWN_RIGHT:
+##            self.x = e.x()
+##        elif self.id == LEFT or self.id == UP_LEFT or self.id == DOWN_LEFT:
+##            self.x = e.x()
+
+##class DragArrow(QLabel):
+##    def __init__(self, rot, grid_widget):
+##        super(DragArrow, self).__init__()
+##        self.grid_widget = grid_widget
+##        self.start_drag = None
+##        self.drag_x = 0
+##        self.drag_y = 0
+##        self.orientation = rot
+##        if self.orientation == UP or self.orientation == DOWN:
+##            self.setCursor(Qt.SizeVerCursor)
+##        elif self.orientation == UP_RIGHT or self.orientation == DOWN_LEFT:
+##            self.setCursor(Qt.SizeBDiagCursor)
+##        elif self.orientation == RIGHT or self.orientation == LEFT:
+##            self.setCursor(Qt.SizeHorCursor)
+##        elif self.orientation == DOWN_RIGHT or self.orientation == UP_LEFT:
+##            self.setCursor(Qt.SizeFDiagCursor)
+##        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+##
+##    def mousePressEvent(self, e):
+##        self.start_drag = e.pos()
+##
+##    def mouseMoveEvent(self, e):
+##        if self.orientation == RIGHT or self.orientation == UP_RIGHT or self.orientation == DOWN_RIGHT:
+##            x_dir = 1
+##        elif self.orientation == LEFT or self.orientation == UP_LEFT or self.orientation == DOWN_LEFT:
+##            x_dir = -1
+##        else:
+##            x_dir = 0
+##        
+##        if self.orientation == UP or self.orientation == UP_RIGHT or self.orientation == UP_LEFT:
+##            y_dir = 1
+##        elif self.orientation == DOWN or self.orientation == DOWN_RIGHT or self.orientation == DOWN_LEFT:
+##            y_dir = -1
+##        else:
+##            y_dir = 0
+##            
+##        d = e.pos() - self.start_drag #difference btw two points
+##        qx = d.x() / (self.grid_widget.spacing + self.grid_widget.grid_width) #quotient btw d and one grid row
+##        qy = d.y() / (self.grid_widget.spacing + self.grid_widget.grid_width)
+##        if int(qx) != 0: #try math.round() instead of int here
+##            #print(self.drag_x)
+##            self.grid_widget.changeX(int(qx), x_dir)
+##            #self.drag_x = int(qx)
+##        if int(qy) != self.drag_y: #try math.round() instead of int here
+##            self.grid_widget.changeY(int(qy) - self.drag_y, y_dir)
+##            self.drag_y = int(qy)
+##
+##    def mouseReleaseEvent(self, e):
+##        self.drag_x = 0
+##        self.drag_y = 0
+##        self.start_drag = None
+        
 
 def main():
     app = QApplication(sys.argv)
-    grid = MainGridWidget()
-    grid.show()
+    grid = GridWidget(20,20)
+    container = GridWidgetContainer(grid)
+    container.show()
     sys.exit(app.exec_())
+    
 
 if __name__ == '__main__':
     main()
-        
