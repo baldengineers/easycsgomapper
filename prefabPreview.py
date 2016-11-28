@@ -11,6 +11,7 @@ class prefabInfo(QDialog):
         self.setGeometry( QRect(self.locationOrigin.x()+self.locationAdd.width()-50,
                                 self.locationOrigin.y()+self.locationAdd.height()-100,
                                 100,190))
+
         #define default values
         self.currentPrefab = ""
         self.textureList   = []
