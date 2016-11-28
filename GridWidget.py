@@ -265,6 +265,7 @@ class ExpandButton(QPushButton):
 
 def main():
     import pickle
+    import pf
     
     app = QApplication(sys.argv)
     grid = GridWidget(20,20)
@@ -280,7 +281,8 @@ def main():
         prefab_list = pickle.load(f)
 
     for p in prefab_list:
-        tab_dict[p.section].addItem(p.text)
+        prefab = pf.Prefab(p)
+        tab_dict[prefab.section].addItem(prefab.text)
 
     list_tab_widget = QTabWidget()
     list_tab_widget.addTab(tile_list1,'Geometry')

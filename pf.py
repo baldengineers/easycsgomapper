@@ -1,12 +1,12 @@
 #contains functions for prefab files
 class Prefab():
-    def __init__(self, text, section, p_vals_list, vmf_data, draw_list, color_list):
-        self.text = text
-        self.section = section
-        self.p_vals_list = p_vals_list
-        self.vmf_data = vmf_data
-        self.draw_list = draw_list
-        self.color_list = color_list
+    def __init__(self, p):
+        self.text = p[0]
+        self.section = p[1]
+        self.p_vals_list = p[2]
+        self.vmf_data = p[3]
+        self.draw_list = p[4]
+        self.color_list = p[5]
 
     def create(self, x, y, scale, rot):
         X,Y,Z = 0,1,2

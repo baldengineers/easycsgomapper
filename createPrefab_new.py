@@ -201,7 +201,7 @@ class Create():
 ##        y = pickle.load(open("tf2/icons/" + name + ".ezm", "rb"))
 ##        print("color list from save file: ", y)
 
-        prefab = pf.Prefab(self.textLineEdit.text(), self.sectionSelect.currentText(), self.p_vals_list, self.vmf_data, self.draw_list, self.icon_grid.polys_color)
+        prefab = [self.textLineEdit.text(), self.sectionSelect.currentText(), self.p_vals_list, self.vmf_data, self.draw_list, self.icon_grid.polys_color]
 
         fname = "tf2/prefabs.dat"
         if os.path.isfile(fname):
@@ -210,7 +210,7 @@ class Create():
         else:
             l = []
         l.append(prefab)
-        l = sorted(l, key=lambda p: p.section)
+        l = sorted(l, key=lambda p: p[1]) #p[1] is the section the prefab is in
         with open("tf2/prefabs.dat", "wb") as f:
             pickle.dump(l, f)
         

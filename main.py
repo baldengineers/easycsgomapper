@@ -31,6 +31,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 import importlib
 import createPrefab
+import pf
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import generateSkybox
@@ -590,6 +591,7 @@ class MainWindow(QMainWindow):
         self.list_tab_widget.addTab(self.tile_list2,'Map Layout')
         self.list_tab_widget.addTab(self.tile_list3,'Fun')
         self.list_tab_widget.currentChanged.connect(self.changeCurrentList)
+        
 
         print("len:", self.list_tab_widget.count())
         
@@ -657,11 +659,36 @@ class MainWindow(QMainWindow):
         self.row.addLayout(self.column)
 
         #TESTING
-        self.grid = GridWidget.GridWidget(self)
-        self.grid_dock = QDockWidget("Skybox List", self)
-
-        self.grid_dock.setWidget(self.grid)
+        self.prefab_list
+        
+        self.grid = GridWidget.GridWidget(20,20)
+        self.grid_container = GridWidget.GridWidgetContainer(self.grid)
+        self.grid_dock = QDockWidget("Grid", self)
+        self.grid_dock.setWidget(self.grid_container)
         self.grid_dock.setFloating(True)
+
+        self.tile_list1 = QListWidget()
+        self.tile_list2 = QListWidget()
+        self.tile_list3 = QListWidget()
+        self.tab_dict = {"Geometry":self.tile_list1, "Map Layout":self.tile_list2, "Fun/Other":self.tile_list3}
+
+        with open("tf2/prefabs.dat", "rb") as f:
+            l = pickle.load(f)
+
+        for p in l:
+            prefab = pf.Prefab(p)
+            self.prefab_list.append(prefab)
+            self.tab_dict[prefab.section].addItem(prefab.text)
+
+        self.list_tab_widget = QTabWidget()
+        self.list_tab_widget.addTab(self.tile_list1,'Geometry')
+        self.list_tab_widget.addTab(self.tile_list2,'Map Layout')
+        self.list_tab_widget.addTab(self.tile_list3,'Fun/Other')
+
+        prefab_dock = QDockWidget("Prefabs", self)
+        prefab_dock.setWidget(self.list_tab_widget)
+        prefab_dock.setFloating(True)
+        
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
         #END TESTING
