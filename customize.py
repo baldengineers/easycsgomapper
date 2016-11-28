@@ -6,7 +6,7 @@ class makeFileTree():
         self.path_list = path_list
         self.slashct = 0
 
-        #determine largest # of directories
+        #determine largest # of directories (1 too high because last one is file?)
         for path in path_list:
             if path.count("/") > self.slashct:
                 self.slashct = path.count("/")
@@ -15,10 +15,12 @@ class makeFileTree():
         #main dir is list containing number of subdirs
         # eg. if there's a system like ./a/ and ./b/
         #                  ./a/1/ and ./a/2/     ./b/1 and ./b/2/
-        # [ [#a [#1], [#2]], [#b [#1], [#2]] ]
+        # the list looks like[ [#a [#1], [#2]], [#b [#1], [#2]] ]
         #each "dir" or list can contain lists (subdirs) or strings (paths)
 
-        
+        #each dir's real name (eg. "materials/kkk_posters/") needs to be assigned
+        #to a set (tuple) of values corresponding to the dir's index in the list.
+        #this will be done via a dictionary
     
 
 def loadVMF(filepath):
