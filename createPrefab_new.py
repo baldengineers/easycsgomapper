@@ -29,8 +29,6 @@ class Create():
             self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
             self.textLineEdit = QLineEdit()
             self.textLineEdit.textChanged.connect(self.check_accept)
-            self.nameLineEdit = QLineEdit()
-            self.nameLineEdit.textChanged.connect(self.check_accept)
             
             self.vmfLineEdit = QLineEdit()
             self.vmfLineEdit.textChanged.connect(self.check_accept)
@@ -100,8 +98,7 @@ class Create():
             
             self.form = QFormLayout()
             self.form.addRow(self.buggyText)
-            self.form.addRow("Prefab Text:", self.textLineEdit)
-            self.form.addRow("Prefab Name:", self.nameLineEdit)
+            self.form.addRow("Prefab Name:", self.textLineEdit)
             self.form.addRow("VMF file (.vmf):", self.vmfLayout)
             self.form.addRow("Export prefab?", self.expCheckBox)
             self.form.addRow("Which section?",self.sectionSelect)
@@ -137,7 +134,7 @@ class Create():
 
     def check_accept(self):
         #checks if the dialog should be accepted
-        if self.vmfLineEdit.displayText() !=  '' and self.textLineEdit.displayText() != '' and self.nameLineEdit.displayText() != '':
+        if self.vmfLineEdit.displayText() !=  '' and self.textLineEdit.displayText() != '':
             self.okay_btn.setEnabled(True)
         else:
             self.okay_btn.setEnabled(False)
@@ -210,11 +207,10 @@ class Create():
         if os.path.isfile(fname):
             with open("tf2/prefabs.dat", "rb") as f:
                 l = pickle.load(f)
-                l[0].__class__ = pf.Prefab
-                print(l[0].lolol)
         else:
             l = []
         l.append(prefab)
+        l = sorted(l, key=lambda p: p.section)
         with open("tf2/prefabs.dat", "wb") as f:
             pickle.dump(l, f)
         

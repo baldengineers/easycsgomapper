@@ -264,10 +264,34 @@ class ExpandButton(QPushButton):
         
 
 def main():
+    import pickle
+    
     app = QApplication(sys.argv)
     grid = GridWidget(20,20)
     container = GridWidgetContainer(grid)
     container.show()
+
+    tile_list1 = QListWidget()
+    tile_list2 = QListWidget()
+    tile_list3 = QListWidget()
+    tab_dict = {"Geometry":tile_list1, "Map Layout":tile_list2, "Fun/Other":tile_list3}
+
+    with open("tf2/prefabs.dat", "rb") as f:
+        prefab_list = pickle.load(f)
+
+    for p in prefab_list:
+        tab_dict[p.section].addItem(p.text)
+
+    list_tab_widget = QTabWidget()
+    list_tab_widget.addTab(tile_list1,'Geometry')
+    list_tab_widget.addTab(tile_list2,'Map Layout')
+    list_tab_widget.addTab(tile_list3,'Fun/Other')
+
+    prefab_dock = QDockWidget("Prefabs")
+    prefab_dock.setWidget(list_tab_widget)
+    prefab_dock.setFloating(True)
+    prefab_dock.show()
+    
     sys.exit(app.exec_())
     
 
