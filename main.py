@@ -660,7 +660,6 @@ class MainWindow(QMainWindow):
 
         #TESTING
         from classes import PrefabItem, ListGroup
-        #self.prefab_list = []
         
         self.grid = GridWidget.GridWidget(20,20)
         self.grid_container = GridWidget.GridWidgetContainer(self.grid)
@@ -677,14 +676,13 @@ class MainWindow(QMainWindow):
         def set_cur_prefab(item):
             self.grid.cur_prefab = item.prefab
         for _, tile_list in self.tab_dict.items():
-            tile_list.currentItemChanged.connect(set_cur_prefab)
+            tile_list.itemClicked.connect(set_cur_prefab)
 
         with open("tf2/prefabs.dat", "rb") as f:
             l = pickle.load(f)
 
         for p in l:
             prefab = pf.Prefab(p)
-##            self.prefab_list.append(prefab)
             self.tab_dict[prefab.section].addItem(PrefabItem(prefab))
 
         self.list_tab_widget = QTabWidget()
