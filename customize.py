@@ -99,6 +99,7 @@ def loadVPKfiles(filepath):
     return temp_list
 
 #for testing
-mat_vpk = makeFileTree(loadVPKfiles("C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf/tf2_textures_dir.vpk"))
-mat_vpk.getOtherFilesInDirectory("materials/patterns/powerhouse")
+if __name__ == '__main__':
+    mat_vpk = makeFileTree(loadVPKfiles("C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf/tf2_textures_dir.vpk"))
+    mat_vpk.getOtherFilesInDirectory("materials/patterns/powerhouse")
 

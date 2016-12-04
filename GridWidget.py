@@ -10,7 +10,9 @@ class GridWidget(QWidget):
         super(GridWidget, self).__init__()
         self.x = x
         self.y = y
-        self.draw_list = []
+        self.draw_list = [] #draw_list contains list of icons and where to draw them
+        #self.prefab_list = [] #prefab_list contains the list of prefabs and where they are located
+        self.cur_prefab = None
         self.polys = []
         self.polys_color = []
         #self.startX = 0
@@ -106,6 +108,10 @@ class GridWidget(QWidget):
                 self.origin = e.pos()
                 self.rubberBand.setGeometry(QRect(self.origin, QSize()))
                 self.rubberBand.show()
+        elif e.button() == Qt.LeftButton:
+            p = self.closestP(e)
+            self.draw_list.append([p.x(), p.y(), self.cur_prefab.draw_list])
+            self.polys_color.append(self.cur_prefab.color_list)
 
     def mouseMoveEvent(self, e):
         if self.rband:
@@ -117,6 +123,12 @@ class GridWidget(QWidget):
             if self.rband:
                 print(QRect(self.origin, e.pos()))
                 self.rubberBand.hide()
+
+    def closestP(self, e):
+        e.pos()
+
+    def updatePrefab(self, prefab):
+        self.cur_prefab = prefab
 
 class CreatePrefabGridWidget(GridWidget):
     #in createPrefab, put a widget at the side to control the size of bounding box
