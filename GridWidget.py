@@ -6,6 +6,7 @@ from PySide.QtGui import *
 X,Y = 0,1
 
 class GridWidget(QWidget):
+    overlapped = Signal(bool)
     def __init__(self, x, y, rband=True):
         super(GridWidget, self).__init__()
         self.x = x
@@ -14,6 +15,8 @@ class GridWidget(QWidget):
         self.draw_list = [] #draw_list contains list of icons and where to draw them
         #self.prefab_list = [] #prefab_list contains the list of prefabs and where they are located
         self.cur_prefab = None
+        
+        self.overlapping = False #if prefabs are overlapping
         self.polys = []
         self.polys_color = []
         #self.startX = 0
@@ -45,7 +48,7 @@ class GridWidget(QWidget):
 ##        h = size.height()
         
         qp.setPen(QColor(0, 0, 0, 0))
-        qp.setBrush(QColor(200, 200, 200, 200))
+        qp.setBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 150, 150, 200))
         
         for x in range(self.spacing, self.x*self.grid_width, self.grid_width):
             x += self.spacing*x/self.grid_width
@@ -70,6 +73,23 @@ class GridWidget(QWidget):
                 self.polys.append(QPolygon([QPoint(prefab[X] + points[p][X], prefab[Y] + points[p][Y]) for p in range(len(points))]))
                 qp.setBrush(QBrush(self.polys_color[x][y]))
                 qp.drawPolygon(self.polys[-1])
+
+        for i1, poly1 in enumerate(self.polys):
+            for i2, poly2 in enumerate(self.polys):
+                if i1 != i2:
+                    if poly1.intersected(poly2):
+                        self.overlapping = True
+                        break
+                    elif self.overlapping:
+                        self.overlapping = False
+            if self.overlapping:
+                break
+
+        if self.overlapping:
+            self.overlapped.emit(True)
+        else:
+            self.overlapped.emit(False)
+            
 ##        for i in range(len(self.draw_list)):
 ##            for i, p in enumerate(self.polys):
 ##                qp.setBrush(QBrush(self.polys_color[i]))
@@ -152,9 +172,9 @@ class CreatePrefabGridWidget(GridWidget):
     def mousePressEvent(self, e):
         if self.cur_poly != None:
             if e.button() == Qt.LeftButton:
-                self.polys_color[self.cur_poly] = self.cur_color
+                self.polys_color[0][self.cur_poly] = self.cur_color #index is 0 because there is only one prefab
             elif e.button() == Qt.RightButton:
-                self.polys_color[self.cur_poly] = None
+                self.polys_color[0][self.cur_poly] = None
             self.repaint()
 
     def mouseMoveEvent(self, e):
@@ -168,10 +188,11 @@ class CreatePrefabGridWidget(GridWidget):
 
     def updateDrawList(self, draw_list):
         self.draw_list = [[0, 0, draw_list]]
-        self.polys_color = [None for i in draw_list]
+        self.polys_color = [[None for i in draw_list]]
         self.repaint()
 
 class GridSquare(QRect):
+    #this class is used to facilitate exporting maps
     def __init__(self, x, y, w, h):
         super(GridSquare, self).__init__(x, y, w, h)
         self.x = x
@@ -180,11 +201,15 @@ class GridSquare(QRect):
 class GridWidgetContainer(QWidget):
     def __init__(self, grid_widget):
         super(GridWidgetContainer, self).__init__()
-        #self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.grid_widget = grid_widget
         arrow = QPixmap("icons/arrow.png") #initial image is facing up
         arrows = []
         self.inner = QGridLayout()
+        self.entire = QVBoxLayout()
         self.outer = QGridLayout()
+        self.status = QStatusBar()
+        self.overlapLabel = QLabel("Prefabs are overlapping. Please move them so that they aren't.")
+        grid_widget.overlapped.connect(self.displayStatus)
         locs = [(0,1),
                 (0,2),
                 (1,2),
@@ -196,13 +221,16 @@ class GridWidgetContainer(QWidget):
         for rot in range(len(locs)):
             transform = QTransform().rotate(45*rot)
             icon = arrow.transformed(transform, Qt.SmoothTransformation)
-            arrows.append(ExpandButton(icon, rot, grid_widget))
+            arrows.append(ExpandButton(icon, rot, self.grid_widget))
 
         for i, loc in enumerate(locs):
-            self.inner.addWidget(arrows[i], loc[0], loc[1])
-        self.inner.addWidget(grid_widget, 1, 1)
+            self.inner.addWidget(arrows[i], loc[X], loc[Y])
+        self.inner.addWidget(self.grid_widget, 1, 1)
 
-        self.outer.addLayout(self.inner, 1, 1)
+        self.entire.addLayout(self.inner)
+        self.entire.addWidget(self.status)
+        
+        self.outer.addLayout(self.entire, 1, 1)
         self.outer.setColumnStretch(0, 1)
         self.outer.setColumnStretch(2, 1)
         self.outer.setRowStretch(0, 1)
@@ -210,6 +238,11 @@ class GridWidgetContainer(QWidget):
 
         self.setLayout(self.outer)
 
+    def displayStatus(self, overlapped):
+        if overlapped:
+            self.status.addPermanentWidget(self.overlapLabel)
+        else:
+            self.status.removeWidget(self.overlapLabel)
         
 UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT = 0, 1, 2, 3, 4, 5, 6, 7
 class ExpandButton(QPushButton):

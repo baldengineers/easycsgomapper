@@ -28,6 +28,7 @@ class CreateWizard(QWizard):
         super(CreateWizard, self).__init__(parent)
 
         self.setPage(self.InfoPage, PrefabInfo(self))
+        self.setPage(self.OptionsPage, PrefabOptions())
 
         self.setStartId(self.InfoPage)
         #self.setWizardStyle(self.ModernStyle)
@@ -577,6 +578,13 @@ class PrefabInfo(QWizardPage):
                 self.wizard().customButtonClicked.disconnect(self.preview)
             self.wizard().setOption(QWizard.HaveCustomButton1, False)
 
+    def isComplete(self):
+        if os.path.isfile(self.vmfLineEdit.text()):
+            return True and QWizardPage.isComplete(self)
+        else:
+            return False and QWizardPage.isComplete(self)
+        self.completeChanged.emit()
+
     def preview(self):
         loadVMF(self.vmfLineEdit.text())
         self.process = subprocess.Popen('cpp_exe/viewer.exe')
@@ -587,7 +595,7 @@ class PrefabInfo(QWizardPage):
         self.icon_grid.cur_color = color
 
     def nextId(self):
-        if custCheckBox.checked():
+        if self.custCheckBox.isChecked():
             return CreateWizard.OptionsPage
 
 class PrefabOptions(QWizardPage):
@@ -597,8 +605,8 @@ class PrefabOptions(QWizardPage):
         self.setSubTitle("Select <b>textures</b>, <b>models</b>, or <b>logic</b> that should have customization")
 
         self.tab = QTabWidget()
-        for tab in ["Textures", "Models", "Logic"]:
-            self.tab.addTab(widget, tab)
+##        for tab in ["Textures", "Models", "Logic"]:
+##            self.tab.addTab(widget, tab)
 
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)

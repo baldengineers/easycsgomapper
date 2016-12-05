@@ -11,10 +11,8 @@ class ListGroup():
     def __init__(self, group):
         #only allows one item to be selected at a time in the list widgets
         for l in group:
-            l.itemSelectionChanged.connect(lambda: self.deselect([i for i in group if i != l]))
+            l.itemClicked.connect(lambda: self.deselect([i for i in group if i != l]))
 
     def deselect(self, lists):
         for l in lists:
-            for i in range(l.count()):
-                item = l.item(i)
-                l.setItemSelected(item, False)
+            l.clearSelection()
