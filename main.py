@@ -659,7 +659,7 @@ class MainWindow(QMainWindow):
         self.row.addLayout(self.column)
 
         #TESTING
-        self.prefab_list
+        from classes import PrefabItem, ListGroup
         
         self.grid = GridWidget.GridWidget(20,20)
         self.grid_container = GridWidget.GridWidgetContainer(self.grid)
@@ -670,20 +670,25 @@ class MainWindow(QMainWindow):
         self.tile_list1 = QListWidget()
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
+        #add items to self.tab_dict and everything will update
         self.tab_dict = {"Geometry":self.tile_list1, "Map Layout":self.tile_list2, "Fun/Other":self.tile_list3}
+        self.list_group = ListGroup([l for _, l in self.tab_dict.items()])
+        def set_cur_prefab(item):
+            self.grid.cur_prefab = item.prefab
+        for _, tile_list in self.tab_dict.items():
+            tile_list.itemClicked.connect(set_cur_prefab)
 
         with open("tf2/prefabs.dat", "rb") as f:
             l = pickle.load(f)
 
         for p in l:
             prefab = pf.Prefab(p)
-            self.prefab_list.append(prefab)
-            self.tab_dict[prefab.section].addItem(prefab.text)
+            self.tab_dict[prefab.section].addItem(PrefabItem(prefab))
 
         self.list_tab_widget = QTabWidget()
-        self.list_tab_widget.addTab(self.tile_list1,'Geometry')
-        self.list_tab_widget.addTab(self.tile_list2,'Map Layout')
-        self.list_tab_widget.addTab(self.tile_list3,'Fun/Other')
+        self.list_tab_widget.addTab(self.tab_dict['Geometry'],'Geometry')
+        self.list_tab_widget.addTab(self.tab_dict['Map Layout'],'Map Layout')
+        self.list_tab_widget.addTab(self.tab_dict['Fun/Other'],'Fun/Other')
 
         prefab_dock = QDockWidget("Prefabs", self)
         prefab_dock.setWidget(self.list_tab_widget)

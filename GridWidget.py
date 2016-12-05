@@ -10,7 +10,10 @@ class GridWidget(QWidget):
         super(GridWidget, self).__init__()
         self.x = x
         self.y = y
-        self.draw_list = []
+        self.p_list = []
+        self.draw_list = [] #draw_list contains list of icons and where to draw them
+        #self.prefab_list = [] #prefab_list contains the list of prefabs and where they are located
+        self.cur_prefab = None
         self.polys = []
         self.polys_color = []
         #self.startX = 0
@@ -49,6 +52,7 @@ class GridWidget(QWidget):
             for y in range(self.spacing, self.y*self.grid_width, self.grid_width):
                 y += self.spacing*y/self.grid_width
                 self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
+                self.p_list.append(QPoint(x,y))
                 qp.drawRect(self.grid_list[-1])
 
         w = self.x*self.spacing + self.x*self.grid_width
@@ -58,19 +62,22 @@ class GridWidget(QWidget):
         ##Draw the Prefabs
         qp.setPen(QColor(255, 0, 0, 255))
         self.polys = []
-        for prefab in self.draw_list:
-            for poly in prefab[2]:
+        for x, prefab in enumerate(self.draw_list):
+            for y, poly in enumerate(prefab[2]):
                 points = []
                 for p in poly:
-                    points.append([c/self.scale*(self.spacing+self.grid_width) for c in p])
-                self.polys.append(QPolygon([QPoint(prefab[X]*(self.spacing+self.grid_width) + points[p][X], prefab[Y]*(self.spacing+self.grid_width) + points[p][Y]) for p in range(len(points))]))
-        for i, p in enumerate(self.polys):
-            qp.setBrush(QBrush(self.polys_color[i]))
-            qp.drawPolygon(p)
+                    points.append([c/self.scale*(self.spacing+self.grid_width) for c in p]) #scales the points of the prefabs down to the current scale of gridwidget
+                self.polys.append(QPolygon([QPoint(prefab[X] + points[p][X], prefab[Y] + points[p][Y]) for p in range(len(points))]))
+                qp.setBrush(QBrush(self.polys_color[x][y]))
+                qp.drawPolygon(self.polys[-1])
+##        for i in range(len(self.draw_list)):
+##            for i, p in enumerate(self.polys):
+##                qp.setBrush(QBrush(self.polys_color[i]))
+##                qp.drawPolygon(p)
             
-    def appendPrefabs(self, x, y, prefab):
-        #prefab is a list of the points in its icon
-        self.draw_list.append([x, y, prefab])
+##    def appendPrefabs(self, x, y, prefab):
+##        #prefab is a list of the points in its icon
+##        self.draw_list.append([x, y, prefab])
 
 ##    def updateDrawList(self, draw_list):
 ##        self.draw_list = draw_list
@@ -106,6 +113,11 @@ class GridWidget(QWidget):
                 self.origin = e.pos()
                 self.rubberBand.setGeometry(QRect(self.origin, QSize()))
                 self.rubberBand.show()
+        elif e.button() == Qt.LeftButton:
+            p = self.closestP(e)
+            self.draw_list.append([p.x(), p.y(), self.cur_prefab.draw_list])
+            self.polys_color.append(self.cur_prefab.color_list)
+            self.repaint()
 
     def mouseMoveEvent(self, e):
         if self.rband:
@@ -117,6 +129,17 @@ class GridWidget(QWidget):
             if self.rband:
                 print(QRect(self.origin, e.pos()))
                 self.rubberBand.hide()
+
+    def closestP(self, e):
+        #finds the closest point to the mouse cursor/QPoint (e)
+        dist = []
+        for p in self.p_list:
+            dist.append([abs(e.x() - p.x()),abs(e.y() - p.y())])
+        xy = min(d for d in dist)
+        return self.p_list[dist.index(xy)]
+
+    def updatePrefab(self, prefab):
+        self.cur_prefab = prefab
 
 class CreatePrefabGridWidget(GridWidget):
     #in createPrefab, put a widget at the side to control the size of bounding box

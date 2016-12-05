@@ -20,130 +20,114 @@ from PySide.QtGui import *
 import os
 import pickle
 
-class Create():
-    def __init__(self, show=True):
-        if show:
-            self.dialog = QDialog()
-            self.dialog.accepted.connect(self.accept)
+class CreateWizard(QWizard):
+    NUM_PAGES = 2
+    (InfoPage, OptionsPage) = range(NUM_PAGES) #constants for page numbers
 
-            self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
-            self.textLineEdit = QLineEdit()
-            self.textLineEdit.textChanged.connect(self.check_accept)
-            
-            self.vmfLineEdit = QLineEdit()
-            self.vmfLineEdit.textChanged.connect(self.check_accept)
-            self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.updateDrawList(self.create_prefab(self.vmfLineEdit.text())))
-            self.vmfBrowse = QPushButton("Browse",self.dialog)
-            self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
-            self.vmfLayout = QHBoxLayout()
-            self.vmfLayout.addWidget(self.vmfLineEdit)
-            self.vmfLayout.addWidget(self.vmfBrowse)
+    def __init__(self, parent=None):
+        super(CreateWizard, self).__init__(parent)
 
-            self.expCheckBox = QCheckBox(self.dialog)
-            self.sectionSelect = QComboBox()
-            #needs to have a cs:go version
-            #if self.isTF:
-            self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
-            #else:
-            #    pass
+        self.setPage(self.InfoPage, PrefabInfo(self))
 
-            self.radioLayout = QHBoxLayout()
-            self.radioTF2 = QRadioButton("TF2",self.dialog)
-            self.radioTF2.setChecked(True)
-            self.radioCSGO = QRadioButton("CS:GO",self.dialog)
-            self.group = QButtonGroup()
-            self.group.addButton(self.radioTF2)
-            self.group.addButton(self.radioCSGO)
-            self.group.setExclusive(True)
-            self.radioLayout.addWidget(self.radioTF2)
-            self.radioLayout.addWidget(self.radioCSGO)
+        self.setStartId(self.InfoPage)
+        #self.setWizardStyle(self.ModernStyle)
+        self.setWindowTitle("Create a Prefab")
 
-            self.color_btn = QPushButton(self.dialog)
-            self.color_btn.sizeHint = lambda:  QSize(32,32)
-            self.color_btn.setStyleSheet("background-color: white")
-            self.color_btn.clicked.connect(self.change_color)
-            self.color_dialog = QColorDialog(self.dialog)
-            
-            self.icon_grid = CreatePrefabGridWidget(20, 20)
-            #self.icon_grid = CreatePrefabGridWidget(self.dialog)
-            self.icon_grid.cur_color = QColor(Qt.white)
-            self.icon_grid.setFocusPolicy(Qt.StrongFocus)
-            self.icon_grid.setFocus()
-
-            self.tool_layout = QVBoxLayout()
-            self.tool_layout.addWidget(self.color_btn)
-            self.tool_layout.addStretch(1)
-            self.icon_grid_layout = QHBoxLayout(self.dialog)
-            self.icon_grid_layout.addLayout(self.tool_layout)
-            self.icon_grid_layout.addWidget(self.icon_grid)
-            self.icon_grid_widget = QWidget(self.dialog)
-            self.icon_grid_widget.setLayout(self.icon_grid_layout)
-
-            self.okay_btn = QPushButton("Create Prefab", self.dialog)
-            self.okay_btn.clicked.connect(self.dialog.accept)
-            self.okay_btn.setEnabled(False)
-            self.preview_btn = QPushButton("Preview", self.dialog)
-            self.preview_btn.clicked.connect(self.preview)
-            self.preview_btn.setEnabled(False)
-            self.cancel_btn = QPushButton("Cancel", self.dialog)
-            self.cancel_btn.clicked.connect(self.dialog.reject)
-            self.btn_layout = QHBoxLayout()
-            self.btn_layout.addStretch(1)
-            self.btn_layout.addWidget(self.okay_btn)
-            self.btn_layout.addWidget(self.preview_btn)
-            self.btn_layout.addWidget(self.cancel_btn)
-            
-
-            #self.blankstring = QWidget()
-            
-            self.form = QFormLayout()
-            self.form.addRow(self.buggyText)
-            self.form.addRow("Prefab Name:", self.textLineEdit)
-            self.form.addRow("VMF file (.vmf):", self.vmfLayout)
-            self.form.addRow("Export prefab?", self.expCheckBox)
-            self.form.addRow("Which section?",self.sectionSelect)
-            self.form.addRow("Which game?", self.radioLayout)
-            self.form.addRow("icon", self.icon_grid_widget)
-##            for i in range(5):
-##                self.form.addRow(self.blankstring)
-            self.form.addRow(self.btn_layout)
-
-            #self.dialog.accepted.connect(lambda: self.create_prefab(self.vmfLineEdit.text(), self.nameLineEdit.text(), self.textLineEdit.text(), self.iconLineEdit.text(), self.expCheckBox.isChecked(), self.radioTF2.isChecked()))
-            
-            #self.dialog.setGeometry(150,150,400,300)
-            self.dialog.setWindowTitle("Create Prefab")
-            self.dialog.setWindowIcon(QIcon("icons\icon.ico"))
-
-            self.dialog.setLayout(self.form)
-            self.dialog.exec_()
-
-    def preview(self):
-        loadVMF(self.vmfLineEdit.text())
-        self.process = subprocess.Popen('cpp_exe/viewer.exe')
-#        window = QWidget()
-#        window.fromWinId(process.pid)
-#        window.setFlags(Qt.FramelessWindowHint)
-#        container = QWidget.createWindowContainer(window)
-#        layout = QVBoxLayout()
-#        layout.addWidget(container)
-#        self.form.addRow(layout)
-    def change_color(self):
-        color = self.color_dialog.getColor()
-        self.color_btn.setStyleSheet("background-color: %s" % color.name())
-        self.icon_grid.cur_color = color
-
-    def check_accept(self):
-        #checks if the dialog should be accepted
-        if self.vmfLineEdit.displayText() !=  '' and self.textLineEdit.displayText() != '':
-            self.okay_btn.setEnabled(True)
-        else:
-            self.okay_btn.setEnabled(False)
-
-        #check if you can preview prefab
-        if self.vmfLineEdit.displayText() !=  '':
-            self.preview_btn.setEnabled(True)
-        else:
-            self.preview_btn.setEnabled(False)
+        self.show()
+##        if show:
+##            self.dialog = QDialog()
+##            self.dialog.accepted.connect(self.accept)
+##
+##            self.buggyText = QLabel("This is a pretty buggy tool at this point, and is mostly used by developers. Are you sure you want to do this? \n(exported prefabs can be found in the main directory, where the executable is.)")
+##            self.textLineEdit = QLineEdit()
+##            self.textLineEdit.textChanged.connect(self.check_accept)
+##            
+##            self.vmfLineEdit = QLineEdit()
+##            self.vmfLineEdit.textChanged.connect(self.check_accept)
+##            self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.updateDrawList(self.create_prefab(self.vmfLineEdit.text())))
+##            self.vmfBrowse = QPushButton("Browse",self.dialog)
+##            self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self.dialog, "Choose .vmf File", "/","*.vmf")[0]))
+##            self.vmfLayout = QHBoxLayout()
+##            self.vmfLayout.addWidget(self.vmfLineEdit)
+##            self.vmfLayout.addWidget(self.vmfBrowse)
+##
+##            self.expCheckBox = QCheckBox(self.dialog)
+##            self.sectionSelect = QComboBox()
+##            #needs to have a cs:go version
+##            #if self.isTF:
+##            self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
+##            #else:
+##            #    pass
+##
+##            self.radioLayout = QHBoxLayout()
+##            self.radioTF2 = QRadioButton("TF2",self.dialog)
+##            self.radioTF2.setChecked(True)
+##            self.radioCSGO = QRadioButton("CS:GO",self.dialog)
+##            self.group = QButtonGroup()
+##            self.group.addButton(self.radioTF2)
+##            self.group.addButton(self.radioCSGO)
+##            self.group.setExclusive(True)
+##            self.radioLayout.addWidget(self.radioTF2)
+##            self.radioLayout.addWidget(self.radioCSGO)
+##
+##            self.color_btn = QPushButton(self.dialog)
+##            self.color_btn.setFixedSize(QSize(32,32))
+##            self.color_btn.setStyleSheet("background-color: white")
+##            self.color_btn.clicked.connect(self.change_color)
+##            self.color_dialog = QColorDialog(self.dialog)
+##            
+##            self.icon_grid = CreatePrefabGridWidget(20, 20)
+##            #self.icon_grid = CreatePrefabGridWidget(self.dialog)
+##            self.icon_grid.cur_color = QColor(Qt.white)
+##            self.icon_grid.setFocusPolicy(Qt.StrongFocus)
+##            self.icon_grid.setFocus()
+##
+##            self.tool_layout = QVBoxLayout()
+##            self.tool_layout.addWidget(self.color_btn)
+##            self.tool_layout.addStretch(1)
+##            self.icon_grid_layout = QHBoxLayout(self.dialog)
+##            self.icon_grid_layout.addLayout(self.tool_layout)
+##            self.icon_grid_layout.addWidget(self.icon_grid)
+##            self.icon_grid_widget = QWidget(self.dialog)
+##            self.icon_grid_widget.setLayout(self.icon_grid_layout)
+##
+##            self.okay_btn = QPushButton("Create Prefab", self.dialog)
+##            self.okay_btn.clicked.connect(self.dialog.accept)
+##            self.okay_btn.setEnabled(False)
+##            self.preview_btn = QPushButton("Preview", self.dialog)
+##            self.preview_btn.clicked.connect(self.preview)
+##            self.preview_btn.setEnabled(False)
+##            self.cancel_btn = QPushButton("Cancel", self.dialog)
+##            self.cancel_btn.clicked.connect(self.dialog.reject)
+##            self.btn_layout = QHBoxLayout()
+##            self.btn_layout.addStretch(1)
+##            self.btn_layout.addWidget(self.okay_btn)
+##            self.btn_layout.addWidget(self.preview_btn)
+##            self.btn_layout.addWidget(self.cancel_btn)
+##            
+##
+##            #self.blankstring = QWidget()
+##            
+##            self.form = QFormLayout()
+##            self.form.addRow(self.buggyText)
+##            self.form.addRow("Prefab Name:", self.textLineEdit)
+##            self.form.addRow("VMF file (.vmf):", self.vmfLayout)
+##            self.form.addRow("Export prefab?", self.expCheckBox)
+##            self.form.addRow("Which section?",self.sectionSelect)
+##            self.form.addRow("Which game?", self.radioLayout)
+##            self.form.addRow("icon", self.icon_grid_widget)
+####            for i in range(5):
+####                self.form.addRow(self.blankstring)
+##            self.form.addRow(self.btn_layout)
+##
+##            #self.dialog.accepted.connect(lambda: self.create_prefab(self.vmfLineEdit.text(), self.nameLineEdit.text(), self.textLineEdit.text(), self.iconLineEdit.text(), self.expCheckBox.isChecked(), self.radioTF2.isChecked()))
+##            
+##            #self.dialog.setGeometry(150,150,400,300)
+##            self.dialog.setWindowTitle("Create Prefab")
+##            self.dialog.setWindowIcon(QIcon("icons\icon.ico"))
+##
+##            self.dialog.setLayout(self.form)
+##            self.dialog.exec_()
 
     def accept(self):
 ##        var_string = ""
@@ -522,7 +506,99 @@ class Create():
  
         return re.search(ex,s).groups() if re.search(ex,s) else None #check if NoneType
 
-    
+class PrefabInfo(QWizardPage):
+    def __init__(self, parent=None):
+        super(PrefabInfo, self).__init__(parent)
+
+        self.setTitle("Prefab Information")
+
+        self.textLineEdit = QLineEdit()
+
+        self.vmfLineEdit = QLineEdit()
+        self.vmfLineEdit.textChanged.connect(lambda: self.icon_grid.updateDrawList(self.wizard().create_prefab(self.vmfLineEdit.text())) if os.path.isfile(self.vmfLineEdit.text()) else None)
+        self.vmfBrowse = QPushButton("Browse")
+        self.vmfBrowse.clicked.connect(lambda: self.vmfLineEdit.setText(QFileDialog.getOpenFileName(self, "Choose .vmf File", "/","*.vmf")[0]))
+        self.vmfLabel = QLabel("&VMF File (.vmf):")
+        self.vmfLabel.setBuddy(self.vmfBrowse)
+        self.vmfLayout = QHBoxLayout()
+        self.vmfLayout.addWidget(self.vmfLabel)
+        self.vmfLayout.addWidget(self.vmfLineEdit)
+        self.vmfLayout.addWidget(self.vmfBrowse)
+
+        self.sectionSelect = QComboBox()
+        self.sectionSelect.addItems(["Geometry","Map Layout","Fun/Other"])
+
+        self.expCheckBox = QCheckBox()
+        self.custCheckBox = QCheckBox()
+
+        self.color_btn = QPushButton()
+        self.color_btn.setFixedSize(QSize(32,32))
+        self.color_btn.setStyleSheet("background-color: white")
+        self.color_btn.clicked.connect(self.changeColor)
+        self.color_dialog = QColorDialog()
+        
+        self.icon_grid = CreatePrefabGridWidget(20, 20)
+        self.icon_grid.cur_color = QColor(Qt.white)
+        
+        self.tool_layout = QVBoxLayout()
+        self.tool_layout.addWidget(self.color_btn)
+        self.tool_layout.addStretch(1)
+        self.icon_grid_layout = QHBoxLayout()
+        self.icon_grid_layout.addLayout(self.tool_layout)
+        self.icon_grid_layout.addWidget(self.icon_grid)
+
+        self.registerField("info.text*", self.textLineEdit)
+        self.registerField("info.vmf*", self.vmfLineEdit)
+        
+        self.form = QFormLayout()
+        self.form.addRow("Prefab &Name:", self.textLineEdit)
+        self.form.addRow(self.vmfLayout)
+        self.form.addRow("&Section:",self.sectionSelect)
+        self.form.addRow("&Export Prefab", self.expCheckBox)
+        self.form.addRow("&Customize", self.custCheckBox)
+        self.form.addRow("Icon:", self.icon_grid_layout)
+
+        self.setLayout(self.form)
+
+    def setVisible(self, visible):
+        QWizardPage.setVisible(self, visible)
+        previewBtn = self.wizard().button(QWizard.CustomButton1)
+        nextBtn = self.wizard().button(QWizard.NextButton)
+        
+        if visible:
+            self.wizard().setButtonText(QWizard.CustomButton1, "&Preview")
+            self.wizard().setOption(QWizard.HaveCustomButton1, True)
+            self.wizard().customButtonClicked.connect(self.preview)
+            previewBtn.setEnabled(False)
+            self.vmfLineEdit.textChanged.connect(lambda: previewBtn.setEnabled(True) if os.path.isfile(self.vmfLineEdit.text()) else previewBtn.setEnabled(False))
+            self.vmfLineEdit.textChanged.connect(lambda: nextBtn.setEnabled(True) if os.path.isfile(self.vmfLineEdit.text()) else nextBtn.setEnabled(False))
+        else:
+            if len(previewBtn.text()) > 0: #disconnect only if button is assigned & connected
+                self.wizard().customButtonClicked.disconnect(self.preview)
+            self.wizard().setOption(QWizard.HaveCustomButton1, False)
+
+    def preview(self):
+        loadVMF(self.vmfLineEdit.text())
+        self.process = subprocess.Popen('cpp_exe/viewer.exe')
+        
+    def changeColor(self):
+        color = self.color_dialog.getColor()
+        self.color_btn.setStyleSheet("background-color: %s" % color.name())
+        self.icon_grid.cur_color = color
+
+    def nextId(self):
+        if custCheckBox.checked():
+            return CreateWizard.OptionsPage
+
+class PrefabOptions(QWizardPage):
+    def __init__(self, parent=None):
+        super(PrefabOptions, self).__init__(parent)
+
+        self.setSubTitle("Select <b>textures</b>, <b>models</b>, or <b>logic</b> that should have customization")
+
+        self.tab = QTabWidget()
+        for tab in ["Textures", "Models", "Logic"]:
+            self.tab.addTab(widget, tab)
 
 if __name__ == '__main__':
     #xd = Create("C:/Users/Jonathan/Documents/GitHub/mapper/dev/block.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
@@ -530,5 +606,5 @@ if __name__ == '__main__':
     #xd = Create(False)
     #xd.create_prefab("C:/Users/Jonathan/Documents/GitHub/mapper/dev/gridtest.vmf", "prefab_name", "prefab_text", "prefab_icon", "workshop_export", is_tf2=True)
     app = QApplication(sys.argv)
-    main = Create()
+    main = CreateWizard()
     

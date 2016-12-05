@@ -348,4 +348,3 @@ loadPickledVPK()
 app = QApplication(sys.argv)
 f = customizeWizard("dev/shtie.vmf")
 sys.exit(app.exec_())
-
