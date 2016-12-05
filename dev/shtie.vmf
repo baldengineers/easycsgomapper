@@ -1,0 +1,330 @@
+versioninfo
+{
+	"editorversion" "400"
+	"editorbuild" "7293"
+	"mapversion" "7"
+	"formatversion" "100"
+	"prefab" "0"
+}
+visgroups
+{
+}
+viewsettings
+{
+	"bSnapToGrid" "1"
+	"bShowGrid" "1"
+	"bShowLogicalGrid" "0"
+	"nGridSpacing" "64"
+	"bShow3DGrid" "0"
+}
+world
+{
+	"id" "1"
+	"mapversion" "7"
+	"classname" "worldspawn"
+	"detailmaterial" "detail/detailsprites_2fort"
+	"detailvbsp" "detail_2fort.vbsp"
+	"maxpropscreenwidth" "-1"
+	"skyname" "sky_tf2_04"
+	solid
+	{
+		"id" "2"
+		side
+		{
+			"id" "1"
+			"plane" "(0 0 64) (512 0 64) (512 -512 64)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "2"
+			"plane" "(0 -512 0) (512 -512 0) (512 0 0)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "3"
+			"plane" "(0 0 64) (0 -512 64) (0 -512 0)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "4"
+			"plane" "(512 0 0) (512 -512 0) (512 -512 64)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "5"
+			"plane" "(512 0 64) (0 0 64) (0 0 0)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "6"
+			"plane" "(512 -512 0) (0 -512 0) (0 -512 64)"
+			"material" "EGYPT/FLAT_WALL_03"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 202 163"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+	solid
+	{
+		"id" "31"
+		side
+		{
+			"id" "7"
+			"plane" "(64 -64 128) (256 -64 128) (256 -128 128)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "8"
+			"plane" "(64 -128 64) (256 -128 64) (256 -64 64)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "9"
+			"plane" "(64 -64 128) (64 -128 128) (64 -128 64)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "10"
+			"plane" "(256 -64 64) (256 -128 64) (256 -128 128)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "11"
+			"plane" "(256 -64 128) (64 -64 128) (64 -64 64)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "12"
+			"plane" "(256 -128 64) (64 -128 64) (64 -128 128)"
+			"material" "BRICK/BRICKWALL001C"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 162 131"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+	solid
+	{
+		"id" "32"
+		side
+		{
+			"id" "13"
+			"plane" "(320 -320 192) (448 -320 192) (448 -384 192)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "14"
+			"plane" "(320 -384 64) (448 -384 64) (448 -320 64)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 -1 0 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "15"
+			"plane" "(320 -320 192) (320 -384 192) (320 -384 64)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "16"
+			"plane" "(448 -320 64) (448 -384 64) (448 -384 192)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[0 1 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "17"
+			"plane" "(448 -320 192) (320 -320 192) (320 -320 64)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		side
+		{
+			"id" "18"
+			"plane" "(448 -384 64) (320 -384 64) (320 -384 192)"
+			"material" "EGYPT/PYRAMID/PYRAMID_SKIN"
+			"uaxis" "[1 0 0 0] 0.25"
+			"vaxis" "[0 0 -1 0] 0.25"
+			"rotation" "0"
+			"lightmapscale" "16"
+			"smoothing_groups" "0"
+		}
+		editor
+		{
+			"color" "0 204 153"
+			"visgroupshown" "1"
+			"visgroupautoshown" "1"
+		}
+	}
+}
+entity
+{
+	"id" "3"
+	"classname" "env_laser"
+	"damage" "100"
+	"dissolvetype" "None"
+	"framestart" "0"
+	"LaserTarget" "le target"
+	"NoiseAmplitude" "0"
+	"renderamt" "100"
+	"rendercolor" "255 255 255"
+	"renderfx" "0"
+	"spawnflags" "0"
+	"targetname" "laser"
+	"texture" "sprites/laserbeam.spr"
+	"TextureScroll" "35"
+	"width" "2"
+	"origin" "256 -256 73"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 500]"
+	}
+}
+entity
+{
+	"id" "27"
+	"classname" "info_target"
+	"angles" "0 0 0"
+	"spawnflags" "0"
+	"targetname" "le target"
+	"origin" "353.559 -105.658 73"
+	editor
+	{
+		"color" "220 30 220"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 1000]"
+	}
+}
+entity
+{
+	"id" "36"
+	"classname" "prop_static"
+	"angles" "0 0 0"
+	"fademindist" "-1"
+	"fadescale" "1"
+	"lightmapresolutionx" "32"
+	"lightmapresolutiony" "32"
+	"model" "models/props_medieval/torch_and_pitchforks.mdl"
+	"skin" "0"
+	"solid" "6"
+	"origin" "144.116 -226.359 73"
+	editor
+	{
+		"color" "255 255 0"
+		"visgroupshown" "1"
+		"visgroupautoshown" "1"
+		"logicalpos" "[0 0]"
+	}
+}
+cameras
+{
+	"activecamera" "-1"
+}
+cordon
+{
+	"mins" "(-1024 -1024 -1024)"
+	"maxs" "(1024 1024 1024)"
+	"active" "0"
+}
