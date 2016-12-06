@@ -187,7 +187,7 @@ class editPage(QWizardPage):
         #add style button
         self.addStyleButton = QPushButton()
         self.addStyleButton.setText(self.CREATENEWSTYLE)
-        self.addStyleButton.clicked.connect(lambda: print("not right now xd"))
+        self.addStyleButton.clicked.connect(self.newStyle)
 
         #default material edit layout (reference
 ##        self.titleVBox = QVBoxLayout()
@@ -210,7 +210,8 @@ class editPage(QWizardPage):
         
         style = QHBoxLayout()
         style.addWidget(QLabel(self.STYLE))
-        style.addWidget(QLineEdit("Default"))
+        self.originalStyle = QLineEdit("Default")
+        style.addWidget(self.originalStyle)
         self.styleList[self.styleCount].append(style)
         for ind, section in enumerate(self.acceptedList):
             for i,item in enumerate(section):
@@ -235,7 +236,12 @@ class editPage(QWizardPage):
 
         self.setLayout(self.edit_page_layout)
         self.styleCount += 1
-       
+
+    def newStyle(self):
+        for ind, section in enumerate(self.acceptedList):
+            for i,item in enumerate(section):
+                #print(i)
+                self.styleList[self.styleCount].append(self.createEdit(self.parent, item,ind,i,True, self.styleCount))       
 
     def createEdit(self, parent, name, mtype, place, default, style):
         #parent is the qwizard class
@@ -255,12 +261,12 @@ class editPage(QWizardPage):
                 newEdit = QLineEdit(name)
                 newEdit.setReadOnly(True)
                 if mtype == 0:
-                    ddButton = IDButton(parent.cur_id_mat)
+                    ddButton = IDButton(self.parent.cur_id_mat)
                     parent.cur_id_mat += 1
                 else:
-                    ddButton = IDButton(parent.cur_id_mod)
+                    ddButton = IDButton(self.parent.cur_id_mod)
                     parent.cur_id_mod += 1
-                ddButton.setEnabled(True)
+                ddButton.setEnabled(False)
             else:
                 newEdit = QLineEdit(name).setEnabled(True)
                 ddButton = IDButton(parent.cur_id).setEnabled(True)
