@@ -9,6 +9,7 @@ class GridWidget(QWidget):
     overlapped = Signal(bool)
     def __init__(self, x, y, rband=True):
         super(GridWidget, self).__init__()
+        self.setMouseTracking(True)
         self.x = x
         self.y = y
         self.p_list = []
@@ -48,14 +49,14 @@ class GridWidget(QWidget):
 ##        h = size.height()
         
         qp.setPen(QColor(0, 0, 0, 0))
-        qp.setBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 150, 150, 200))
+        qp.setBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
         
         for x in range(self.spacing, self.x*self.grid_width, self.grid_width):
             x += self.spacing*x/self.grid_width
             for y in range(self.spacing, self.y*self.grid_width, self.grid_width):
                 y += self.spacing*y/self.grid_width
                 self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
-                self.p_list.append(QPoint(x,y))
+                self.p_list.append(QPoint(x-self.spacing,y-self.spacing)) #subtract self.spacing to center prefab over boxes
                 qp.drawRect(self.grid_list[-1])
 
         w = self.x*self.spacing + self.x*self.grid_width
@@ -94,15 +95,6 @@ class GridWidget(QWidget):
 ##            for i, p in enumerate(self.polys):
 ##                qp.setBrush(QBrush(self.polys_color[i]))
 ##                qp.drawPolygon(p)
-            
-##    def appendPrefabs(self, x, y, prefab):
-##        #prefab is a list of the points in its icon
-##        self.draw_list.append([x, y, prefab])
-
-##    def updateDrawList(self, draw_list):
-##        self.draw_list = draw_list
-##        self.polys_color = [None for i in draw_list]
-##        self.repaint()
 
     def changeSize(self, c, d):
         #c is change (whether adding or subtracting a row)
@@ -110,13 +102,13 @@ class GridWidget(QWidget):
         if d != DOWN and d != UP:
             self.x += c
             if d == LEFT or d == UP_LEFT or d == DOWN_LEFT:
-            #TODO: add something here that shifts all prefabs in grid over by 1 to the RIGHT
-                pass
+                for prefab in self.draw_list:
+                    prefab[X] += c*(self.spacing+self.grid_width)
         if d != LEFT and d != RIGHT:
             self.y += c
-            if d == DOWN or d == DOWN_RIGHT or d == DOWN_LEFT:
-            #Same TODO as above except shift by 1 DOWN
-                pass
+            if d == UP or d == UP_LEFT or d == UP_RIGHT:
+                for prefab in self.draw_list:
+                    prefab[Y] += c*(self.spacing+self.grid_width)
 
         self.repaint()
         
@@ -143,6 +135,8 @@ class GridWidget(QWidget):
         if self.rband:
             if not self.origin.isNull():
                 self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
+
+        if 
 
     def mouseReleaseEvent(self, e):
         if e.button() == Qt.RightButton:
@@ -208,7 +202,7 @@ class GridWidgetContainer(QWidget):
         self.entire = QVBoxLayout()
         self.outer = QGridLayout()
         self.status = QStatusBar()
-        self.overlapLabel = QLabel("Prefabs are overlapping. Please move them so that they aren't.")
+        self.overlapLabel = QLabel("Warning: Prefabs Overlapping")
         grid_widget.overlapped.connect(self.displayStatus)
         locs = [(0,1),
                 (0,2),
