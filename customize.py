@@ -238,6 +238,8 @@ class editPage(QWizardPage):
         self.styleCount += 1
 
     def newStyle(self):
+        #remember to store text from qlineedits when resetting layout
+        self.styleList.append([])
         for ind, section in enumerate(self.acceptedList):
             for i,item in enumerate(section):
                 #print(i)
@@ -256,20 +258,24 @@ class editPage(QWizardPage):
             tVBox.addWidget(QLabel(name))
             eVBox = QHBoxLayout()
             eVBox.addWidget(QLabel(self.NEWLIST[mtype]))
-            if not default:
-                #change to disabled when done with testing
-                newEdit = QLineEdit(name)
-                newEdit.setReadOnly(True)
-                if mtype == 0:
-                    ddButton = IDButton(self.parent.cur_id_mat)
-                    parent.cur_id_mat += 1
-                else:
-                    ddButton = IDButton(self.parent.cur_id_mod)
-                    parent.cur_id_mod += 1
-                ddButton.setEnabled(False)
+            
+            #change to disabled when done with testing
+            newEdit = QLineEdit(name)
+
+            if mtype == 0:
+                ddButton = IDButton(self.parent.cur_id_mat)
+                parent.cur_id_mat += 1
             else:
-                newEdit = QLineEdit(name).setEnabled(True)
-                ddButton = IDButton(parent.cur_id).setEnabled(True)
+                ddButton = IDButton(self.parent.cur_id_mod)
+                parent.cur_id_mod += 1
+                
+            if not default:
+                ddButton.setEnabled(False)
+                newEdit.setReadOnly(True)
+            else:
+                ddButton.setEnabled(True)
+                newEdit.setReadOnly(False)
+            
             self.editList[style][mtype].append(newEdit)
             eVBox.addWidget(newEdit)
             aVBox = QHBoxLayout()
