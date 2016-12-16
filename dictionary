@@ -1,0 +1,55 @@
+//
+//team : ints of 0, 1, or 2
+//int_angles : string of ints representing rotation amounts "0 0 0"
+//todo:
+//make dict of inputs/outputs that each class has
+
+"func_respawnroom"
+{
+    "targetname"
+    {
+        type    : "string"
+        default : ""
+    }
+    "StartDisabled"
+    {
+        type    : "bool"
+        default : "0"
+    }
+    "TeamNum"
+    {
+        type    : "team"
+        default : "0"
+    }
+}
+"func_respawnroomvisualizer"
+{
+    "respawnroomname"
+    {
+        type    : "string"
+        default : ""
+    }
+    "StartDisabled"
+    {
+        type    : "bool"
+        default : "0"
+    }
+}
+"info_player_teamspawn"
+{
+    "targetname"
+    {
+        type    : "string"
+        default : ""
+    }
+    "angles"
+    {
+        type : "int_angles"
+        default : "0 0 0"
+    }
+    "TeamNum"
+    {
+        type    : "team"
+        default : "0"
+    }
+}
