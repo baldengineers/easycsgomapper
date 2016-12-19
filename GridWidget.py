@@ -57,7 +57,9 @@ class GridWidget(QGraphicsView):
         ##Draw Grid
         pen = QPen(QColor(0, 0, 0, 0))
         brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
+        for x in range(self.spacing, w, self.grid_width):
             x += self.spacing*x/self.grid_width
+            for y in range(self.spacing, h, self.grid_width):
                 y += self.spacing*y/self.grid_width
                 self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
                 self.p_list.append(QPoint(x-self.spacing,y-self.spacing)) #subtract self.spacing to center prefab over boxes
