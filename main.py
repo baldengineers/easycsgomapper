@@ -662,7 +662,7 @@ class MainWindow(QMainWindow):
         from classes import PrefabItem, ListGroup
 
         #grid for placing prefabs
-        self.grid = GridWidget.GridWidget(20,20)
+        self.grid = GridWidget.GridWidget(20,20,self)
         self.grid_container = GridWidget.GridWidgetContainer(self.grid)
         self.grid_dock = QDockWidget("Grid", self)
         self.grid_dock.setWidget(self.grid_container)
@@ -702,8 +702,11 @@ class MainWindow(QMainWindow):
         #create buttons for the tools
         self.grid_tools_ag = QActionGroup(self)
         self.add_prefab_action = QAction(QIcon("icons/add_prefab.png"), "Add a prefab to the grid", self.grid_tools_ag)
+        self.add_prefab_action.toggled.connect(self.grid.enableAddPrefab)
         self.select_action = QAction(QIcon("icons/select.png"), "Select Prefabs", self.grid_tools_ag)
+        self.select_action.toggled.connect(self.grid.enableSelect)
         self.move_action = QAction(QIcon("icons/move.png"), "Move Prefab", self.grid_tools_ag)
+        self.move_action.toggled.connect(self.grid.enableMove)
 
         self.grid_tools = QToolBar()
         self.grid_tools.setOrientation(Qt.Vertical)

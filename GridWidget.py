@@ -9,9 +9,10 @@ X,Y = 0,1
 class GridWidget(QGraphicsView):
     overlapped = Signal(bool)
     prefab_outline = QPen(QColor(0, 0, 0, 255))
-    def __init__(self, x, y, rband=True):
+    def __init__(self, x, y, parent=None):
         super(GridWidget, self).__init__()
         self.setMouseTracking(True)
+        self.parent = parent
 ##        self.x = x
 ##        self.y = y
         self.p_list = []
@@ -23,23 +24,17 @@ class GridWidget(QGraphicsView):
         self.prefabs = []
         #self.startX = 0
         #self.startY = 0
-        #self.setMouseTracking(True)
         self.scale = 64
         self.spacing = 2
         self.grid_width = 16
         self.grid_list = []
         #vars for rubber band
-        self.rband = rband #if rubberband is enabled
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
         #set up graphics
         self.scene = QGraphicsScene(self)
         self.setSize(x,y)
         self.setScene(self.scene)
-        
-
-        
-        self.show()
 
 ##    def paintEvent(self, e):
 ##        qp = QPainter()
@@ -67,7 +62,7 @@ class GridWidget(QGraphicsView):
 
         ##Draw the Prefabs
         pen = GridWidget.prefab_outline
-        self.polys = []
+        polys = []
         for x, prefab in enumerate(self.draw_list):
             for y, poly in enumerate(prefab[2]):
                 points = []
@@ -75,7 +70,7 @@ class GridWidget(QGraphicsView):
                     points.append([c/self.scale*(self.spacing+self.grid_width) for c in p]) #scales the points of the prefabs down to the current scale of gridwidget
                 brush = QBrush(prefab.color_list[i])
                 self.polys.append(PrefabPoly([QPoint(x + points[p][X], y + points[p][Y]) for p in range(len(points))], pen, brush, self))
-                self.scene.addItem(self.polys[-1])
+                self.scene.addItem(polys[-1])
 
     def placePrefab(self, x, y, prefab):
         #self.prefabs.append(PrefabItem(x, y, prefab.draw_list, prefab.color_list, self))
@@ -90,6 +85,7 @@ class GridWidget(QGraphicsView):
             self.scene.addItem(polys[-1])
 
         if not isinstance(self, CreatePrefabGridWidget):
+            PrefabPoly.setAllCursor(Qt.CrossCursor)
             self.prefabs.append(PrefabItemGroup(x, y, prefab))
             for p in polys:
                 self.prefabs[-1].addToGroup(p)
@@ -179,32 +175,60 @@ class GridWidget(QGraphicsView):
         else:
             e.ignore()
 
-    def mousePressEvent(self, e):
-        if e.button() == Qt.RightButton:
-            if self.rband:
-                self.origin = e.pos()
-                self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-                self.rubberBand.show()
-        elif e.button() == Qt.LeftButton:
-            p = self.closestP(e)
-            self.placePrefab(p.x(), p.y(), self.cur_prefab)
-            #self.draw_list.append([p.x(), p.y(), self.cur_prefab.draw_list, self.cur_prefab.color_list])
-            #self.repaint()
+    def enableAddPrefab(ssetCursoretCursorself, add):
+        if add:
+            setCursorprint('add')
+            self.setCursor(Qt.CrossCursor)
+            PrefabPolsetCursory.setAllCursor(Qt.CrossCursor)
+        else:
+            pass
+
+    def enableSelect(self, select):
+        #this function is called when the toggle state of self.parent.select_action changes in main.py
+        if select:
+            print('select')
+            self.setDragMode(QGraphicsView.RubberBandDrag)
+            self.setCursor(Qt.ArrowCursor)
+            print('set to arrow')
+            PrefabPoly.setAllCursor(Qt.ArrowCursor)
+        else:
+            self.setDragMode(QGraphicsView.NoDrag)
+
+    def enableMove(self, move):
+        if move:
+            self.setCursor(Qt.ArrowCursor)
+            PrefabPoly.setAllCursor(Qt.SizeAllCursor)
+        else:
+            pass
+
+    def mousePressEvent(self, e):        
+        if e.button() == Qt.LeftButton:
+            if self.parent.add_prefab_action.isChecked():
+                p = self.closestP(e)
+                self.placePrefab(p.x(), p.y(), self.cur_prefab)
+            elif self.parent.select_action.isChecked():
+##                self.origin = e.pos()
+##                self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+##                self.rubberBand.show()
+                pass
+                
 
         QGraphicsView.mousePressEvent(self, e)
 
     def mouseMoveEvent(self, e):
-        if self.rband:
-            if not self.origin.isNull():
-                self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
+        if self.parent.select_action.isChecked():
+##            if not self.origin.isNull():
+##                self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
+            pass
 
         QGraphicsView.mouseMoveEvent(self, e)
 
     def mouseReleaseEvent(self, e):
-        if e.button() == Qt.RightButton:
-            if self.rband:
-                print(QRect(self.origin, e.pos()))
-                self.rubberBand.hide()
+        if e.button() == Qt.LeftButton:
+            if self.parent.select_action.isChecked():
+##                print(QRect(self.origin, e.pos()))
+##                self.rubberBand.hide()
+                pass
 
         QGraphicsView.mouseReleaseEvent(self, e)
 
@@ -221,8 +245,8 @@ class GridWidget(QGraphicsView):
 
 class CreatePrefabGridWidget(GridWidget):
     #in createPrefab, put a widget at the side to control the size of bounding box
-    def __init__(self, x, y, rband=False):
-        super(CreatePrefabGridWidget, self).__init__(x, y, rband)
+    def __init__(self, x, y):
+        super(CreatePrefabGridWidget, self).__init__(x, y)
         self.cur_color = None #color as defined by the color picker in CreatePrefab
         self.cur_poly = None #index of the current polygon mouse is hovering over
         self.setMouseTracking(True)
@@ -256,12 +280,17 @@ class GridSquare(QRect):
 
 class PrefabPoly(QGraphicsPolygonItem):
     #these are the individuo polygons in each prefab
+    #http://stackoverflow.com/questions/26315584/apply-a-function-to-all-instances-of-a-class
+
+    objs = [] #contains all the instances of the class
+    
     def __init__(self, points, pen, brush, parent):
         super(PrefabPoly, self).__init__(QPolygon(points))
         self.setPen(pen)
         self.setBrush(brush)
         self.setCursor(Qt.PointingHandCursor)
         self.parent = parent
+        PrefabPoly.objs.append(self)
         
     def mousePressEvent(self, e):
         if isinstance(self.parent, CreatePrefabGridWidget):
@@ -271,6 +300,11 @@ class PrefabPoly(QGraphicsPolygonItem):
                 self.setBrush(QBrush(None))
 
         QGraphicsPolygonItem.mousePressEvent(self, e)
+
+    @classmethod
+    def setAllCursor(cls, cursor):
+        for obj in cls.objs:
+            obj.setCursor(cursor)
 
 class PrefabItemGroup(QGraphicsItemGroup):
     #these are the individuo polygons in each prefab
