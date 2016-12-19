@@ -28,7 +28,7 @@ class CreateWizard(QWizard):
         super(CreateWizard, self).__init__(parent)
 
         self.setPage(self.InfoPage, PrefabInfo(self))
-        self.setPage(self.OptionsPage, PrefabOptions())
+        #self.setPage(self.OptionsPage, PrefabOptions())
 
         self.setStartId(self.InfoPage)
         #self.setWizardStyle(self.ModernStyle)
@@ -563,20 +563,20 @@ class PrefabInfo(QWizardPage):
 
     def setVisible(self, visible):
         QWizardPage.setVisible(self, visible)
-        previewBtn = self.wizard().button(QWizard.CustomButton1)
-        nextBtn = self.wizard().button(QWizard.NextButton)
-        
-        if visible:
-            self.wizard().setButtonText(QWizard.CustomButton1, "&Preview")
-            self.wizard().setOption(QWizard.HaveCustomButton1, True)
-            self.wizard().customButtonClicked.connect(self.preview)
-            previewBtn.setEnabled(False)
-            self.vmfLineEdit.textChanged.connect(lambda: previewBtn.setEnabled(True) if os.path.isfile(self.vmfLineEdit.text()) else previewBtn.setEnabled(False))
-            self.vmfLineEdit.textChanged.connect(lambda: nextBtn.setEnabled(True) if os.path.isfile(self.vmfLineEdit.text()) else nextBtn.setEnabled(False))
-        else:
-            if len(previewBtn.text()) > 0: #disconnect only if button is assigned & connected
-                self.wizard().customButtonClicked.disconnect(self.preview)
-            self.wizard().setOption(QWizard.HaveCustomButton1, False)
+        if self.wizard():
+            previewBtn = self.wizard().button(QWizard.CustomButton1)
+            nextBtn = self.wizard().button(QWizard.NextButton)
+            
+            if visible:
+                self.wizard().setButtonText(QWizard.CustomButton1, "&Preview")
+                self.wizard().setOption(QWizard.HaveCustomButton1, True)
+                self.wizard().customButtonClicked.connect(self.preview)
+                previewBtn.setEnabled(False)
+                self.vmfLineEdit.textChanged.connect(lambda: previewBtn.setEnabled(True) if os.path.isfile(self.vmfLineEdit.text()) else previewBtn.setEnabled(False))
+            else:
+                if len(previewBtn.text()) > 0: #disconnect only if button is assigned & connected
+                    self.wizard().customButtonClicked.disconnect(self.preview)
+                self.wizard().setOption(QWizard.HaveCustomButton1, False)
 
     def isComplete(self):
         if os.path.isfile(self.vmfLineEdit.text()):
@@ -597,6 +597,8 @@ class PrefabInfo(QWizardPage):
     def nextId(self):
         if self.custCheckBox.isChecked():
             return CreateWizard.OptionsPage
+        else:
+            return -1
 
 class PrefabOptions(QWizardPage):
     def __init__(self, parent=None):

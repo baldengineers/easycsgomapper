@@ -1,6 +1,6 @@
 #contains functions for prefab files
 class Prefab():
-    def __init__(self, p):
+    def __init__(self, p=[None, None, None, None, None, None]):
         self.text = p[0]
         self.section = p[1]
         self.p_vals_list = p[2]
