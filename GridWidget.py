@@ -56,14 +56,12 @@ class GridWidget(QGraphicsView):
 
         ##Draw Grid
         pen = QPen(QColor(0, 0, 0, 0))
-        #brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
-        for x in range(0, w, self.grid_width):
-            x += self.grid_width
-            self.scene.addLine(QLine(x,0,x,h))
-            self.p_list.append(QPoint(x,0)) #0 is just a placeholder
-        for y in range(0, h, self.grid_width):
-            self.scene.addLine(QLine(0,y,w,y))
-            self.p_list[int(y/self.grid_width)].setY(y) #gets the index of the correct point
+        brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
+            x += self.spacing*x/self.grid_width
+                y += self.spacing*y/self.grid_width
+                self.grid_list.append(GridSquare(x, y, self.grid_width, self.grid_width))
+                self.p_list.append(QPoint(x-self.spacing,y-self.spacing)) #subtract self.spacing to center prefab over boxes
+                self.scene.addRect(self.grid_list[-1], pen, brush)
 
         ##Draw the Prefabs
         pen = GridWidget.prefab_outline
