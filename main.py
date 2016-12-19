@@ -660,16 +660,19 @@ class MainWindow(QMainWindow):
 
         #TESTING
         from classes import PrefabItem, ListGroup
-        
+
+        #grid for placing prefabs
         self.grid = GridWidget.GridWidget(20,20)
         self.grid_container = GridWidget.GridWidgetContainer(self.grid)
         self.grid_dock = QDockWidget("Grid", self)
         self.grid_dock.setWidget(self.grid_container)
         self.grid_dock.setFloating(True)
 
+        #define various lists
         self.tile_list1 = QListWidget()
         self.tile_list2 = QListWidget()
         self.tile_list3 = QListWidget()
+        
         #add items to self.tab_dict and everything will update
         self.tab_dict = {"Geometry":self.tile_list1, "Map Layout":self.tile_list2, "Fun/Other":self.tile_list3}
         self.list_group = ListGroup([l for _, l in self.tab_dict.items()])
@@ -678,21 +681,43 @@ class MainWindow(QMainWindow):
         for _, tile_list in self.tab_dict.items():
             tile_list.itemClicked.connect(set_cur_prefab)
 
+        #add prefabs to the lists
         with open("tf2/prefabs.dat", "rb") as f:
             l = pickle.load(f)
-
         for p in l:
             prefab = pf.Prefab(p)
             self.tab_dict[prefab.section].addItem(PrefabItem(prefab))
 
+        #create tabwidget for the lists
         self.list_tab_widget = QTabWidget()
         self.list_tab_widget.addTab(self.tab_dict['Geometry'],'Geometry')
         self.list_tab_widget.addTab(self.tab_dict['Map Layout'],'Map Layout')
         self.list_tab_widget.addTab(self.tab_dict['Fun/Other'],'Fun/Other')
 
-        prefab_dock = QDockWidget("Prefabs", self)
-        prefab_dock.setWidget(self.list_tab_widget)
-        prefab_dock.setFloating(True)
+        #create dock for the tab widget
+        self.prefab_dock = QDockWidget("Prefabs", self)
+        self.prefab_dock.setWidget(self.list_tab_widget)
+        self.prefab_dock.setFloating(True)
+
+        #create buttons for the tools
+        self.grid_tools_ag = QActionGroup(self)
+        self.add_prefab_action = QAction(QIcon("icons/add_prefab.png"), "Add a prefab to the grid", self.grid_tools_ag)
+        self.select_action = QAction(QIcon("icons/select.png"), "Select Prefabs", self.grid_tools_ag)
+        self.move_action = QAction(QIcon("icons/move.png"), "Move Prefab", self.grid_tools_ag)
+
+        self.grid_tools = QToolBar()
+        self.grid_tools.setOrientation(Qt.Vertical)
+        self.addToolBar(Qt.LeftToolBarArea, self.grid_tools)
+
+        for act in [self.add_prefab_action,self.select_action,self.move_action]:
+            act.setCheckable(True)
+            self.grid_tools.addAction(act)
+
+        self.add_prefab_action.setChecked(True) #set the default button checked
+
+##        self.grid_tool_dock = QDockWidget("Tools", self)
+##        self.grid_tool_dock.setWidget(self.grid_tools)
+##        self.grid_tool_dock.setFloating(True)
         
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.skybox_list_dock)
