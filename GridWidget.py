@@ -175,28 +175,25 @@ class GridWidget(QGraphicsView):
         else:
             e.ignore()
 
-    def enableAddPrefab(ssetCursoretCursorself, add):
+    def enableAddPrefab(self, add):
         if add:
-            setCursorprint('add')
-            self.setCursor(Qt.CrossCursor)
-            PrefabPolsetCursory.setAllCursor(Qt.CrossCursor)
+            self.viewport().setCursor(Qt.CrossCursor)
+            PrefabPoly.setAllCursor(Qt.CrossCursor)
         else:
             pass
 
     def enableSelect(self, select):
         #this function is called when the toggle state of self.parent.select_action changes in main.py
         if select:
-            print('select')
             self.setDragMode(QGraphicsView.RubberBandDrag)
-            self.setCursor(Qt.ArrowCursor)
-            print('set to arrow')
+            self.viewport().setCursor(Qt.ArrowCursor)
             PrefabPoly.setAllCursor(Qt.ArrowCursor)
         else:
             self.setDragMode(QGraphicsView.NoDrag)
 
     def enableMove(self, move):
         if move:
-            self.setCursor(Qt.ArrowCursor)
+            self.viewport().setCursor(Qt.ArrowCursor)
             PrefabPoly.setAllCursor(Qt.SizeAllCursor)
         else:
             pass
