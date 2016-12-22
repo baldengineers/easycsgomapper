@@ -703,16 +703,14 @@ class MainWindow(QMainWindow):
         self.grid_tools_ag = QActionGroup(self)
         self.add_prefab_action = QAction(QIcon("icons/add_prefab.png"), "Add a prefab to the grid", self.grid_tools_ag)
         self.add_prefab_action.toggled.connect(self.grid.enableAddPrefab)
-        self.select_action = QAction(QIcon("icons/select.png"), "Select Prefabs", self.grid_tools_ag)
+        self.select_action = QAction(QIcon("icons/select_move.png"), "Select Prefabs", self.grid_tools_ag)
         self.select_action.toggled.connect(self.grid.enableSelect)
-        self.move_action = QAction(QIcon("icons/move.png"), "Move Prefab", self.grid_tools_ag)
-        self.move_action.toggled.connect(self.grid.enableMove)
-
+        
         self.grid_tools = QToolBar()
         self.grid_tools.setOrientation(Qt.Vertical)
         self.addToolBar(Qt.LeftToolBarArea, self.grid_tools)
 
-        for act in [self.add_prefab_action,self.select_action,self.move_action]:
+        for act in [self.add_prefab_action,self.select_action]:
             act.setCheckable(True)
             self.grid_tools.addAction(act)
 
