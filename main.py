@@ -716,6 +716,10 @@ class MainWindow(QMainWindow):
 
         self.add_prefab_action.setChecked(True) #set the default button checked
 
+        def file_export():
+            for p in self.grid.prefabs:
+                p.prefab.create(p.posx, p.posy, self.grid.prefab_scale, self.rotataion) 
+
 ##        self.grid_tool_dock = QDockWidget("Tools", self)
 ##        self.grid_tool_dock.setWidget(self.grid_tools)
 ##        self.grid_tool_dock.setFloating(True)

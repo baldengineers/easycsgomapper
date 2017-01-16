@@ -209,6 +209,11 @@ class GridWidget(QGraphicsView):
             for c in p.childItems():
                 for i in self.scene.collidingItems(c):
                     if isinstance(i, PrefabPoly) and i.parentItem() != p:
+##                        polygon = c.polygon().intersected(i.polygon()).toPolygon()
+##                        print(polygon)
+##                        for p in polygon:
+##                            print(p)
+##                        print(geo.area([[p.x(), p.y()] for p in polygon]))
                         self.overlapping = True
                         self.overlapped.emit(True)
                         return
@@ -325,6 +330,8 @@ class PrefabItemGroup(QGraphicsItemGroup):
     def itemChange(self, change, value):
 ##        print(self.x())
 ##        print(self.y())
+        self.posx = int(self.x()/(GridWidget.spacing+GridWidget.grid_width))
+        self.posy = int(self.y()/(GridWidget.spacing+GridWidget.grid_width))
         if change == QGraphicsItemGroup.ItemPositionChange:
             new_pos = value.toPoint()
             cp = self.parent.closestP(QPoint(new_pos.x(), new_pos.y()), False) #False = do not map
