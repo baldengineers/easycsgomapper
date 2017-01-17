@@ -41,10 +41,10 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon("icons/icon.ico"))
 
         #create menubar
-##        exitAction = QAction("&Exit", self)
-##        exitAction.setShortcut("Ctrl+Q")
-##        exitAction.setStatusTip("Exit Application")
-##        exitAction.triggered.connect(self.close_application)
+        exitAction = QAction("&Exit", self)
+        exitAction.setShortcut("Ctrl+Q")
+        exitAction.setStatusTip("Exit Application")
+        exitAction.triggered.connect(self.close_application)
 ##
 ##        openAction = QAction("&Open", self)
 ##        openAction.setShortcut("Ctrl+O")
@@ -68,10 +68,10 @@ class MainWindow(QMainWindow):
 ##        tutorialAction.setStatusTip("Quick reference guide on the Mapper website.")
 ##        tutorialAction.triggered.connect(lambda: webbrowser.open_new_tab('http://tf2mapper.com/tutorial.html'))
 ##
-##        newAction = QAction("&New", self)
-##        newAction.setShortcut("Ctrl+n")
-##        newAction.setStatusTip("Create a New File")
-##        newAction.triggered.connect(self.grid_change)
+        newAction = QAction("&New", self)
+        newAction.setShortcut("Ctrl+n")
+        newAction.setStatusTip("Create a New File")
+        newAction.triggered.connect(self.file_new)
 ##
 ##        hammerAction = QAction("&Open Hammer",self)
 ##        hammerAction.setShortcut("Ctrl+H")
@@ -93,15 +93,15 @@ class MainWindow(QMainWindow):
 ##        exportAction.setStatusTip("Export as .vmf")
 ##        exportAction.triggered.connect(self.file_export)
 ##
-##        undoAction = QAction("&Undo", self)
-##        undoAction.setShortcut("Ctrl+Z")
-##        undoAction.setStatusTip("Undo previous action")
-##        undoAction.triggered.connect(lambda: self.undo(True))
-##
-##        redoAction = QAction("&Redo", self)
-##        redoAction.setShortcut("Ctrl+Shift+Z")
-##        redoAction.setStatusTip("Redo previous action")
-##        redoAction.triggered.connect(lambda: self.undo(False))
+        undoAction = QAction("&Undo", self)
+        undoAction.setShortcut("Ctrl+Z")
+        undoAction.setStatusTip("Undo previous action")
+        undoAction.triggered.connect(lambda: self.undo(True))
+
+        redoAction = QAction("&Redo", self)
+        redoAction.setShortcut("Ctrl+Shift+Z")
+        redoAction.setStatusTip("Redo previous action")
+        redoAction.triggered.connect(lambda: self.undo(False))
 ##
 ##        gridAction = QAction("&Set Grid Size", self)
 ##        gridAction.setShortcut("Ctrl+G")
@@ -133,16 +133,16 @@ class MainWindow(QMainWindow):
 ##        bspExportAction.setShortcut("Ctrl+Shift+E")
 ##        bspExportAction.triggered.connect(self.file_export_bsp)
 ##
-##        mainMenu = self.menuBar()
-##        
-##        
-##        fileMenu = mainMenu.addMenu("&File") 
-##        editMenu = mainMenu.addMenu("&Edit")
-##        optionsMenu = mainMenu.addMenu("&Options")
-##        toolsMenu = mainMenu.addMenu("&Tools")
-##        helpMenu = mainMenu.addMenu("&Help")
-##        
-##        fileMenu.addAction(newAction)
+        mainMenu = self.menuBar()
+        
+        
+        fileMenu = mainMenu.addMenu("&File") 
+        editMenu = mainMenu.addMenu("&Edit")
+        optionsMenu = mainMenu.addMenu("&Options")
+        toolsMenu = mainMenu.addMenu("&Tools")
+        helpMenu = mainMenu.addMenu("&Help")
+        
+        fileMenu.addAction(newAction)
 ##        fileMenu.addAction(openAction)
 ##        fileMenu.addAction(saveAction)
 ##        fileMenu.addAction(saveAsAction)
@@ -155,12 +155,12 @@ class MainWindow(QMainWindow):
 ##        exportMenu.addAction(exportAction)
 ##        exportMenu.addAction(bspExportAction)
 ##        
-##        fileMenu.addSeparator()
-##
-##        editMenu.addAction(undoAction)
-##        editMenu.addAction(redoAction)
-##        
-##        fileMenu.addAction(exitAction)
+        fileMenu.addSeparator()
+
+        editMenu.addAction(undoAction)
+        editMenu.addAction(redoAction)
+        
+        fileMenu.addAction(exitAction)
 ##
 ##        optionsMenu.addAction(gridAction)
 ##        optionsMenu.addAction(changeSkybox)
@@ -246,13 +246,17 @@ class MainWindow(QMainWindow):
     def file_export(self):
         pass
 
+    def file_new(self):
+        dialog = GridChangeWindow(self)
+        values = dialog.returnVal()
+        self.grid = GridWidget.GridWidget(values[0],values[1],self)
+        self.grid_container = GridWidget.GridWidgetContainer(self.grid)
+        self.grid_dock.setWidget(self.grid_container)
+
     def file_open(self):
         pass
 
     def file_save(self):
-        pass
-
-    def grid_change(self):
         pass
 
     def open_hammer(self):
@@ -361,6 +365,73 @@ class MainWindow(QMainWindow):
 
     def undo(self, undo):
         pass
+
+class GridChangeWindow(QDialog):
+    def __init__(self, parent, startup = False):
+        super(GridChangeWindow,self).__init__()
+        #parent - references the main window's attributes
+        #startup | Boolean | - if the window is being run when program starts up
+
+        self.startup = startup
+        
+        if not self.startup:
+            parent.entity_list = []
+            parent.iconlist = []
+            parent.totalblocks = []
+            parent.grid_list = []
+
+        self.widthSpin = QSpinBox()
+        self.heightSpin = QSpinBox()
+
+        for spin in [self.widthSpin, self.heightSpin]:
+            spin.setRange(0,1000)
+            spin.setSingleStep(5)
+            spin.setValue(5)
+        
+        self.okay_btn = QPushButton("OK",self)
+        self.okay_btn.clicked.connect(lambda: self.clickFunction(parent))
+
+        self.form = QFormLayout()
+        self.form.addRow("Set Grid Width:",self.widthSpin)
+        self.form.addRow("Set Grid Height:",self.heightSpin)
+        #self.form.addRow("Set Amount of Levels:",self.text3)
+        if self.startup:
+            self.radioTF2 = QRadioButton("&TF2",self)
+            self.radioTF2.setChecked(True)
+            self.radioTF2.setWhatsThis("Team Fortress 2")
+            self.radioCSGO = QRadioButton("&CS:GO",self)
+            self.radioCSGO.setEnabled(False)
+            self.radioCSGO.setWhatsThis("CS:GO mapping not yet implemented")
+
+            self.group = QButtonGroup()
+            self.group.addButton(self.radioTF2)
+            self.group.addButton(self.radioCSGO)
+            self.group.setExclusive(True)
+
+            self.radioLayout = QHBoxLayout()
+            self.radioLayout.addWidget(self.radioTF2)
+            self.radioLayout.addWidget(self.radioCSGO)
+            
+            self.form.addRow("Choose game:",self.radioLayout)
+        self.form.addRow(self.okay_btn)
+
+        self.setLayout(self.form)
+        self.setWindowTitle("Set Grid Size")
+        self.setWindowIcon(QIcon("icons\icon.ico"))
+        self.exec_()
+
+    def clickFunction(self, parent):
+        self.hide()
+        self.deleteLater()
+        if self.startup:
+            parent.isTF = self.radioTF2.isChecked()
+
+    def returnVal(self):
+        return (self.widthSpin.value(), self.heightSpin.value())
+
+    def closeEvent(self, event):
+        if self.startup:
+            sys.exit()
 
 def main():
     #Main Program
