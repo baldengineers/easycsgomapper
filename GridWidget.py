@@ -58,9 +58,9 @@ class GridWidget(QGraphicsView):
         ##Draw Grid
         pen = QPen(QColor(0, 0, 0, 0))
         brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
-        for ix, x in enumerate(range(GridWidget.spacing, w, GridWidget.grid_width)):
+        for x in range(GridWidget.spacing, w, GridWidget.grid_width):
             x += GridWidget.spacing*x/GridWidget.grid_width
-            for iy, y in enumerate(range(GridWidget.spacing, h, GridWidget.grid_width)):
+            for y in range(GridWidget.spacing, h, GridWidget.grid_width):
                 y += GridWidget.spacing*y/GridWidget.grid_width
                 self.grid_list.append(GridSquare(x, y, GridWidget.grid_width, GridWidget.grid_width, pen, brush))
                 self.p_list.append(QPoint(x-GridWidget.spacing/2,y-GridWidget.spacing/2)) #subtract GridWidget.spacing to center prefab over boxes
@@ -150,6 +150,13 @@ class GridWidget(QGraphicsView):
         #d is constant determining the direction of change
         if d != DOWN and d != UP:
             self.x += c
+            for x in range(self.x*(GridWidget.spacing+GridWidget.grid_width), self.x+c, GridWidget.grid_width):
+                x += GridWidget.spacing*x/GridWidget.grid_width
+                for y in range(GridWidget.spacing, h, GridWidget.grid_width):
+                    y += GridWidget.spacing*y/GridWidget.grid_width
+                    self.grid_list.append(GridSquare(x, y, GridWidget.grid_width, GridWidget.grid_width, pen, brush))
+                    self.p_list.append(QPoint(x-GridWidget.spacing/2,y-GridWidget.spacing/2)) #subtract GridWidget.spacing to center prefab over boxes
+                    self.scene.addItem(self.grid_list[-1])
             if d == LEFT or d == UP_LEFT or d == DOWN_LEFT:
                 for p in self.prefabs:
                     p.setX(p.x() + c*(GridWidget.spacing+GridWidget.grid_width))

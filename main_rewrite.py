@@ -21,7 +21,7 @@ import shutil
 import winsound
 
 #import our own modules
-import GridWidget
+from GridWidget import GridWidget, GridWidgetContainer
 from classes import PrefabItem, ListGroup
 import createPrefab
 import pf
@@ -179,8 +179,8 @@ class MainWindow(QMainWindow):
 
     def home(self):
         #grid for placing prefabs
-        self.grid = GridWidget.GridWidget(20,20,self)
-        self.grid_container = GridWidget.GridWidgetContainer(self.grid)
+        self.grid = GridWidget(20,20,self)
+        self.grid_container = GridWidgetContainer(self.grid)
         self.grid_dock = QDockWidget("Grid", self)
         self.grid_dock.setWidget(self.grid_container)
         self.grid_dock.setFloating(False)
@@ -249,8 +249,8 @@ class MainWindow(QMainWindow):
     def file_new(self):
         dialog = GridChangeWindow(self)
         values = dialog.returnVal()
-        self.grid = GridWidget.GridWidget(values[0],values[1],self)
-        self.grid_container = GridWidget.GridWidgetContainer(self.grid)
+        self.grid = GridWidget(values[0],values[1],self)
+        self.grid_container = GridWidgetContainer(self.grid)
         self.grid_dock.setWidget(self.grid_container)
 
     def file_open(self):
@@ -313,7 +313,7 @@ class MainWindow(QMainWindow):
 
         elif command == "sideshow":
             new_text = ''
-            self.sideshow()
+            self._sideshow()
         elif command == "func":
             try:
                 eval("self."+value + "()")
@@ -340,13 +340,13 @@ class MainWindow(QMainWindow):
         self.curr_text.setText("")
 
     # These commmands are part of the dev console 
-    def sideshow(self):
-        self.gif("icons/sideshow.gif", (350,262,154,103), "SIDESHOW", "icons/ss.ico")
+    def _sideshow(self):
+        self._gif("icons/sideshow.gif", (350,262,154,103), "SIDESHOW", "icons/ss.ico")
 
-    def heavy(self):
-        self.gif("icons/heavy.gif", (350,262,150,99), "DANCE HEAVY DANCE!")
+    def _heavy(self):
+        self._gif("icons/heavy.gif", (350,262,150,99), "DANCE HEAVY DANCE!")
 
-    def gif(self, file, geo, title, icon="icons\icon.ico"):
+    def _gif(self, file, geo, title, icon="icons\icon.ico"):
         self.gif = QLabel()
         movie = QMovie(file)
         self.gif.setMovie(movie)
