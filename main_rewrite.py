@@ -1,32 +1,37 @@
 #import other modules
-import sys
-import os.path
-import os
-from PySide.QtCore import *
-from PySide.QtGui import *
-import importlib
-from PIL import Image
-from PIL.ImageQt import ImageQt
+
 ##import generateSkybox
 ##import light_create
 ##import export
-import subprocess
+from PIL import Image
+from PIL.ImageQt import ImageQt
+from PySide.QtCore import *
+from PySide.QtGui import *
+import collections
+import glob
+import importlib
+import os
+import os.path
 import pickle
 import random
-import glob
-import webbrowser
-import wave
-import zipfile
 import shutil
+import subprocess
+import sys
+import wave
+import webbrowser
 import winsound
+import zipfile
 
 #import our own modules
 from GridWidget import GridWidget, GridWidgetContainer
 from classes import PrefabItem, ListGroup
+from console import Console
 import createPrefab
 import pf
 
 class MainWindow(QMainWindow):
+    VERSION = "1.0.2"
+    
     def __init__(self):
         super(MainWindow, self).__init__()
 
@@ -45,16 +50,16 @@ class MainWindow(QMainWindow):
         exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip("Exit Application")
         exitAction.triggered.connect(self.close_application)
-##
-##        openAction = QAction("&Open", self)
-##        openAction.setShortcut("Ctrl+O")
-##        openAction.setStatusTip("Open .vmf file")
-##        openAction.triggered.connect(self.file_open)
-##
-##        saveAction = QAction("&Save", self)
-##        saveAction.setShortcut("Ctrl+S")
-##        saveAction.setStatusTip("Save File as .ezm save, allowing for use by others/you later.")
-##        saveAction.triggered.connect(self.file_save)
+
+        openAction = QAction("&Open", self)
+        openAction.setShortcut("Ctrl+O")
+        openAction.setStatusTip("Open .vmf file")
+        openAction.triggered.connect(self.file_open)
+
+        saveAction = QAction("&Save", self)
+        saveAction.setShortcut("Ctrl+S")
+        saveAction.setStatusTip("Save File as .ezm save, allowing for use by others/you later.")
+        saveAction.triggered.connect(self.file_save)
 ##        
 ##        saveAsAction = QAction("&Save As", self)
 ##        saveAsAction.setShortcut("Ctrl+Shift+S")
@@ -102,21 +107,15 @@ class MainWindow(QMainWindow):
         redoAction.setShortcut("Ctrl+Shift+Z")
         redoAction.setStatusTip("Redo previous action")
         redoAction.triggered.connect(lambda: self.undo(False))
-##
-##        gridAction = QAction("&Set Grid Size", self)
-##        gridAction.setShortcut("Ctrl+G")
-##        gridAction.setStatusTip("Set Grid Height and Width. RESETS ALL BLOCKS.")
-##        gridAction.triggered.connect(self.grid_change) #change so it just makes grid bigger/smaller, not erase all blocks, or else it would just do the same exact thing as making a new file
-##
 ##        createPrefabAction = QAction("&Create Prefab", self)
 ##        createPrefabAction.setShortcut("Ctrl+I")
 ##        createPrefabAction.setStatusTip("View the readme for a good idea on formatting Hammer Prefabs.")
 ##        createPrefabAction.triggered.connect(self.create_prefab)
 ##
-##        consoleAction = QAction("&Open Dev Console", self)
-##        consoleAction.setShortcut("`")
-##        consoleAction.setStatusTip("Run functions/print variables manually")
-##        consoleAction.triggered.connect(self.open_console)
+        consoleAction = QAction("&Open Dev Console", self)
+        consoleAction.setShortcut("`")
+        consoleAction.setStatusTip("Run functions/print variables manually")
+        consoleAction.triggered.connect(self.open_console)
 ##
 ##        changeSkybox = QAction("&Change Skybox", self)
 ##        changeSkybox.setStatusTip("Change the skybox of the map.")
@@ -143,8 +142,8 @@ class MainWindow(QMainWindow):
         helpMenu = mainMenu.addMenu("&Help")
         
         fileMenu.addAction(newAction)
-##        fileMenu.addAction(openAction)
-##        fileMenu.addAction(saveAction)
+        fileMenu.addAction(openAction)
+        fileMenu.addAction(saveAction)
 ##        fileMenu.addAction(saveAsAction)
 ##        fileMenu.addSeparator()
 ##        
@@ -169,7 +168,7 @@ class MainWindow(QMainWindow):
 ##        toolsMenu.addAction(createPrefabAction)
 ##        toolsMenu.addAction(hammerAction)
 ##        toolsMenu.addSeparator()
-##        toolsMenu.addAction(consoleAction)
+        toolsMenu.addAction(consoleAction)
 ##        
 ##        helpMenu.addAction(tutorialAction)
 ##        helpMenu.addAction(helpAction)
@@ -193,9 +192,11 @@ class MainWindow(QMainWindow):
 
         #assign lists to their specified sections
         #NOTE : add new sections to self.tab_dict and everything will update
-        self.tab_dict = {"Geometry":self.tile_list1,
-                         "Map Layout":self.tile_list2,
-                         "Fun/Other":self.tile_list3}
+        self.tab_dict = collections.OrderedDict(
+                        [("Geometry",   self.tile_list1),
+                         ("Map Layout", self.tile_list2),
+                         ("Fun/Other",  self.tile_list3)]
+                        )
         self.list_group = ListGroup([l for _, l in self.tab_dict.items()])
         for _, tile_list in self.tab_dict.items():
             tile_list.itemClicked.connect(self.set_cur_prefab)
@@ -235,10 +236,16 @@ class MainWindow(QMainWindow):
 
         self.add_prefab_action.setChecked(True) #set the default button checked
 
+    #Define events here
+    def closeEvent(self, event):
+        #closeEvent runs close_application when the x button is pressed
+        event.ignore()
+        self.close_application()
+
     #PUT HERE ALL the functions called when a button is pressed
     #PLEASE arrange in alphabetical order
     def close_application(self):
-        pass
+        sys.exit()
 
     def create_prefab(self):
         pass
@@ -254,10 +261,18 @@ class MainWindow(QMainWindow):
         self.grid_dock.setWidget(self.grid_container)
 
     def file_open(self):
-        pass
+        name = QFileDialog.getOpenFileName(self, "Open File", 'user/saves/', "*.ezm")[0]
 
+        with open(name, "rb") as f:
+            print(pickle.load(f))
+            
+        
     def file_save(self):
-        pass
+        name = QFileDialog.getSaveFileName(self, "Save File", 'user/saves/', "*.ezm")[0]
+        data = [self.grid.prefabs] #add more to this as more things must be saved, e.g. skybox
+        
+        with open(name, "wb") as f:
+            pickle.dump(data, f)
 
     def open_hammer(self):
         pass
@@ -265,98 +280,7 @@ class MainWindow(QMainWindow):
     def open_console(self):
         #called when the menubar button is clicked
         #allows developers to interactively determine a variety of variable values when running program
-        command = ""
-        char_num = 0
-        text = self.curr_text.displayText()
-        text_prefix = text + " --> "
-        
-        command = text.split()[0]
-        
-        try:
-            value = text.split()[1]
-        except IndexError:
-            value = ""
-
-        if command == "print":
-
-            try:
-                new_text = text_prefix + str(eval(value))
-            except Exception as e:
-                new_text = text_prefix + str(e)
-
-        elif command == "setlevel":
-            try:
-                if int(value)-1 < int(self.levels):
-                    self.level = int(value)-1
-                    self.level.setText("Level: " + str(self.level+1))
-                    new_text = text_prefix + "Level set to "+str(value+".")
-                else:
-                    new_text = text_prefix + "Level "+str(value+" is out of range.")
-            except Exception as e:
-                new_text = text_prefix + str(e)
-
-        elif command == "help":
-            new_text = text_prefix + '''Developer console for Easy '''+gameVar+''' Mapper version r 1.0.1. Current commands are: print <variable>, func <function>, setlevel <int>, help, restart, exit, func <function>, wiki, py <python function>'''
-
-        elif command == "exit":
-            self.close_application()
-            
-        elif command == "restart":
-            self.close_application(True)
-
-        elif command == "pootis":
-            new_text = '<img src="icons/thedoobs.jpg">'
-
-        elif command == "sterries" or command == "jerries":
-            new_text = text_prefix + "Gimme all those berries, berries, berries!"
-            
-
-        elif command == "sideshow":
-            new_text = ''
-            self._sideshow()
-        elif command == "func":
-            try:
-                eval("self."+value + "()")
-                new_text = text_prefix + "Function "+value+" has been run."
-            except Exception as e:
-                new_text = text_prefix + str(e)
-
-        elif command == "wiki":
-            try:
-                webbrowser.open("http://github.com/baldengineers/easytf2_mapper/wiki")
-                new_text = text_prefix + "Wiki has been opened in your default browser"
-            except Exception as e:
-                print(str(e))
-                
-        elif command == "py":
-            try:
-                new_text = text_prefix + str(eval(value))
-            except Exception as e:
-                new_text = text_prefix + str(e)
-        else:
-            new_text = text_prefix + "\"" + command + "\" is not a valid command"
-
-        self.prev_text.append(new_text)
-        self.curr_text.setText("")
-
-    # These commmands are part of the dev console 
-    def _sideshow(self):
-        self._gif("icons/sideshow.gif", (350,262,154,103), "SIDESHOW", "icons/ss.ico")
-
-    def _heavy(self):
-        self._gif("icons/heavy.gif", (350,262,150,99), "DANCE HEAVY DANCE!")
-
-    def _gif(self, file, geo, title, icon="icons\icon.ico"):
-        self.gif = QLabel()
-        movie = QMovie(file)
-        self.gif.setMovie(movie)
-        self.gif.setGeometry(geo[0],geo[1],geo[2],geo[3])
-        self.gif.setWindowTitle(title)
-        self.gif.setWindowIcon(QIcon(icon))
-        self.gif.show()
-
-        movie.start()
-    # END
+        self.console = Console(self)
     
     def set_cur_prefab(self, item):
         #called when list item is clicked
@@ -394,7 +318,7 @@ class GridChangeWindow(QDialog):
         self.form = QFormLayout()
         self.form.addRow("Set Grid Width:",self.widthSpin)
         self.form.addRow("Set Grid Height:",self.heightSpin)
-        #self.form.addRow("Set Amount of Levels:",self.text3)
+
         if self.startup:
             self.radioTF2 = QRadioButton("&TF2",self)
             self.radioTF2.setChecked(True)
