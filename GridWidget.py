@@ -13,6 +13,8 @@ class GridWidget(QGraphicsView):
     prefab_outline = QPen(QColor(0, 0, 0, 255))
     spacing = 2
     grid_width = 16
+    factor = spacing+grid_width
+
     def __init__(self, x, y, parent=None):
         super(GridWidget, self).__init__()
         self.setMouseTracking(True)
@@ -47,17 +49,19 @@ class GridWidget(QGraphicsView):
 ##        self.draw(qp)
 ##        qp.end()
 
-    def setSize(self, x, y, new=False):
-        #new tells whether a new instance of the grid is being created (as when loading a file or creating a new project)
-        self.x = x
-        self.y = y
-        w = self.x*GridWidget.spacing + self.x*GridWidget.grid_width
-        h = self.y*GridWidget.spacing + self.y*GridWidget.grid_width
+    def setSize(self, x, y, draw_prefabs = []):
+        #draw_prefabs contains the prefabs needed to be drawn
+        #format for draw_prefabs [[x,y],prefab]
+        self.posx = x
+        self.posy = y
+        w = self.posx*GridWidget.spacing + self.posx*GridWidget.grid_width
+        h = self.posy*GridWidget.spacing + self.posy*GridWidget.grid_width
         self.scene.setSceneRect(0, 0, w, h)
 
         ##Draw Grid
         pen = QPen(QColor(0, 0, 0, 0))
-        brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
+        brush = QBrush(QColor(200, 200, 200, 200)
+##        brush = QBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
         for x in range(GridWidget.spacing, w, GridWidget.grid_width):
             x += GridWidget.spacing*x/GridWidget.grid_width
             for y in range(GridWidget.spacing, h, GridWidget.grid_width):
@@ -68,11 +72,9 @@ class GridWidget(QGraphicsView):
 
         ##Draw the Prefabs
         pen = GridWidget.prefab_outline
-        if new:
-            for p in self.prefabs:
-                print('request')
-                self.drawPrefab(x, y, p.prefab, pen)
-                print('done')
+        if draw_prefabs:
+            for p in draw_prefabs:
+                self.drawPrefab(p[0][X], p[0][Y], p[1], pen)
 
     def placePrefab(self, x, y, prefab):
         #self.prefabs.append(PrefabItem(x, y, prefab.draw_list, prefab.color_list, self))
@@ -84,7 +86,7 @@ class GridWidget(QGraphicsView):
         for i, poly in enumerate(prefab.draw_list):
             points = []
             for p in poly:
-                points.append([c/self.prefab_scale*(GridWidget.spacing+GridWidget.grid_width) for c in p]) #scales the points of the prefabs down to the current scale of gridwidget
+                points.append([c/self.prefab_scale*GridWidget.factor for c in p]) #scales the points of the prefabs down to the current scale of gridwidget
             brush = QBrush(prefab.color_list[i])
             polys.append(PrefabPoly([QPoint(x + points[p][X], y + points[p][Y]) for p in range(len(points))], pen, brush, self))
             self.scene.addItem(polys[-1])
@@ -95,62 +97,13 @@ class GridWidget(QGraphicsView):
             for p in polys:
                 self.prefabs[-1].addToGroup(p)
             self.scene.addItem(self.prefabs[-1])
-            
-##    def draw(self, qp):
-##        size = self.size()
-##        w = size.width()
-##        h = size.height()
-        
-##        qp.setPen(QColor(0, 0, 0, 0))
-##        qp.setBrush(QColor(200, 200, 200, 200) if not self.overlapping else QColor(200, 100, 100, 200))
-##        
-##        for x in range(GridWidget.spacing, self.x*GridWidget.grid_width, GridWidget.grid_width):
-##            x += GridWidget.spacing*x/GridWidget.grid_width
-##            for y in range(GridWidget.spacing, self.y*GridWidget.grid_width, GridWidget.grid_width):
-##                y += GridWidget.spacing*y/GridWidget.grid_width
-##                self.grid_list.append(GridSquare(x, y, GridWidget.grid_width, GridWidget.grid_width))
-##                self.p_list.append(QPoint(x-GridWidget.spacing,y-GridWidget.spacing)) #subtract GridWidget.spacing to center prefab over boxes
-##                qp.drawRect(self.grid_list[-1])
-##
-##        w = self.x*GridWidget.spacing + self.x*GridWidget.grid_width
-##        h = self.y*GridWidget.spacing + self.y*GridWidget.grid_width
-##        self.scene.setSceneRect(0, 0, w, h)
-##        self.setFixedSize(w, h)
-##        
-##        ##Draw the Prefabs
-##        qp.setPen(QColor(255, 0, 0, 255))
-##        self.polys = []
-##        for x, prefab in enumerate(self.draw_list):
-##            for y, poly in enumerate(prefab[2]):
-##                points = []
-##                for p in poly:
-##                    points.append([c/self.prefab_scale*(GridWidget.spacing+GridWidget.grid_width) for c in p]) #scales the points of the prefabs down to the current scale of gridwidget
-##                self.polys.append(PrefabPoly([QPoint(prefab[X] + points[p][X], prefab[Y] + points[p][Y]) for p in range(len(points))]))
-##                qp.setBrush(QBrush(prefab[3][y]))
-##                qp.drawPolygon(self.polys[-1])
-##
-##        for i1, poly1 in enumerate(self.polys):
-##            for i2, poly2 in enumerate(self.polys):
-##                if i1 != i2:
-##                    if poly1.intersected(poly2):
-##                        self.overlapping = True
-##                        break
-##                    elif self.overlapping:
-##                        self.overlapping = False
-##            if self.overlapping:
-##                break
-##
-##        if self.overlapping:
-##            self.overlapped.emit(True)
-##        else:
-##            self.overlapped.emit(False)
 
     def changeSize(self, c, d):
         #c is change (whether adding or subtracting a row)
         #d is constant determining the direction of change
         if d != DOWN and d != UP:
-            self.x += c
-            for x in range(self.x*(GridWidget.spacing+GridWidget.grid_width), self.x+c, GridWidget.grid_width):
+            self.posx += c
+            for x in range(self.posx*GridWidget.factor, self.posx+c, GridWidget.grid_width):
                 x += GridWidget.spacing*x/GridWidget.grid_width
                 for y in range(GridWidget.spacing, h, GridWidget.grid_width):
                     y += GridWidget.spacing*y/GridWidget.grid_width
@@ -159,17 +112,17 @@ class GridWidget(QGraphicsView):
                     self.scene.addItem(self.grid_list[-1])
             if d == LEFT or d == UP_LEFT or d == DOWN_LEFT:
                 for p in self.prefabs:
-                    p.setX(p.x() + c*(GridWidget.spacing+GridWidget.grid_width))
+                    p.setX(p.x() + c*GridWidget.factor)
         if d != LEFT and d != RIGHT:
             self.y += c
             if d == UP or d == UP_LEFT or d == UP_RIGHT:
                 for p in self.prefabs:
-                    p.setY(p.y() + c*(GridWidget.spacing+GridWidget.grid_width))
+                    p.setY(p.y() + c*GridWidget.factor)
 
-        print(self.x, self.y)
+        print(self.posx, self.posy)
         #instead of setting size again, simply delete the outer row/ add another row.
         #do this so it won't keep drawing a bunch of grid squares on top of each other
-        self.setSize(self.x, self.y)
+        self.setSize(self.posx, self.posy)
         
     def dragEnterEvent(self, e):
         if e.mimeData().hasImage:
@@ -200,6 +153,16 @@ class GridWidget(QGraphicsView):
             PrefabItemGroup.setAllSelectable(False)
             PrefabItemGroup.setAllMovable(False)
             self.select_mode = False
+
+    def removeAll(self):
+        for item in self.scene.items():
+            self.scene.removeItem(item)
+
+    def removeSelected(self):
+        for item in self.scene.selectedItems():
+            self.scene.removeItem(item)
+            self.prefabs.remove(item)
+            print(self.prefabs)
 
     def mousePressEvent(self, e):        
         if e.button() == Qt.LeftButton:
@@ -325,10 +288,11 @@ class PrefabItemGroup(QGraphicsItemGroup):
     
     def __init__(self, x, y, prefab, parent):
         super(PrefabItemGroup, self).__init__()
-        self.posx = int(x/(GridWidget.spacing+GridWidget.grid_width))
-        self.posy = int(y/(GridWidget.spacing+GridWidget.grid_width))
+        self.posx = int(x/GridWidget.factor)
+        self.posy = int(y/GridWidget.factor)
         self.setX(x)
         self.setY(y)
+        self.setZValue(1)
         self.prefab = prefab
         self.parent = parent
         self.setFlag(QGraphicsItemGroup.ItemSendsGeometryChanges)
@@ -341,17 +305,35 @@ class PrefabItemGroup(QGraphicsItemGroup):
 ##        print(self.x())
 ##        print(self.y())
         if change == QGraphicsItemGroup.ItemPositionChange:
+            keep_x = False
+            keep_y = False
             new_pos = value.toPoint()
             cp = self.parent.closestP(QPoint(new_pos.x(), new_pos.y()), False) #False = do not map
             new_pos.setX(cp.x())
             new_pos.setY(cp.y())
-            #correct the below statement (is it translate(new_pos)?)
-            if self.scene().sceneRect().contains(self.boundingRect().translate(new_pos)):
-                self.posx = int(cp.x()/(GridWidget.spacing+GridWidget.grid_width))
-                self.posy = int(cp.y()/(GridWidget.spacing+GridWidget.grid_width))
-                return new_pos
-            else:
-                return QGraphicsItemGroup.itemChange(self, change, value)        
+            return new_pos
+
+##            BR = QPoint(self.boundingRect().bottomRight().x() + new_pos.x(), self.boundingRect().bottomRight().y() + new_pos.y())
+##            if self.scene().sceneRect().contains(QPoint(BR.x(), 0)):
+##                self.posx = int(cp.x()/GridWidget.factor)
+##                keep_x = True
+##            if self.scene().sceneRect().contains(QPoint(0, BR.y())):
+##                self.posy = int(cp.y()/GridWidget.factor)
+##                keep_y = True
+##
+##            if keep_x and not keep_y:
+##                #only move on x axis
+##                return QPoint(new_pos.x(), 0)
+##            elif not keep_x and keep_y:
+##                #only move on y axis
+##                return QPoint(0, new_pos.y())
+##            elif keep_x and keep_y:
+##                #move on both axes
+##                return new_pos
+##            elif not keep_x and not keep_y:
+##                #return the old values and do not translate
+##                print('original')
+##                return QPoint(self.x(), self.y()) 
         return QGraphicsItemGroup.itemChange(self, change, value)
 
 ##    def boundingPoly(self):
@@ -360,7 +342,7 @@ class PrefabItemGroup(QGraphicsItemGroup):
 ##        poly = [item for sublist in self.prefab.draw_list for item in sublist]
 ##        points = []
 ##        for p in poly:
-##            points.append([c/self.parent.prefab_scale*(GridWidget.spacing+GridWidget.grid_width) for c in p])
+##            points.append([c/self.parent.prefab_scale*GridWidget.factor for c in p])
 ##
 ##        return QPolygon([QPoint(self.x() + points[p][X], self.y() + points[p][Y]) for p in range(len(points))])
 ##        polygon = QPolygon()

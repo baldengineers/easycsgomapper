@@ -26,11 +26,15 @@ import zipfile
 from GridWidget import GridWidget, GridWidgetContainer
 from classes import PrefabItem, ListGroup
 from console import Console
-import createPrefab
+import createPrefabWizard
 import pf
+
+#constants
+[X, Y, Z] = range(3)
 
 class MainWindow(QMainWindow):
     VERSION = "1.0.2"
+    [GRID_DATA] = range(1)
     
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -39,6 +43,7 @@ class MainWindow(QMainWindow):
         self.rotation = 0
         self.history = []
         self.redo_history = []
+        self.save_loc = "user/saves/"
 
         #create window
         self.setGeometry(100, 25, 875, 750)
@@ -49,22 +54,22 @@ class MainWindow(QMainWindow):
         exitAction = QAction("&Exit", self)
         exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip("Exit Application")
-        exitAction.triggered.connect(self.close_application)
+        exitAction.triggered.connect(self.closeApplication)
 
         openAction = QAction("&Open", self)
         openAction.setShortcut("Ctrl+O")
         openAction.setStatusTip("Open .vmf file")
-        openAction.triggered.connect(self.file_open)
+        openAction.triggered.connect(self.fileOpen)
 
         saveAction = QAction("&Save", self)
         saveAction.setShortcut("Ctrl+S")
         saveAction.setStatusTip("Save File as .ezm save, allowing for use by others/you later.")
-        saveAction.triggered.connect(self.file_save)
+        saveAction.triggered.connect(self.fileSave)
 ##        
 ##        saveAsAction = QAction("&Save As", self)
 ##        saveAsAction.setShortcut("Ctrl+Shift+S")
 ##        saveAsAction.setStatusTip("Save File as .ezm save, allowing for use by others/you later.")
-##        saveAsAction.triggered.connect(lambda: self.file_save(False, True))
+##        saveAsAction.triggered.connect(lambda: self.fileSave(False, True))
 ##        
 ##        helpAction = QAction("&Wiki",self)
 ##        helpAction.triggered.connect(lambda: webbrowser.open_new_tab('http://github.com/baldengineers/easytf2_mapper/wiki'))
@@ -76,17 +81,17 @@ class MainWindow(QMainWindow):
         newAction = QAction("&New", self)
         newAction.setShortcut("Ctrl+n")
         newAction.setStatusTip("Create a New File")
-        newAction.triggered.connect(self.file_new)
+        newAction.triggered.connect(self.fileNew)
 ##
 ##        hammerAction = QAction("&Open Hammer",self)
 ##        hammerAction.setShortcut("Ctrl+H")
 ##        hammerAction.setStatusTip("Opens up Hammer.")
-##        hammerAction.triggered.connect(lambda: self.open_hammer(0,"null"))
+##        hammerAction.triggered.connect(lambda: self.openHammer(0,"null"))
 ##
 ##        changeHammer = QAction("&Change Hammer Directory",self)
 ##        changeHammer.setShortcut("Ctrl+Shift+H")
 ##        changeHammer.setStatusTip("Changes default hammer directory.")
-##        changeHammer.triggered.connect(lambda: self.open_hammer(0,"null",True))
+##        changeHammer.triggered.connect(lambda: self.openHammer(0,"null",True))
 ##
 ##        changeLightAction = QAction("&Change Lighting", self)
 ##        changeLightAction.setShortcut("Ctrl+J")
@@ -96,7 +101,7 @@ class MainWindow(QMainWindow):
 ##        exportAction = QAction("&as .VMF", self)
 ##        exportAction.setShortcut("Ctrl+E")
 ##        exportAction.setStatusTip("Export as .vmf")
-##        exportAction.triggered.connect(self.file_export)
+##        exportAction.triggered.connect(self.fileExport)
 ##
         undoAction = QAction("&Undo", self)
         undoAction.setShortcut("Ctrl+Z")
@@ -110,12 +115,12 @@ class MainWindow(QMainWindow):
 ##        createPrefabAction = QAction("&Create Prefab", self)
 ##        createPrefabAction.setShortcut("Ctrl+I")
 ##        createPrefabAction.setStatusTip("View the readme for a good idea on formatting Hammer Prefabs.")
-##        createPrefabAction.triggered.connect(self.create_prefab)
+##        createPrefabAction.triggered.connect(self.createPrefab)
 ##
         consoleAction = QAction("&Open Dev Console", self)
         consoleAction.setShortcut("`")
         consoleAction.setStatusTip("Run functions/print variables manually")
-        consoleAction.triggered.connect(self.open_console)
+        consoleAction.triggered.connect(self.openConsole)
 ##
 ##        changeSkybox = QAction("&Change Skybox", self)
 ##        changeSkybox.setStatusTip("Change the skybox of the map.")
@@ -130,7 +135,7 @@ class MainWindow(QMainWindow):
 ##        bspExportAction = QAction("&as .BSP",self)
 ##        bspExportAction.setStatusTip("Export as .bsp")
 ##        bspExportAction.setShortcut("Ctrl+Shift+E")
-##        bspExportAction.triggered.connect(self.file_export_bsp)
+##        bspExportAction.triggered.connect(self.fileExport_bsp)
 ##
         mainMenu = self.menuBar()
         
@@ -177,6 +182,7 @@ class MainWindow(QMainWindow):
         self.home()
 
     def home(self):
+        
         #grid for placing prefabs
         self.grid = GridWidget(20,20,self)
         self.grid_container = GridWidgetContainer(self.grid)
@@ -199,7 +205,7 @@ class MainWindow(QMainWindow):
                         )
         self.list_group = ListGroup([l for _, l in self.tab_dict.items()])
         for _, tile_list in self.tab_dict.items():
-            tile_list.itemClicked.connect(self.set_cur_prefab)
+            tile_list.itemClicked.connect(self.setCurPrefab)
 
         #add prefabs to the lists
         with open("tf2/prefabs.dat", "rb") as f:
@@ -238,51 +244,69 @@ class MainWindow(QMainWindow):
 
     #Define events here
     def closeEvent(self, event):
-        #closeEvent runs close_application when the x button is pressed
+        #closeEvent runs closeApplication when the x button is pressed
         event.ignore()
-        self.close_application()
+        self.closeApplication()
+
+    def keyPressEvent(self, event):
+        if event.isAutoRepeat(): #if you are just holding down a key
+            event.ignore()
+        else:
+            if event.key() == Qt.Key_Delete:
+                self.grid.removeSelected()
 
     #PUT HERE ALL the functions called when a button is pressed
     #PLEASE arrange in alphabetical order
-    def close_application(self):
+    def closeApplication(self):
         sys.exit()
 
-    def create_prefab(self):
+    def createPrefab(self):
         pass
 
-    def file_export(self):
+    def fileExport(self):
         pass
 
-    def file_new(self):
+    def fileNew(self):
         dialog = GridChangeWindow(self)
         values = dialog.returnVal()
         self.grid = GridWidget(values[0],values[1],self)
         self.grid_container = GridWidgetContainer(self.grid)
         self.grid_dock.setWidget(self.grid_container)
 
-    def file_open(self):
-        name = QFileDialog.getOpenFileName(self, "Open File", 'user/saves/', "*.ezm")[0]
+    def fileOpen(self):
+        name = QFileDialog.getOpenFileName(self, "Open File", self.save_loc, "*.ezm")[0]
+
+        self.grid.removeAll()
 
         with open(name, "rb") as f:
-            print(pickle.load(f))
+            data = pickle.load(f)
+            grid_data = data[self.GRID_DATA]
+            self.grid.setSize(grid_data[0][X], grid_data[0][Y], grid_data[1])
             
         
-    def file_save(self):
-        name = QFileDialog.getSaveFileName(self, "Save File", 'user/saves/', "*.ezm")[0]
-        data = [self.grid.prefabs] #add more to this as more things must be saved, e.g. skybox
+    def fileSave(self):
+        name = QFileDialog.getSaveFileName(self, "Save File", self.save_loc, "*.ezm")[0]
+
+        prefabs = []
+        for p in self.grid.prefabs:
+            prefabs.append([[p.x(),p.y()],p.prefab])
+            
+        grid_data = [[self.grid.posx, self.grid.posy], prefabs]
+
+        data = [grid_data] #add more to this as more things must be saved, e.g. skybox
         
         with open(name, "wb") as f:
             pickle.dump(data, f)
 
-    def open_hammer(self):
+    def openHammer(self):
         pass
 
-    def open_console(self):
+    def openConsole(self):
         #called when the menubar button is clicked
         #allows developers to interactively determine a variety of variable values when running program
         self.console = Console(self)
     
-    def set_cur_prefab(self, item):
+    def setCurPrefab(self, item):
         #called when list item is clicked
         #assigns the current prefab of the grid to the selected prefab
         self.grid.cur_prefab = item.prefab
