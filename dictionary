@@ -4,52 +4,57 @@
 //todo:
 //make dict of inputs/outputs that each class has
 
-"func_respawnroom"
+Entities
+{
+    "func_respawnroom"
+    {
+        "targetname",
+        "StartDisabled",
+        "TeamNum"
+    }
+    "func_respawnroomvisualizer"
+    {
+        "respawnroomname",
+        "StartDisabled"
+    }
+    "info_player_teamspawn"
+    {
+        "targetname",
+        "angles",
+        "TeamNum"
+    }
+}
+
+Flags
 {
     "targetname"
     {
+        display : "Entity Name"
         type    : "string"
         default : ""
     }
     "StartDisabled"
     {
+        display : "Start Disabled"
         type    : "bool"
         default : "0"
     }
     "TeamNum"
     {
+        display : "Team"
         type    : "team"
         default : "0"
-    }
-}
-"func_respawnroomvisualizer"
-{
-    "respawnroomname"
-    {
-        type    : "string"
-        default : ""
-    }
-    "StartDisabled"
-    {
-        type    : "bool"
-        default : "0"
-    }
-}
-"info_player_teamspawn"
-{
-    "targetname"
-    {
-        type    : "string"
-        default : ""
     }
     "angles"
     {
         type : "int_angles"
         default : "0 0 0"
     }
-    "TeamNum"
+    "respawnroomname"
     {
-        type    : "team"
-        default : "0"
+        display : "Assoc. Respawn Room Name"
+        type    : "string"
+        default : ""
     }
+    
 }
