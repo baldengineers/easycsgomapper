@@ -23,6 +23,31 @@ Entities
         "angles",
         "TeamNum"
     }
+    "prop_static"
+    {
+        "angles",
+        "model",
+        "skin",
+        "solid"
+    }
+    "item_healthkit_small"
+    {
+        "angles",
+        "TeamNum",
+        "StartDisabled"
+    }
+    "item_healthkit_medium"
+    {
+        "angles",
+        "TeamNum",
+        "StartDisabled"    
+    }
+    "item_healthkit_large"
+    {
+        "angles",
+        "TeamNum",
+        "StartDisabled"    
+    }
 }
 
 Flags
